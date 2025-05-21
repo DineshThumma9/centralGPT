@@ -21,9 +21,10 @@ const LoginPage = () => {
     const {login} = useAuth();
 
     const onSubmit = async (email: string, password: string) => {
-        await login(email, password);
-    };
+        console.log(email, password);
 
+        await login(email, password);
+    }
     return (
         <Flex h="100vh" alignItems="center" justifyContent="center">
             <Flex

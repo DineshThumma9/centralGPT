@@ -24,6 +24,7 @@ const SignUpPage = () => {
     const {register} = useAuth();
 
     const onSubmit = async (email: string, password: string, username: string) => {
+        console.log(email,password,username)
         await register(email, password, username);
     };
 

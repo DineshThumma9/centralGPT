@@ -1,17 +1,12 @@
 import { Box } from "@chakra-ui/react";
-import {Outlet} from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
-
-const Layout  = () => {
+const Layout = () => {
     return (
-        <>
-            <Box padding="2rem" maxWidth="100vw" margin="0" textAlign="center">
-                <Outlet/>
-            </Box>
-        </>
-    )
-}
-
+        <Box width="100vw" height="100vh" overflow="hidden">
+            <Outlet />
+        </Box>
+    );
+};
 
 export default Layout;
-
