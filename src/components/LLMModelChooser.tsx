@@ -1,6 +1,6 @@
-import { Button, HStack, Menu, MenuButton, MenuItem, MenuList, Text } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-import { useState } from "react";
+import {Button, HStack, Menu, MenuButton, MenuItem, MenuList, Text} from "@chakra-ui/react";
+import {ChevronDownIcon} from "@chakra-ui/icons";
+import {useState} from "react";
 import axios from "axios";
 
 
@@ -15,17 +15,16 @@ const LLMModelChooser = () => {
         "compound-beta-mini",
     ];
 
-    const apiModels:string[] =[
-            "openai",
-             "claudie",
-             "gemini",
-              "vertex",
-              "azure",
-             "groq"
+    const apiModels: string[] = [
+        "openai",
+        "claudie",
+        "gemini",
+        "vertex",
+        "azure",
+        "groq"
 
 
-
-        ];
+    ];
     const ollamaModels: string[] = [
 
 
@@ -37,6 +36,7 @@ const LLMModelChooser = () => {
         "mistral:latest"
     ]
     const llms: string[] = ["groq", "ollama"];
+
 
     return (
         <HStack>

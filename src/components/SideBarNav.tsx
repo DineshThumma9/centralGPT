@@ -1,6 +1,6 @@
-import {HStack, MenuIcon} from "@chakra-ui/react";
+import {HStack} from "@chakra-ui/react";
 import {AddIcon, Search2Icon} from "@chakra-ui/icons";
-import {BsMenuButtonFill, BsMenuDown} from "react-icons/bs";
+import {BsMenuDown} from "react-icons/bs";
 
 
 const SideBarNav = () => {
