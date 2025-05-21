@@ -6,7 +6,7 @@ import {getAuthState} from "../store/authStore";
 
 
 export const API = axios.create({
-  baseURL: "http://localhost:8001/auth",
+  baseURL: "http://localhost:8001/",
   withCredentials: true,
 });
 
@@ -15,7 +15,7 @@ export const login = (data: { username: string; password: string }) => {
   form.append("username", data.username); // 👈 username is the key OAuth2 expects
   form.append("password", data.password);
 
-  return API.post("/login", form, {
+   return API.post("/auth/login", form, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
@@ -24,13 +24,23 @@ export const login = (data: { username: string; password: string }) => {
 
 
 // REGISTER: Correct endpoint and return the promise
-export const register = (data: { username: string; email: string; password: string }) => {
-  return API.post("/register", data,{
-    headers:{
-      "Content-Type":"application/json"
+export const register = async (username:string, email:string, password:string) => {
+
+  // Explicitly construct the object with the exact fields the API expects
+  const response = await axios.post('/auth/register', {
+    username: username,
+    email: email,
+    password: password
+  }, {
+    headers: {
+      'Content-Type': 'application/json'
     }
-  }); // ✅ Use register here
+  });
+  return response.data;
 };
+
+
+
 
 API.interceptors.request.use((config) => {
   const token =getAuthState().token;

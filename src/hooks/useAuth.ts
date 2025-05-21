@@ -18,7 +18,7 @@ export const useAuth = () => {
   };
 
   const registerUser = async (username: string, email: string, password: string) => {
-    const res = await register({ username, email, password });
+    const res = await register( username, email, password );
     const { token, username: returnedUser } = res.data;
     setAuth(token, returnedUser);
   };
