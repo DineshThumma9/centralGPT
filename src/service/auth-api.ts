@@ -10,14 +10,26 @@ export const API = axios.create({
   withCredentials: true,
 });
 
-// LOGIN: Correct endpoint and return the promise
-export const login = (data: { email: string; password: string }) => {
-  return API.post("/login", data); // ✅ Use login here, not register
+export const login = (data: { username: string; password: string }) => {
+  const form = new URLSearchParams();
+  form.append("username", data.username); // 👈 username is the key OAuth2 expects
+  form.append("password", data.password);
+
+  return API.post("/login", form, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
 };
+
 
 // REGISTER: Correct endpoint and return the promise
 export const register = (data: { username: string; email: string; password: string }) => {
-  return API.post("/register", data); // ✅ Use register here
+  return API.post("/register", data,{
+    headers:{
+      "Content-Type":"application/json"
+    }
+  }); // ✅ Use register here
 };
 
 API.interceptors.request.use((config) => {

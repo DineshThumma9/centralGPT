@@ -16,14 +16,14 @@ import {Link} from "react-router-dom";
 const LoginPage = () => {
     const {toggleColorMode} = useColorMode();
     const formBackground = useColorModeValue('gray.100', 'gray.700');
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const {login} = useAuth();
 
-    const onSubmit = async (email: string, password: string) => {
-        console.log(email, password);
+    const onSubmit = async (username: string, password: string) => {
+        console.log(username, password);
 
-        await login(email, password);
+        await login(username, password);
     }
     return (
         <Flex h="100vh" alignItems="center" justifyContent="center">
@@ -36,11 +36,11 @@ const LoginPage = () => {
             >
                 <Heading mb={6}>Log In</Heading>
                 <Input
-                    placeholder="johndoe@gmail.com"
-                    type="email"
+                    placeholder="Username"
+                    type="text"
                     variant="filled"
                     mb={3}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => setUsername(e.target.value)}
                 />
                 <Input
                     placeholder="**********"
@@ -55,7 +55,7 @@ const LoginPage = () => {
                         colorScheme="teal"
                         mb={8}
                         type="submit"
-                        onClick={() => onSubmit(email, password)}
+                        onClick={() => onSubmit(username, password)}
                     >
                         Log In
                     </Button>
