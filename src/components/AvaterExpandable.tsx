@@ -1,41 +1,21 @@
-import {Avatar, Button, Divider, Menu, Portal} from "@chakra-ui/react";
+import {Avatar, Divider, Menu, MenuButton, MenuItem, MenuList, VStack} from "@chakra-ui/react";
+import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
 import Pc from "../assets/img.png";
 
-
 const AvaterExpandable = () => {
-
-
-    const [more, setMore] = useState(false)
     return (
-        <>
-
-            <Avatar name="Sasuke Uchiha" src={Pc}/>
-
-            {moreOptions &&
-                <Menu.Root>
-                    <Menu.Trigger asChild>
-                        <Button variant="outline" size="sm">
-                            Open
-                        </Button>
-                    </Menu.Trigger>
-                    <Portal>
-                        <Menu.Positioner>
-                            <Menu.Content>
-                                <Menu.Item value="zoro">Roronora Zoror</Menu.Item>
-                                <Divider/>
-                                <Menu.Item value="configure assitant">Customize</Menu.Item>
-                                <Menu.Item value="new-win">Logout</Menu.Item>
-                            </Menu.Content>
-                        </Menu.Positioner>
-                    </Portal>
-                </Menu.Root>
-
-
-            }
-
-        </>
-
-    )
-}
+        <VStack>
+            <Menu>
+                <MenuButton as={Avatar} name="Sasuke Uchiha" src={Pc} cursor="pointer"/>
+                <MenuList>
+                    <MenuItem icon={<BiUser/>}>Roronora Zoror</MenuItem>
+                    <Divider/>
+                    <MenuItem icon={<BiCog/>}>Customize</MenuItem>
+                    <MenuItem icon={<BiLogOut/>}>Logout</MenuItem>
+                </MenuList>
+            </Menu>
+        </VStack>
+    );
+};
 
 export default AvaterExpandable;

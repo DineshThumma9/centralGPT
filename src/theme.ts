@@ -6,6 +6,10 @@ const config: ThemeConfig = {
 
 const theme = extendTheme({
     config,
+    fonts: {
+    heading: "'Red Rose', sans-serif",
+    body: "'Jaldi', sans-serif",
+  },
     colors: {
         gray: {
             50: '#f9f9f9',
@@ -43,7 +47,21 @@ const theme = extendTheme({
             800: '#000000',
             900: '#000000'
         }
-    }
+    },
+
+    brand: {
+      primary: "#008000", // green
+      secondary: "#000000", // black
+    },
+
+    styles: {
+    global: {
+      body: {
+        bg: "black",
+        color: "brand.secondary",
+      },
+    },
+  },
 });
 
 export default theme;

@@ -8,10 +8,10 @@ const SideBarNav = () => {
 
     return (
 
-        <HStack width = "80%"  justifyContent={"space-between"} >
+        <HStack width="100%" justifyContent="space-between" px={2}>
             <AddIcon />
-            <Search2Icon/>
-            <BsMenuDown/>
+            <Search2Icon />
+            <BsMenuDown />
         </HStack>
 
     )

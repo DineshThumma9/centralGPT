@@ -1,4 +1,4 @@
-import { Box, HStack, IconButton, Text, VStack } from "@chakra-ui/react";
+import { Box, Divider, HStack, IconButton, Text, VStack } from "@chakra-ui/react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useState } from "react";
 import SideBarNav from "./SideBarNav.tsx";
@@ -24,6 +24,7 @@ export default function Sidebar() {
             color="white"
             h="100vh"
             p={4}
+            overflow="hidden" // Prevent content overflow
         >
             <IconButton
                 icon={collapsed ? <FiChevronRight /> : <FiChevronLeft />}
@@ -34,16 +35,19 @@ export default function Sidebar() {
                 bg="white"
                 _hover={{ bg: "gray.600" }}
             />
-            <VStack alignSelf="center" spacing={4} height={"100vh"}>
+            <VStack align="stretch" spacing={4} height="100%">
                 {!collapsed && (
                     <>
                         <SideBarNav />
-                        <VStack>
+                        <VStack spacing={2} align="stretch" overflowY="auto" flex="1">
                             {titles.map((title) => (
-                                <Chat title={title} key={title} />
+                                <>
+                                    <Chat title={title} key={title} />
+                                    <Divider color="white" />
+                                </>
                             ))}
                         </VStack>
-                        <HStack>
+                        <HStack justify="space-between" mt="auto">
                             <SettingsIcon />
                             <Text>Settings</Text>
                         </HStack>
