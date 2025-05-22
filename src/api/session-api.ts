@@ -25,6 +25,8 @@ const newSession = async () => {
         localStorage.setItem("current Session Id", res.data.session_id);
         console.log("Session Id Stored: " + res.data.session_id);
     }
+
+    return res.data.session_id
 };
 
 const sendMessage = async (data: { message?: string, session_id: string }) => {
@@ -84,10 +86,10 @@ const updateSessionTitle = async (session_id: string, title: string) => {
         console.log("Res is Empty");
     }
 
-    return res.data;
+    return res.data.title;
 };
 
-const getAllSessions: = async () => {
+const getAllSessions = async () => {
     console.log("In get ALL Sessions");
 
     const res = await API.get("/getAll");

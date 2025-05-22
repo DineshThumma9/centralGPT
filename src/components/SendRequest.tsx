@@ -2,21 +2,18 @@ import { Box, HStack, IconButton, Input, InputGroup, InputLeftElement } from "@c
 import { Search2Icon } from "@chakra-ui/icons";
 import { FaPaperPlane } from "react-icons/fa";
 import { useState } from "react";
+import useSessions from "../hooks/useSessions.ts";
+
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
+    const {sendRequest} = useSessions()
 
-    const sendStreamMessage = () => {
-        if (input.trim()) {
-            console.log("Sending message:", input);
-            setInput("");
-        }
-    };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendStreamMessage();
+            sendRequest(input);
         }
     };
 
@@ -62,7 +59,7 @@ const SendRequest = () => {
                     aria-label="Send message"
                     icon={<FaPaperPlane />}
                     colorScheme="brand"
-                    onClick={sendStreamMessage}
+                    onClick={() => sendRequest(input)}
                     isDisabled={!input.trim()}
                     size="lg"
                     borderRadius="full"

@@ -8,12 +8,26 @@ import {
     Text,
 } from "@chakra-ui/react";
 import { BiDotsVerticalRounded, BiEdit, BiShare, BiTrash } from "react-icons/bi";
+import useSessions from "../hooks/useSessions.ts";
+import {useEffect, useState} from "react";
+import {getAllSessions} from "../api/session-api.ts";
+import type Session from "../entities/Session.ts"
+
 
 interface Props {
     title: string;
 }
 
 const Chat = ({ title }: Props) => {
+
+    const {changeTitle ,deleteSessionById } = useSessions()
+    const [sessions,setSesstions] = useState<Session[]>()
+
+    useEffect(async () => {
+        setSesstions(await getAllSessions())
+    }, []);
+
+
     return (
         <HStack
             justifyContent="space-between"
@@ -59,12 +73,15 @@ const Chat = ({ title }: Props) => {
                     <MenuItem
                         icon={<BiEdit />}
                         _hover={{ bg: "surface.tertiary" }}
+                        onClick = {(e) =>  changeTitle(sessions.filter(sessions.id == e.id))}
+
                         color="app.text.primary"
                     >
                         Change Title
                     </MenuItem>
                     <MenuItem
                         icon={<BiTrash />}
+                        onClick= {(e) =>  deleteSessionById(sessions.filter(sessions.id == e.id))}}
                         _hover={{ bg: "red.600" }}
                         color="app.text.primary"
                     >

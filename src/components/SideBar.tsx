@@ -4,21 +4,18 @@ import { useState, useEffect } from "react";
 import SideBarNav from "./SideBarNav.tsx";
 import { SettingsIcon } from "@chakra-ui/icons";
 import Chat from "./Chat.tsx";
-
+import useSessions from "../hooks/useSessions.ts";
+import sessionStore from "../store/sessionStore.ts";
+import type Session from "../entities/Session.ts"
 interface SidebarProps {
     onCollapse?: (collapsed: boolean) => void;
 }
 
 export default function Sidebar({ onCollapse }: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
+    const {getSessions} = useSessions()
+    const sessions : Session[] = sessionStore.getState().sessions
 
-    const titles: string[] = [
-        "Who is Napoleon Bonaparte",
-        "Ringa Ring",
-        "Allu Arjun Movies",
-        "How to center div",
-        "Kaleja"
-    ];
 
     const handleToggle = () => {
         const newCollapsed = !collapsed;
@@ -28,6 +25,12 @@ export default function Sidebar({ onCollapse }: SidebarProps) {
 
     useEffect(() => {
         onCollapse?.(collapsed);
+    }, []);
+
+
+
+    useEffect(() => {
+        getSessions()
     }, []);
 
     return (
@@ -86,9 +89,9 @@ export default function Sidebar({ onCollapse }: SidebarProps) {
                                 },
                             }}
                         >
-                            {titles.map((title) => (
-                                <Box key={title}>
-                                    <Chat title={title} />
+                            {sessions.map((session) => (
+                                <Box key={session.id}>
+                                    <Chat title={session.title} />
                                 </Box>
                             ))}
                         </VStack>
