@@ -7,7 +7,8 @@ import {
     updateSessionTitle
 } from "../api/session-api.ts";
 import type Message from "../entities/Message.ts";
-import type Session from "../entities/Session.ts"
+import type Session from "../entities/Session.ts";
+import sessionStore from "../store/sessionStore.ts";
 
 const useSessions = () => {
   const {
@@ -23,20 +24,26 @@ const useSessions = () => {
   } = sessionStore.getState();
 
   const createNewSession = async () => {
-    const { session_id } = await newSession();
-    addSession(session_id);
+    const session_id = await newSession();
+    // Create a proper Session object
+    const newSessionObj: Session = {
+      session_id,
+      title: "New Chat",
+      created_at: new Date().toISOString()
+    };
+    addSession(newSessionObj);
     setCurrentSessionId(session_id);
     clear();
   };
 
   const changeTitle = async (title: string) => {
     if (!current_session) throw new Error("No active session.");
-    const { title: newTitle } = await updateSessionTitle(current_session, title);
+    const newTitle = await updateSessionTitle(current_session, title);
     setTitle(newTitle);
   };
 
   const getHistory = async (session_id: string) => {
-    const chat_history: Message[] = await getChatHistory(session_id);
+    const chat_history: Message[] = await getChatHistory({ session_id });
     setCurrentSessionId(session_id);
     setMessages(chat_history);
   };
@@ -44,18 +51,27 @@ const useSessions = () => {
   const deleteSessionById = async (session_id: string) => {
     await deleteSession(session_id);
     removeSession(session_id);
-    clear(); // Optional: only clear if current session is being deleted
+    clear();
   };
 
   const getSessions = async () => {
     const allSessions: Session[] = await getAllSessions();
     setSessions(allSessions);
-
   };
 
   const sendRequest = async (msg: string) => {
     if (!current_session) throw new Error("No active session.");
-    addMessage({ sender: "user", content: msg }); // Assuming addMessage expects a Message object
+
+    // Create proper Message object matching your entity
+    const userMessage: Message = {
+      session_id: current_session,
+      message_id: Date.now().toString(), // temporary ID
+      content: msg,
+      role: "user",
+      created_at: new Date().toISOString()
+    };
+
+    addMessage(userMessage);
     await sendMessage({ message: msg, session_id: current_session });
   };
 
@@ -63,11 +79,10 @@ const useSessions = () => {
     createNewSession,
     changeTitle,
     getHistory,
-    deleteSession: deleteSessionById,
+    deleteSessionById,
     getSessions,
     sendRequest
   };
 };
-
 
 export default useSessions;

@@ -4,16 +4,25 @@ import { FaPaperPlane } from "react-icons/fa";
 import { useState } from "react";
 import useSessions from "../hooks/useSessions.ts";
 
-
 const SendRequest = () => {
     const [input, setInput] = useState("");
-    const {sendRequest} = useSessions()
+    const { sendRequest } = useSessions();
 
+    const handleSendMessage = async () => {
+        if (!input.trim()) return;
+
+        try {
+            await sendRequest(input.trim());
+            setInput(""); // Clear input after sending
+        } catch (error) {
+            console.error("Failed to send message:", error);
+        }
+    };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendRequest(input);
+            handleSendMessage();
         }
     };
 
@@ -59,7 +68,7 @@ const SendRequest = () => {
                     aria-label="Send message"
                     icon={<FaPaperPlane />}
                     colorScheme="brand"
-                    onClick={() => sendRequest(input)}
+                    onClick={handleSendMessage}
                     isDisabled={!input.trim()}
                     size="lg"
                     borderRadius="full"

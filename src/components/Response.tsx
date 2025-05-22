@@ -1,14 +1,22 @@
 import { Box, Text, VStack, Center } from "@chakra-ui/react";
-import type { Message } from "./ChatArea.tsx";
+import { useEffect, useState } from "react";
+import sessionStore from "../store/sessionStore.ts";
+import type Message from "../entities/Message.ts";
 
 const Response = () => {
-    const messages: Message[] = [
-        // Add some sample messages for testing
-        { role: "user", content: "Hello, how are you?" },
-        { role: "assistant", content: "I'm doing well, thank you! How can I help you today?" },
-        { role: "user", content: "Can you explain quantum computing?" },
-        { role: "assistant", content: "Quantum computing is a type of computation that harnesses the collective properties of quantum states, such as superposition, interference, and entanglement, to process information." }
-    ];
+    const [messages, setMessages] = useState<Message[]>([]);
+
+    useEffect(() => {
+        // Subscribe to store changes
+        const unsubscribe = sessionStore.subscribe((state) => {
+            setMessages(state.messages);
+        });
+
+        // Get initial state
+        setMessages(sessionStore.getState().messages);
+
+        return unsubscribe;
+    }, []);
 
     return (
         <Box
@@ -56,7 +64,7 @@ const Response = () => {
                 <VStack spacing={4} align="stretch" p={6}>
                     {messages.map((msg, idx) => (
                         <Box
-                            key={idx}
+                            key={msg.message_id || idx}
                             alignSelf={msg.role === "user" ? "flex-end" : "flex-start"}
                             bg={msg.role === "user" ? "app.accent" : "app.card.bg"}
                             color={msg.role === "user" ? "white" : "app.text.primary"}

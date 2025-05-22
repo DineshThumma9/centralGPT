@@ -9,24 +9,52 @@ import {
 } from "@chakra-ui/react";
 import { BiDotsVerticalRounded, BiEdit, BiShare, BiTrash } from "react-icons/bi";
 import useSessions from "../hooks/useSessions.ts";
-import {useEffect, useState} from "react";
-import {getAllSessions} from "../api/session-api.ts";
-import type Session from "../entities/Session.ts"
-
+import { useEffect, useState } from "react";
+import { getAllSessions } from "../api/session-api.ts";
+import type Session from "../entities/Session.ts";
 
 interface Props {
     title: string;
+    sessionId: string;
+    onSelect?: () => void;
 }
 
-const Chat = ({ title }: Props) => {
+const Chat = ({ title, sessionId, onSelect }: Props) => {
+    const { changeTitle, deleteSessionById } = useSessions();
+    const [sessions, setSessions] = useState<Session[]>([]);
 
-    const {changeTitle ,deleteSessionById } = useSessions()
-    const [sessions,setSesstions] = useState<Session[]>()
-
-    useEffect(async () => {
-        setSesstions(await getAllSessions())
+    useEffect(() => {
+        const fetchSessions = async () => {
+            try {
+                const allSessions = await getAllSessions();
+                setSessions(allSessions);
+            } catch (error) {
+                console.error("Failed to fetch sessions:", error);
+            }
+        };
+        fetchSessions();
     }, []);
 
+    const handleChangeTitle = async () => {
+        const newTitle = prompt("Enter new title:", title);
+        if (newTitle && newTitle.trim()) {
+            try {
+                await changeTitle(newTitle.trim());
+            } catch (error) {
+                console.error("Failed to change title:", error);
+            }
+        }
+    };
+
+    const handleDeleteSession = async () => {
+        if (confirm("Are you sure you want to delete this session?")) {
+            try {
+                await deleteSessionById(sessionId);
+            } catch (error) {
+                console.error("Failed to delete session:", error);
+            }
+        }
+    };
 
     return (
         <HStack
@@ -40,6 +68,7 @@ const Chat = ({ title }: Props) => {
             }}
             transition="all 0.2s ease-in-out"
             cursor="pointer"
+            onClick={onSelect}
         >
             <Text
                 isTruncated
@@ -73,15 +102,14 @@ const Chat = ({ title }: Props) => {
                     <MenuItem
                         icon={<BiEdit />}
                         _hover={{ bg: "surface.tertiary" }}
-                        onClick = {(e) =>  changeTitle(sessions.filter(sessions.id == e.id))}
-
+                        onClick={handleChangeTitle}
                         color="app.text.primary"
                     >
                         Change Title
                     </MenuItem>
                     <MenuItem
                         icon={<BiTrash />}
-                        onClick= {(e) =>  deleteSessionById(sessions.filter(sessions.id == e.id))}}
+                        onClick={handleDeleteSession}
                         _hover={{ bg: "red.600" }}
                         color="app.text.primary"
                     >
