@@ -1,6 +1,4 @@
 import {
-    Avatar, Box,
-    Divider,
     HStack,
     IconButton,
     Menu,
@@ -8,45 +6,81 @@ import {
     MenuItem,
     MenuList,
     Text,
-    useColorMode
 } from "@chakra-ui/react";
-import {useState} from "react";
-import {BiDotsVerticalRounded, BiEdit, BiShare, BiTrash} from "react-icons/bi";
-import Pc from "../assets/img.png";
+import { BiDotsVerticalRounded, BiEdit, BiShare, BiTrash } from "react-icons/bi";
 
-
-interface Props{
-    title:string
+interface Props {
+    title: string;
 }
 
-const Chat = ({title}:Props) => {
-
+const Chat = ({ title }: Props) => {
     return (
         <HStack
             justifyContent="space-between"
-            borderRadius="40px"
-            borderWidth="1px"
-            shadow="sm"
-            // borderColor="white"
             w="100%"
-
+            p={1}
+            _hover={{
+                bg: "surface.tertiary",
+                borderColor: "app.accent",
+                transform: "translateY(-1px)",
+            }}
+            transition="all 0.2s ease-in-out"
+            cursor="pointer"
         >
-            <Text isTruncated>{title}</Text>
+            <Text
+                isTruncated
+                color="app.text.primary"
+                fontSize="sm"
+                fontWeight="medium"
+                flex="1"
+            >
+                {title}
+            </Text>
+
             <Menu>
                 <MenuButton
                     as={IconButton}
                     icon={<BiDotsVerticalRounded />}
                     variant="ghost"
                     aria-label="More Options"
+                    size="sm"
+                    color="app.text.secondary"
+                    _hover={{
+                        bg: "surface.tertiary",
+                        color: "app.accent",
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                 />
-                <MenuList>
-                    <MenuItem icon={<BiEdit />}>Change Title</MenuItem>
-                    <MenuItem icon={<BiTrash />}>Delete</MenuItem>
-                    <MenuItem icon={<BiShare />}>Share</MenuItem>
+                <MenuList
+                    bg="app.card.bg"
+                    borderColor="app.border"
+                    shadow="lg"
+                >
+                    <MenuItem
+                        icon={<BiEdit />}
+                        _hover={{ bg: "surface.tertiary" }}
+                        color="app.text.primary"
+                    >
+                        Change Title
+                    </MenuItem>
+                    <MenuItem
+                        icon={<BiTrash />}
+                        _hover={{ bg: "red.600" }}
+                        color="app.text.primary"
+                    >
+                        Delete
+                    </MenuItem>
+                    <MenuItem
+                        icon={<BiShare />}
+                        _hover={{ bg: "surface.tertiary" }}
+                        color="app.text.primary"
+                    >
+                        Share
+                    </MenuItem>
                 </MenuList>
             </Menu>
         </HStack>
-    )
-}
+    );
+};
 
-export default Chat
+export default Chat;

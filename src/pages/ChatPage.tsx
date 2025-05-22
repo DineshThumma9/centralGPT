@@ -8,22 +8,27 @@ const ChatPage = () => {
 
     return (
         <Grid
-            templateAreas={{
-                lg: `"aside main"`,
-                base: `"aside main"`
-            }}
-            templateColumns={{
-                lg: isSidebarCollapsed ? "60px 1fr" : "350px 1fr", // Adjust main area width dynamically
-                base: "80px 1fr"
-            }}
+            templateAreas={`"aside main"`}
+            templateColumns={isSidebarCollapsed ? "60px 1fr" : "350px 1fr"}
             h="100vh"
-            color="gray.700"
+            bg="app.bg"
+            color="app.text.primary"
             overflow="hidden"
+            transition="all 0.3s ease-in-out"
         >
-            <GridItem area="aside" overflow="hidden">
+            <GridItem
+                area="aside"
+                overflow="hidden"
+                zIndex={10}
+            >
                 <Sidebar onCollapse={setIsSidebarCollapsed} />
             </GridItem>
-            <GridItem area="main" overflow="hidden">
+            <GridItem
+                area="main"
+                overflow="hidden"
+                bg="app.bg"
+                transition="all 0.3s ease-in-out"
+            >
                 <ChatArea />
             </GridItem>
         </Grid>

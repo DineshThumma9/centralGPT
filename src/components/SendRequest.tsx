@@ -1,45 +1,82 @@
-import {Box, HStack, IconButton, Input, InputGroup, InputLeftElement} from "@chakra-ui/react";
-import {Search2Icon} from "@chakra-ui/icons";
-import {FaPaperPlane} from "react-icons/fa";
-import {useState} from "react";
-
+import { Box, HStack, IconButton, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
+import { Search2Icon } from "@chakra-ui/icons";
+import { FaPaperPlane } from "react-icons/fa";
+import { useState } from "react";
 
 const SendRequest = () => {
+    const [input, setInput] = useState("");
 
-    const [input,setInput] = useState("")
-    const sendStreamMessage= () => {}
+    const sendStreamMessage = () => {
+        if (input.trim()) {
+            console.log("Sending message:", input);
+            setInput("");
+        }
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendStreamMessage();
+        }
+    };
 
     return (
-
-
-              <Box w="full" p={4} bg="white" borderTop="1px solid #eee">
-                <HStack alignItems="center">
-                    <InputGroup>
-                        <InputLeftElement pointerEvents="none">
-                            <Search2Icon color="gray.300"/>
-                        </InputLeftElement>
-                        <Input
-                            borderRadius="40px"
-                            type="search"
-                            placeholder="Type your query"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                        />
-                    </InputGroup>
-                    <IconButton
-                        aria-label="Send"
-                        icon={<FaPaperPlane/>}
-                        colorScheme="blue"
-                        onClick={sendStreamMessage}
+        <Box
+            w="full"
+            p={4}
+            bg="app.card.bg"
+            borderTop="1px solid"
+            borderColor="app.border"
+            minH="80px"
+        >
+            <HStack alignItems="center" spacing={3}>
+                <InputGroup flex="1">
+                    <InputLeftElement pointerEvents="none">
+                        <Search2Icon color="app.text.muted" />
+                    </InputLeftElement>
+                    <Input
+                        borderRadius="full"
+                        type="text"
+                        placeholder="Type your query..."
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        bg="app.bg"
+                        borderColor="app.border"
+                        color="app.text.primary"
+                        _placeholder={{
+                            color: "app.text.muted"
+                        }}
+                        _hover={{
+                            borderColor: "app.accent"
+                        }}
+                        _focus={{
+                            borderColor: "app.accent",
+                            boxShadow: `0 0 0 1px var(--chakra-colors-brand-500)`
+                        }}
+                        size="lg"
                     />
-                </HStack>
-            </Box>
-    )
+                </InputGroup>
 
+                <IconButton
+                    aria-label="Send message"
+                    icon={<FaPaperPlane />}
+                    colorScheme="brand"
+                    onClick={sendStreamMessage}
+                    isDisabled={!input.trim()}
+                    size="lg"
+                    borderRadius="full"
+                    _hover={{
+                        transform: "scale(1.05)"
+                    }}
+                    _active={{
+                        transform: "scale(0.95)"
+                    }}
+                    transition="all 0.2s"
+                />
+            </HStack>
+        </Box>
+    );
+};
 
-
-
-
-}
-
-export default SendRequest
+export default SendRequest;

@@ -11,20 +11,35 @@ export interface Message {
 
 const ChatArea = () => {
     return (
-        <>
-            <VStack flex="1" spacing={4} h="100vh" overflowY="auto" color="gray.700" px={4}>
+        <VStack
+            flex="1"
+            spacing={0}
+            h="100vh"
+            bg="app.bg"
+            color="app.text.primary"
+            overflow="hidden"
+        >
+            {/* Header */}
+            <HStack
+                w="full"
+                justifyContent="space-between"
+                alignItems="center"
+                p={4}
+                bg="app.card.bg"
+                borderBottom="1px solid"
+                borderColor="app.border"
+                minH="70px"
+            >
+                <LLMModelChooser />
+                <AvaterExpandable />
+            </HStack>
 
-                <HStack w="full" justifyContent="space-between" alignItems="center" py={2}>
-                    <LLMModelChooser />
-                    <AvaterExpandable />
-                </HStack>
+            {/* Chat Messages Area */}
+            <Response />
 
-                <Response />
-
-                <SendRequest />
-
-            </VStack>
-        </>
+            {/* Input Area */}
+            <SendRequest />
+        </VStack>
     );
 };
 

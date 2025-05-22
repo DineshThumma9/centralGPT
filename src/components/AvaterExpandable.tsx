@@ -8,7 +8,7 @@ const AvaterExpandable = () => {
             <Menu>
                 <MenuButton as={Avatar} name="Sasuke Uchiha" src={Pc} cursor="pointer"/>
                 <MenuList>
-                    <MenuItem icon={<BiUser/>}>Roronora Zoror</MenuItem>
+                    <MenuItem _hover = "green.100" icon={<BiUser/>}>Roronora Zoror</MenuItem>
                     <Divider/>
                     <MenuItem icon={<BiCog/>}>Customize</MenuItem>
                     <MenuItem icon={<BiLogOut/>}>Logout</MenuItem>

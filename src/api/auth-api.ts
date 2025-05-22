@@ -1,5 +1,9 @@
 import axios, { AxiosError } from "axios";
-import { getAuthState } from "../store/authStore";
+import { getAuthState } from "../store/authStore.ts";
+
+
+
+
 
 export const API = axios.create({
   baseURL: "http://localhost:8001/",
@@ -25,6 +29,15 @@ export const login = (
     },
   });
 };
+
+
+
+
+
+
+
+
+
 
 export const register = async (username: string, email: string, password: string) => {
   try {

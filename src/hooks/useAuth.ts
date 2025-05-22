@@ -1,4 +1,4 @@
-import { login, register } from "../service/auth-api.ts";
+import { login, register } from "../api/auth-api.ts";
 import { getAuthState } from "../store/authStore";
 
 export const useAuth = () => {
