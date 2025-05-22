@@ -1,11 +1,20 @@
-import {Box, IconButton, Text, VStack} from "@chakra-ui/react";
-import {FiChevronLeft, FiChevronRight} from "react-icons/fi";
-import {useState} from "react";
+import { Box, HStack, IconButton, Text, VStack } from "@chakra-ui/react";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useState } from "react";
 import SideBarNav from "./SideBarNav.tsx";
-import {SettingsIcon} from "@chakra-ui/icons";
+import { SettingsIcon } from "@chakra-ui/icons";
+import Chat from "./Chat.tsx";
 
 export default function Sidebar() {
     const [collapsed, setCollapsed] = useState(false);
+
+    const titles: string[] = [
+        "WHo is Napolean Bonarparted",
+        "Ringa Ring",
+        "Allu Arjun Movies",
+        "How to center div",
+        "Kaleja"
+    ];
 
     return (
         <Box
@@ -17,26 +26,27 @@ export default function Sidebar() {
             p={4}
         >
             <IconButton
-                icon={collapsed ? <FiChevronRight/> : <FiChevronLeft/>}
+                icon={collapsed ? <FiChevronRight /> : <FiChevronLeft />}
                 aria-label="Toggle sidebar"
                 size="sm"
                 mb={4}
                 onClick={() => setCollapsed(!collapsed)}
                 bg="white"
-                _hover={{bg: "gray.600"}}
+                _hover={{ bg: "gray.600" }}
             />
-            <VStack align="center" spacing={4}>
-
+            <VStack alignSelf="center" spacing={4} height={"100vh"}>
                 {!collapsed && (
                     <>
-
-                        <SideBarNav/>
-                        <Text>New Chat</Text>
-                        <Text>History</Text>
-                        <Text>Settings</Text>
-                        <SettingsIcon/>
-
-
+                        <SideBarNav />
+                        <VStack>
+                            {titles.map((title) => (
+                                <Chat title={title} key={title} />
+                            ))}
+                        </VStack>
+                        <HStack>
+                            <SettingsIcon />
+                            <Text>Settings</Text>
+                        </HStack>
                     </>
                 )}
             </VStack>

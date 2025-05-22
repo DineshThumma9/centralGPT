@@ -14,7 +14,7 @@ import {useState} from "react";
 import LLMModelChooser from "./LLMModelChooser.tsx";
 import {Search2Icon} from "@chakra-ui/icons";
 import axios from "axios";
-import Pc from "../assets/react.svg";
+import Pc from "../assets/img.png";
 
 interface Message {
     role: "user" | "assistant";
@@ -98,7 +98,7 @@ const sendMessage = () => {
     };
 
     return (
-        <VStack flex="1" spacing={0} h="100vh" overflow="hidden">
+        <VStack flex="1" spacing={0} h="100vh" overflow="hidden" color = "grey">
 
             <HStack w="full" justifyContent="space-between" alignItems="center" px={4} py={2}>
                 <LLMModelChooser/>

@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 
 const Layout = () => {
     return (
-        <Box width="100vw" height="100vh" overflow="hidden">
+        <Box color = "grey">
             <Outlet />
         </Box>
     );

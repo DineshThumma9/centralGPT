@@ -11,6 +11,7 @@ const ChatPage = () => {
             }}
             templateColumns={{lg: '250px 1fr', base: '80px 1fr'}}
             h="100vh"
+            color = "grey"
         >
             <GridItem area="aside">
                 <Sidebar/>
