@@ -23,9 +23,11 @@ const SignUpPage = () => {
 
     const {register} = useAuth();
 
-    const onSubmit = async (email: string, password: string, username: string) => {
-        console.log(email,password,username)
-        await register(email, password, username);
+    const onSubmit = async (username: string,email:string,password:string) => {
+        console.log("Input has been read")
+        console.log("usename: " + username + "  email:" + email + " password" +  password)
+        await register(username,email,password);
+        navigator
     };
 
     return (
@@ -60,7 +62,7 @@ const SignUpPage = () => {
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <ButtonGroup>
-                    <Button colorScheme="teal" mb={8} onClick={() => onSubmit(email, password, username)}>
+                    <Button colorScheme="teal" mb={8} onClick={() => onSubmit(username,email,password)}>
                         Sign Up
                     </Button>
                     <Link to="/login">

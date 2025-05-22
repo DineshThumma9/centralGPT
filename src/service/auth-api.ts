@@ -1,51 +1,73 @@
-// src/api/auth.ts
-
-import axios from "axios";
-// Add this once to automatically attach token from Zustand
-import {getAuthState} from "../store/authStore";
-
+import axios, { AxiosError } from "axios";
+import { getAuthState } from "../store/authStore";
 
 export const API = axios.create({
   baseURL: "http://localhost:8001/",
   withCredentials: true,
 });
 
-export const login = (data: { username: string; password: string }) => {
+export const login = (
+                   data:
+                      {
+                        username: string;
+                        password: string;
+                      }) => {
+
+
   const form = new URLSearchParams();
-  form.append("username", data.username); // 👈 username is the key OAuth2 expects
+  form.append("username", data.username);
   form.append("password", data.password);
 
-   return API.post("/auth/login", form, {
+
+  return API.post("/auth/login", form, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   });
 };
 
+export const register = async (username: string, email: string, password: string) => {
+  try {
+    console.log(
+      "Sending registration data:",
+      JSON.stringify({ username, email, password }, null, 2)
+    );
 
-// REGISTER: Correct endpoint and return the promise
-export const register = async (username:string, email:string, password:string) => {
+    const response = await API.post(
+      "/auth/register",
+      { username, email, password },
+      { headers: { "Content-Type": "application/json" } }
+    );
 
-  // Explicitly construct the object with the exact fields the API expects
-  const response = await axios.post('/auth/register', {
-    username: username,
-    email: email,
-    password: password
-  }, {
-    headers: {
-      'Content-Type': 'application/json'
+
+
+    console.log("Registration response:", response.data);
+    return response.data;
+
+
+
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error("Registration error status:", error.response?.status);
+      console.error("Registration error details:", error.response?.data);
+      if (error.response?.data?.detail) {
+        console.error(
+          "Validation errors:",
+          JSON.stringify(error.response.data.detail, null, 2)
+        );
+      }
+    } else {
+      console.error("An unexpected error occurred:", error);
     }
-  });
-  return response.data;
+    throw error;
+  }
 };
 
-
-
-
 API.interceptors.request.use((config) => {
-  const token =getAuthState().token;
+  const token = getAuthState().token;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+

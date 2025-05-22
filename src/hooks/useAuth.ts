@@ -1,5 +1,5 @@
 import { login, register } from "../service/auth-api.ts";
-import {getAuthState, useAuthStore} from "../store/authStore";
+import {getAuthState} from "../store/authStore";
 
 export const useAuth = () => {
 
@@ -12,16 +12,43 @@ export const useAuth = () => {
   const logout = getAuthState().logout
 
   const loginUser = async (username: string, password: string) => {
-    const res = await login({ username, password });
-    const { token, username: returnedUser } = res.data;
-    setAuth(token, returnedUser); // token now auto-attached in future requests
+    try {
+      const res = await login({ username, password });
+        if (!res || !res.data) {
+      throw new Error("No response data from register API");
+    }
+
+      const { access ,refresh} = res.data;
+       localStorage.setItem("access:",access)
+       localStorage.setItem("refresh" ,refresh)
+      setAuth(access, username); // token now auto-attached in future requests
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error;
+    }
   };
 
   const registerUser = async (username: string, email: string, password: string) => {
-    const res = await register( username, email, password );
-    const { token, username: returnedUser } = res.data;
-    setAuth(token, returnedUser);
-  };
+  try {
+    console.log("IN useAuth");
+    const res = await register(username, email, password);
+    console.log("Registration response:", res);
+
+    if (!res || !res.access || !res.refresh) {
+      throw new Error("Missing tokens in register API response");
+    }
+
+    const { access, refresh } = res;
+    setAuth(access, username);
+    localStorage.setItem("refresh", refresh);
+    localStorage.setItem("access", access);
+  } catch (error) {
+    console.error("Registration failed:", error);
+    throw error;
+  }
+m
+};
+
 
   return { login: loginUser, register: registerUser, logout };
 };
