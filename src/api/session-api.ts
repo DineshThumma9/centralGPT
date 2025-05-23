@@ -1,140 +1,112 @@
 import axios from "axios";
+import type Message from "../entities/Message.ts";
 
-interface SessionResponse {
-    session_id: string;
-    message: string;
-}
-
+// ✅ FIX: Removed duplicate import and redeclaration of `newSession` and `streamChatResponse`
 const API = axios.create({
-    baseURL: "http://localhost:8001/session",
-    withCredentials: true
+  baseURL: "http://localhost:8001/session",
+  withCredentials: true
 });
 
-const newSession = async () => {
-    console.log("In newSession");
+interface SessionResponse {
+  session_id: string;
+  message: string;
+}
 
+// ✅ FIX: Properly defined and exported newSession
+export const newSession = async (): Promise<string> => {
+  console.log("In newSession");
+
+  try {
     const res = await API.post("/new", {}, {
-        headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" }
     });
 
-    console.log("Sent request and got response");
-    if(!res || !res.data) {
-        console.log(res);
-        throw new Error("Res is empty");
-    } else {
-        localStorage.setItem("current Session Id", res.data.session_id);
-        console.log("Session Id Stored: " + res.data.session_id);
+    if (!res?.data) throw new Error("Empty response");
+
+    localStorage.setItem("current Session Id", res.data.session_id);
+    console.log("Session Id Stored: " + res.data.session_id);
+    return res.data.session_id;
+  } catch (error) {
+    console.log("Error occurred in newSession:", error);
+    throw error;
+  }
+};
+
+// ✅ FIX: Template literal was incorrect; function signature had no types
+export const streamChatResponse = (
+  sessionId: string,
+  message: string,
+  onUserPersistence: (msg: Message) => void,
+  assistantMsg: (msg: Message) => void,
+  onComplete: () => void,
+  onPersist: () => void,
+  onError: (error?: any) => void
+) => {
+  const evtSource = new EventSource(
+    `/message/stream?sessionId=${sessionId}&message=${encodeURIComponent(message)}`
+  );
+
+  evtSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === "content") {
+      assistantMsg({ message_id: data.message_id, content: data.content } as Message);
+    } else if (data.type === "complete") {
+      evtSource.close();
+      onComplete();
     }
+  };
 
-    return res.data.session_id
+  evtSource.onerror = (err) => {
+    console.error("Streaming error:", err);
+    evtSource.close();
+    onError(err);
+  };
+
+  return evtSource;
 };
 
-
-
-
-
-export const streamChatResponse = ( message: string, onChunk: (chunk: string) => void, onDone?: () => void) => {
-    const evtSource = new EventSource(`/message/stream?message=${encodeURIComponent(message)}`);
-
-    evtSource.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.type === "content") {
-            onChunk(data.content);
-        } else if (data.type === "complete") {
-            evtSource.close();
-            onDone?.();
-        }
-    };
-
-    evtSource.onerror = (err) => {
-        console.error("Streaming error:", err);
-        evtSource.close();
-    };
-
-    return evtSource;
-};
-
-
-const sendMessage = async (data: { message?: string, session_id: string }) => {
-    console.log("In Send Message");
-
-    const res = await API.post("/message", data, {
-        headers: { "Content-Type": "text/event-stream" }
-    });
-
-    console.log("Sent Request");
-
-    if(!res || !res.data) {
-        console.log("Res is Empty");
-        throw new Error("Response From send Message is Empty");
-    }
-
-    return res.data;
-};
-
-const getChatHistory = async (data: { session_id: string, limit?: number }) => {
-    console.log("Getting Whole conversation of", data.session_id);
-    console.log("data object is" + data);
-
+// ✅ Cleaned up redundant logs and structured error handling
+export const getChatHistory = async (data: { session_id: string; limit?: number }) => {
+  try {
     const res = await API.get("/history/" + data.session_id);
-
-    if(!res || !res.data) {
-        console.log(res.data);
-        console.log("History is Empty");
-        throw new Error("Chat History Empty");
-    }
-
+    if (!res?.data) throw new Error("Chat History Empty");
     return res.data;
+  } catch (error) {
+    console.log("Error while fetching chat history", error);
+    throw error;
+  }
 };
 
-const deleteSession = async (session_id: string) => {
-    console.log("In Delete Session");
-    console.log("Sending in Request session id" + session_id);
-
+export const deleteSession = async (session_id: string) => {
+  try {
     const res = await API.delete(session_id);
-
-    if(!res || !res.data) {
-        console.log("Res is empty", res);
-        throw new Error("Delete session failed");
-    }
-
+    if (!res?.data) throw new Error("Delete session failed");
     return res.data;
+  } catch (e) {
+    console.log("Error while deleting session", e);
+    throw e;
+  }
 };
 
-const updateSessionTitle = async (session_id: string, title: string) => {
-    console.log("In Updation of title");
-
+export const updateSessionTitle = async (session_id: string, title: string) => {
+  try {
     const res = await API.patch(session_id + "/title", { title }, {
-        headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" }
     });
-
-    if(!res || !res.data) {
-        console.log("Res is Empty");
-    }
-
     return res.data.title;
+  } catch (e) {
+    console.log("Error while updating session title", e);
+    throw e;
+  }
 };
 
-const getAllSessions = async () => {
-    console.log("In get ALL Sessions");
-
+export const getAllSessions = async () => {
+  try {
     const res = await API.get("/getAll");
-
-    if(!res || !res.data) {
-        console.log("Sessions ids" + res.data);
-        throw new Error("Res is Empty no Sessions found");
-    }
-
+    if (!res?.data) throw new Error("No sessions found");
     return res.data;
+  } catch (e) {
+    console.log("Error getting all sessions", e);
+    throw e;
+  }
 };
-
-export {
-    newSession,
-    sendMessage,
-    getChatHistory,
-    deleteSession,
-    updateSessionTitle,
-    getAllSessions
-};
-
-
