@@ -4,6 +4,7 @@ import {
     getChatHistory,
     newSession,
     sendMessage,
+    streamChatResponse,
     updateSessionTitle
 } from "../api/session-api.ts";
 import type Message from "../entities/Message.ts";
@@ -20,7 +21,8 @@ const useSessions = () => {
     setCurrentSessionId,
     current_session,
     setTitle,
-    setMessages
+    setMessages,
+      setStreaming,updateMessage
   } = sessionStore.getState();
 
   const createNewSession = async () => {
@@ -35,6 +37,40 @@ const useSessions = () => {
     setCurrentSessionId(session_id);
     clear();
   };
+
+  const sendRequest = async (msg: string) => {
+    if (!current_session) throw new Error("No active session.");
+
+    const userMessage: Message = {
+        session_id: current_session,
+        message_id: Date.now().toString(),
+        content: msg,
+        role: "user",
+        created_at: new Date().toISOString()
+    };
+
+    addMessage(userMessage);
+    setStreaming(true);
+
+    let response = "";
+    const assistantMessageId = Date.now().toString();
+
+    addMessage({
+        session_id: current_session,
+        message_id: assistantMessageId,
+        content: "",
+        role: "assistant",
+        created_at: new Date().toISOString()
+    });
+
+    streamChatResponse( msg, (chunk) => {
+        response += chunk;
+        updateMessage(assistantMessageId, response);
+    }, () => {
+        setStreaming(false);
+    });
+};
+
 
   const changeTitle = async (title: string) => {
     if (!current_session) throw new Error("No active session.");
@@ -54,26 +90,27 @@ const useSessions = () => {
     clear();
   };
 
+
   const getSessions = async () => {
     const allSessions: Session[] = await getAllSessions();
     setSessions(allSessions);
   };
 
-  const sendRequest = async (msg: string) => {
-    if (!current_session) throw new Error("No active session.");
-
-    // Create proper Message object matching your entity
-    const userMessage: Message = {
-      session_id: current_session,
-      message_id: Date.now().toString(), // temporary ID
-      content: msg,
-      role: "user",
-      created_at: new Date().toISOString()
-    };
-
-    addMessage(userMessage);
-    await sendMessage({ message: msg, session_id: current_session });
-  };
+  // const sendRequest = async (msg: string) => {
+  //   if (!current_session) throw new Error("No active session.");
+  //
+  //   // Create proper Message object matching your entity
+  //   const userMessage: Message = {
+  //     session_id: current_session,
+  //     message_id: Date.now().toString(), // temporary ID
+  //     content: msg,
+  //     role: "user",
+  //     created_at: new Date().toISOString()
+  //   };
+  //
+  //   addMessage(userMessage);
+  //   await sendMessage({ message: msg, session_id: current_session });
+  // };
 
   return {
     createNewSession,

@@ -20,6 +20,8 @@ interface Props {
 }
 
 const Chat = ({ title, sessionId, onSelect }: Props) => {
+
+
     const { changeTitle, deleteSessionById } = useSessions();
     const [sessions, setSessions] = useState<Session[]>([]);
 

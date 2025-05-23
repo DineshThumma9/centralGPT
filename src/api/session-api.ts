@@ -29,6 +29,32 @@ const newSession = async () => {
     return res.data.session_id
 };
 
+
+
+
+
+export const streamChatResponse = ( message: string, onChunk: (chunk: string) => void, onDone?: () => void) => {
+    const evtSource = new EventSource(`/message/stream?message=${encodeURIComponent(message)}`);
+
+    evtSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "content") {
+            onChunk(data.content);
+        } else if (data.type === "complete") {
+            evtSource.close();
+            onDone?.();
+        }
+    };
+
+    evtSource.onerror = (err) => {
+        console.error("Streaming error:", err);
+        evtSource.close();
+    };
+
+    return evtSource;
+};
+
+
 const sendMessage = async (data: { message?: string, session_id: string }) => {
     console.log("In Send Message");
 

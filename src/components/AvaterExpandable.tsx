@@ -2,18 +2,17 @@ import {Avatar, Divider, Menu, MenuButton, MenuItem, MenuList, VStack} from "@ch
 import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
 import Pc from "../assets/img.png";
 import {useAuth} from "../hooks/useAuth.ts";
-import {useAuthStore} from "../store/authStore.ts";
 
 const AvaterExpandable = () => {
 
-    const logout = useAuthStore(s=>s.logout)
+    const {logout} = useAuth()
 
     return (
         <VStack>
             <Menu>
                 <MenuButton as={Avatar} name="Sasuke Uchiha" src={Pc} cursor="pointer"/>
                 <MenuList>
-                    <MenuItem _hover = "green.100" icon={<BiUser/>}>Roronora Zoror</MenuItem>
+                    <MenuItem _hover = "green.100" icon={<BiUser/>}>Roronora Zoro</MenuItem>
                     <Divider/>
                     <MenuItem icon={<BiCog/>}>Customize</MenuItem>
                     <MenuItem icon={<BiLogOut/>} onClick = {logout}>Logout</MenuItem>
