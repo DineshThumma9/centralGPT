@@ -1,112 +1,181 @@
 import axios from "axios";
 import type Message from "../entities/Message.ts";
 
-// ✅ FIX: Removed duplicate import and redeclaration of `newSession` and `streamChatResponse`
 const API = axios.create({
-  baseURL: "http://localhost:8001/session",
-  withCredentials: true
+    baseURL: "http://localhost:8000/sessions",
+    withCredentials: true
 });
 
+
+
 interface SessionResponse {
-  session_id: string;
-  message: string;
+    session_id: string;
+    message: string;
 }
 
-// ✅ FIX: Properly defined and exported newSession
+
+
+
 export const newSession = async (): Promise<string> => {
-  console.log("In newSession");
+    try {
 
-  try {
-    const res = await API.post("/new", {}, {
-      headers: { "Content-Type": "application/json" }
-    });
+        const access = localStorage.getItem("refresh")
+        console.log("access token :" ,access)
+        const res = await API.post("/new", null, {
+           headers: { "Authorization": `Bearer ${access}` }
 
-    if (!res?.data) throw new Error("Empty response");
+        });
 
-    localStorage.setItem("current Session Id", res.data.session_id);
-    console.log("Session Id Stored: " + res.data.session_id);
-    return res.data.session_id;
-  } catch (error) {
-    console.log("Error occurred in newSession:", error);
-    throw error;
-  }
-};
+        console.log(res)
 
-// ✅ FIX: Template literal was incorrect; function signature had no types
-export const streamChatResponse = (
-  sessionId: string,
-  message: string,
-  onUserPersistence: (msg: Message) => void,
-  assistantMsg: (msg: Message) => void,
-  onComplete: () => void,
-  onPersist: () => void,
-  onError: (error?: any) => void
-) => {
-  const evtSource = new EventSource(
-    `/message/stream?sessionId=${sessionId}&message=${encodeURIComponent(message)}`
-  );
+        console.log("This is res data :" , res.data)
 
-  evtSource.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data.type === "content") {
-      assistantMsg({ message_id: data.message_id, content: data.content } as Message);
-    } else if (data.type === "complete") {
-      evtSource.close();
-      onComplete();
+        if (!res?.data?.session_id) throw new Error("Empty session response");
+
+
+        const sessionId = res.data.session_id;
+        localStorage.setItem("current_session_id", sessionId);
+        console.log("Session Id Stored:", sessionId);
+        return sessionId;
+    } catch (error) {
+        console.error("Error occurred in newSession:", error);
+        throw error;
     }
-  };
-
-  evtSource.onerror = (err) => {
-    console.error("Streaming error:", err);
-    evtSource.close();
-    onError(err);
-  };
-
-  return evtSource;
 };
 
-// ✅ Cleaned up redundant logs and structured error handling
+
+
+
+export const streamChatResponse = (
+    sessionId: string, message: string, assistantMsg: (msg: Message) => void, p0: ({message_id, content}: {
+      message_id: any;
+      content: any;
+    }) => void, onComplete: () => void, onError: (error: Error) => void, p1: (error: any) => void): EventSource => {
+    const evtSource = new EventSource(
+        `http://localhost:8001/session/message/stream?sessionId=${sessionId}&message=${encodeURIComponent(message)}`
+    );
+
+    evtSource.onmessage = (event: MessageEvent) => {
+        try {
+            const data = JSON.parse(event.data);
+
+            if (data.type === "content") {
+                assistantMsg({
+                    message_id: data.message_id,
+                    content: data.content,
+                    role: "assistant",
+                    session_id: sessionId,
+                    created_at: new Date().toISOString()
+                });
+            } else if (data.type === "complete") {
+                evtSource.close();
+                onComplete();
+            } else if (data.type === "error") {
+                evtSource.close();
+                onError(new Error(data.error ?? "Unknown stream error"));
+            }
+        } catch (parseError) {
+            evtSource.close();
+            onError(parseError instanceof Error ? parseError : new Error("Unknown parse error"));
+        }
+    };
+
+    evtSource.onerror = (err: Event) => {
+        evtSource.close();
+        onError(new Error("EventSource connection error"));
+    };
+
+    evtSource.onopen = () => {
+        console.log("SSE connection opened");
+    };
+
+    return evtSource;
+};
+
+
+
+
 export const getChatHistory = async (data: { session_id: string; limit?: number }) => {
-  try {
-    const res = await API.get("/history/" + data.session_id);
-    if (!res?.data) throw new Error("Chat History Empty");
-    return res.data;
-  } catch (error) {
-    console.log("Error while fetching chat history", error);
-    throw error;
-  }
+    try {
+        const res = await API.get(`/history/${data.session_id}`, {
+            params: { limit: data.limit || 50 }
+        });
+
+        if (!res?.data) throw new Error("SessionComponent History Empty");
+        return res.data;
+    } catch (error) {
+        console.error("Error while fetching chat history:", error);
+        throw error;
+    }
 };
+
+
+
+
+
 
 export const deleteSession = async (session_id: string) => {
-  try {
-    const res = await API.delete(session_id);
-    if (!res?.data) throw new Error("Delete session failed");
-    return res.data;
-  } catch (e) {
-    console.log("Error while deleting session", e);
-    throw e;
-  }
+    try {
+        const res = await API.delete(`/${session_id}`);
+        if (!res?.data) throw new Error("Delete session failed");
+        return res.data;
+    } catch (error) {
+        console.error("Error while deleting session:", error);
+        throw error;
+    }
 };
 
-export const updateSessionTitle = async (session_id: string, title: string) => {
-  try {
-    const res = await API.patch(session_id + "/title", { title }, {
-      headers: { "Content-Type": "application/json" }
-    });
-    return res.data.title;
-  } catch (e) {
-    console.log("Error while updating session title", e);
-    throw e;
-  }
+
+
+
+
+export const testMsg= async (msg: string) => {
+    try {
+
+
+        const current_session_id = localStorage.getItem("current_session_id")
+        const res = await API.post(`/simple/${msg}`, {current_session_id}, {
+            headers: { "Content-Type": "application/json" }
+        });
+        console.log("In Sessions API ")
+        console.log("Res object is {res}")
+
+
+        if (!res?.data) throw new Error("Res in Test Msg Failed");
+        return res.data;
+    } catch (error) {
+        console.log("Error while getting test message", error);
+        throw error;
+    }
 };
+
+
+
+
+export const updateSessionTitle = async (session_id: string, title: string): Promise<string> => {
+    try {
+        const res = await API.patch(`/${session_id}/title`, { title }, {
+            headers: { "Content-Type": "application/json" }
+        });
+
+        if (!res?.data?.title) throw new Error("Update session title failed");
+        return res.data.title;
+    } catch (error) {
+        console.error("Error while updating session title:", error);
+        throw error;
+    }
+};
+
+
+
 
 export const getAllSessions = async () => {
-  try {
-    const res = await API.get("/getAll");
-    if (!res?.data) throw new Error("No sessions found");
-    return res.data;
-  } catch (e) {
-    console.log("Error getting all sessions", e);
-    throw e;
-  }
+    try {
+        const res = await API.get("/getAll");
+        if (!res?.data) throw new Error("No sessions found");
+        return res.data;
+    } catch (error) {
+        console.error("Error getting all sessions:", error);
+        throw error;
+    }
 };

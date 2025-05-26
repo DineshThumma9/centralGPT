@@ -7,6 +7,7 @@ const AvaterExpandable = () => {
 
     const {logout} = useAuth()
 
+
     return (
         <VStack>
             <Menu>

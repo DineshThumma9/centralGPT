@@ -1,9 +1,9 @@
 import { login, register } from "../api/auth-api.ts";
-import { getAuthState } from "../store/authStore";
+import {getAuthState, useAuthStore} from "../store/authStore";
 
 export const useAuth = () => {
   const setAuth = getAuthState().setAuth;
-  const logout = getAuthState().logout;
+  const logout = useAuthStore(s=>s.logout)
 
   const loginUser = async (username: string, password: string) => {
     try {

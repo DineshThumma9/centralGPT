@@ -1,17 +1,20 @@
 import type Session from "../entities/Session.ts";
 import sessionStore from "../store/sessionStore.ts";
 import { useEffect, useRef } from "react";
-import { newSession, getChatHistory, deleteSession, updateSessionTitle, getAllSessions, streamChatResponse } from "../api/session-api.ts";
+import { newSession, getChatHistory, deleteSession, updateSessionTitle, getAllSessions, streamChatResponse,testMsg } from "../api/session-api.ts";
 import type Message from "../entities/Message.ts";
+import type {AxiosResponse} from "axios";
 
 const useSessions = () => {
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  // Get store functions and state
+  const store = sessionStore.getState();
   const {
     addMessage, setSessions, removeSession, addSession, clear,
     setCurrentSessionId, current_session, setTitle,
-    setMessages, setStreaming, updateMessage, isStreaming, setLoading
-  } = sessionStore.getState();
-
-  const eventSourceRef = useRef<EventSource | null>(null);
+    setMessages, setStreaming, updateMessage, isStreaming, setLoading,
+  } = store;
 
   useEffect(() => {
     return () => {
@@ -22,90 +25,182 @@ const useSessions = () => {
     };
   }, []);
 
+
+
+  const tstMsgFunc= async (msg:string) => {
+    try{
+      console.log("In tsgMegFunc")
+      const res = await testMsg(msg)
+
+
+      const return_msg:Message  = {
+         message_id : res.message_id,
+        session_id: res.session_id,
+        content: res.content,
+         role : res.role,
+         created_at : res.created_at
+      }
+      console.log("Checking res object",res)
+
+      if(!res || !res.content){
+        throw Error("Res is empty")
+      }
+
+
+      addMessage(return_msg)
+      return return_msg
+    }
+    catch (error){
+       console.log("Found error in useSessiosn testMegFunc" , error)
+
+    }
+  }
+
+
   const createNewSession = async () => {
     try {
+      setLoading(true);
       const session_id = await newSession();
+
       const newSessionObj: Session = {
-        session_id,
-        title: "New Chat",
+        session_id: session_id,
+        title: "New SessionComponent",
         created_at: new Date().toISOString()
       };
+
+      // Add to store and make it current
       addSession(newSessionObj);
       setCurrentSessionId(session_id);
-      clear();
+      setTitle("New SessionComponent");
+      clear(); // Clear messages for new session
+
+      console.log("New session created and set as current:", session_id);
+      return session_id;
     } catch (e) {
-      console.log("Error in createNewSession:", e);
+      console.error("Error in createNewSession:", e);
+      throw e;
+    } finally {
+      setLoading(false);
     }
   };
 
   const sendRequest = async (msg: string) => {
-    if (!current_session) throw new Error("No active session.");
-    if (isStreaming) return console.warn("Message is already streaming");
+    if (!current_session) {
+      console.warn("No active session, creating new one...");
+      await createNewSession();
+      const updatedState = sessionStore.getState();
+      if (!updatedState.current_session) {
+        throw new Error("Failed to create session");
+      }
+    }
+
+    const activeSession = sessionStore.getState().current_session;
+    if (isStreaming) {
+      console.warn("Message is already streaming");
+      return;
+    }
 
     const userMsgId = Date.now().toString();
     const userMessage: Message = {
-      session_id: current_session,
+      session_id: activeSession!,
       message_id: userMsgId,
       content: msg,
       role: "user",
       created_at: new Date().toISOString()
     };
 
+    // Add user message immediately
     addMessage(userMessage);
     setStreaming(true);
 
-    if (eventSourceRef.current) eventSourceRef.current.close();
+    // Close any existing connection
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
 
-    let assistantMsgId = Date.now().toString();
+    try {
+      eventSourceRef.current = streamChatResponse(
+        activeSession!,
+        msg,
+        (persistedUserMsg) => {
+          updateMessage(userMsgId, persistedUserMsg);
+        },
+        ({ message_id, content }) => {
+          const messages = sessionStore.getState().messages;
+          const exists = messages.some(m => m.message_id === message_id);
 
-    eventSourceRef.current = streamChatResponse(
-      current_session,
-      msg,
-      (persistedUserMsg) => updateMessage(userMsgId, persistedUserMsg),
-      ({ message_id, content }) => {
-        const messages = sessionStore.getState().messages;
-        const exists = messages.some(m => m.message_id === message_id);
-        if (exists) {
-          updateMessage(message_id, { content });
-        } else {
-          addMessage({
-            session_id: current_session,
-            message_id,
-            content,
-            role: "assistant",
-            created_at: new Date().toISOString(),
-            isStreaming: true
-          });
+          if (exists) {
+            updateMessage(message_id, { content });
+          } else {
+            addMessage({
+              session_id: activeSession!,
+              message_id,
+              content,
+              role: "assistant",
+              created_at: new Date().toISOString(),
+              isStreaming: true
+            });
+          }
+        },
+        () => {
+          console.log("Streaming completed");
+          if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+          }
+          setStreaming(false);
+
+
+          const currentState = sessionStore.getState();
+          const updatedSessions = currentState.sessions.map(session =>
+            (session.session_id || session.session_id) === activeSession
+              ? { ...session, updated_at: new Date().toISOString() }
+              : session
+          );
+          setSessions(updatedSessions);
+        },
+        () => {
+          console.log("Message persisted");
+        },
+        (error) => {
+
+          console.error("SSE error:", error);
+          updateMessage(userMsgId, { isError: true, isStreaming: false });
+          if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+          }
+          setStreaming(false);
         }
-      },
-      () => {
-        if (eventSourceRef.current) eventSourceRef.current.close();
-        eventSourceRef.current = null;
-        setStreaming(false);
-      },
-      () => {
-        if (eventSourceRef.current) eventSourceRef.current.close();
-        eventSourceRef.current = null;
-        setStreaming(false);
-      },
-      (error) => {
-        console.error("SSE error callback:", error);
-        updateMessage(userMsgId, { isError: true, isStreaming: false });
-        if (eventSourceRef.current) eventSourceRef.current.close();
-        eventSourceRef.current = null;
-        setStreaming(false);
-      }
-    );
+      );
+    } catch (error) {
+      console.error("Error setting up streaming:", error);
+      setStreaming(false);
+      throw error;
+    }
   };
 
   const changeTitle = async (title: string) => {
     try {
       setLoading(true);
       if (!current_session) throw new Error("No active session.");
+
       const newTitle = await updateSessionTitle(current_session, title);
       setTitle(newTitle);
+
+      // Update the session in the sessions list reactively
+      const currentState = sessionStore.getState();
+      const updatedSessions = currentState.sessions.map(session =>
+        (session.session_id || session.session_id) === current_session
+          ? { ...session, title: newTitle, updated_at: new Date().toISOString() }
+          : session
+      );
+      setSessions(updatedSessions);
+
+      console.log("Title updated:", newTitle);
     } catch (e) {
-      console.log("Error updating title", e);
+      console.error("Error updating title", e);
+      throw e;
     } finally {
       setLoading(false);
     }
@@ -117,8 +212,17 @@ const useSessions = () => {
       const history = await getChatHistory({ session_id });
       setCurrentSessionId(session_id);
       setMessages(history);
+
+      const currentState = sessionStore.getState();
+      const session = currentState.sessions.find(s => (s.session_id || s.session_id) === session_id);
+      if (session) {
+        setTitle(session.title);
+      }
+
+      console.log("History loaded for session:", session_id);
     } catch (e) {
-      console.log("Error fetching history", e);
+      console.error("Error fetching history", e);
+      throw e;
     } finally {
       setLoading(false);
     }
@@ -126,34 +230,94 @@ const useSessions = () => {
 
   const deleteSessionById = async (session_id: string) => {
     try {
+      setLoading(true);
       await deleteSession(session_id);
       removeSession(session_id);
-      clear();
+
+
+      if (current_session === session_id) {
+        const remainingSessions = sessionStore.getState().sessions;
+        if (remainingSessions.length > 0) {
+          const latestSession = remainingSessions.sort((a, b) =>
+            new Date(b.updated_at || b.created_at).getTime() -
+            new Date(a.updated_at || a.created_at).getTime()
+          )[0];
+          await getHistory(latestSession.session_id || latestSession.session_id!);
+        } else {
+
+          setCurrentSessionId(null);
+          clear();
+          setTitle("");
+        }
+      }
+
+      console.log("Session deleted:", session_id);
     } catch (e) {
-      console.log("Error deleting session", e);
+      console.error("Error deleting session", e);
+      throw e;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchAllSessions = async () => {
+  const getSessions = async () => {
     try {
       setLoading(true);
-      const all = await getAllSessions();
-      setSessions(all);
+      const allSessions:Session[] = await getAllSessions();
+      setSessions(allSessions);
+
+      const currentState = sessionStore.getState();
+      if (!currentState.current_session && allSessions.length > 0) {
+        const latestSession = allSessions.sort((a, b) =>
+          new Date(b.updated_at || b.created_at).getTime() -
+          new Date(a.updated_at || a.created_at).getTime()
+        )[0];
+        await getHistory(latestSession.session_id || latestSession.session_id);
+      }
+
+      console.log("Sessions loaded:", allSessions.length);
     } catch (e) {
-      console.log("Error fetching all sessions", e);
+      console.error("Error fetching all sessions", e);
       setSessions([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const selectSession = async (session_id: string) => {
+    try {
+      if (current_session === session_id) {
+        console.log("Session already selected:", session_id);
+        return;
+      }
+
+
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+        setStreaming(false);
+      }
+
+      await getHistory(session_id);
+      console.log("Session selected:", session_id);
+    } catch (e) {
+      console.error("Error selecting session", e);
+      throw e;
+    }
+  };
+
+  const fetchAllSessions = getSessions;
+
   return {
     createNewSession,
     changeTitle,
     getHistory,
     deleteSessionById,
+    getSessions,
     fetchAllSessions,
-    sendRequest
+    sendRequest,
+    tstMsgFunc,
+    selectSession
   };
 };
 

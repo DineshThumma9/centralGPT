@@ -1,6 +1,6 @@
 import type Session from "../entities/Session.ts";
 import type Message from "../entities/Message.ts";
-import { createStore } from "zustand/vanilla";
+import {create} from "zustand";
 
 export type SessionState = {
     current_session: string | null;
@@ -14,7 +14,7 @@ export type SessionState = {
     setMessages: (messages: Message[]) => void;
     addMessage: (message: Message) => void;
     setTitle: (title: string) => void;
-    updateMessage: (messageId: string, content: string) => void;
+    updateMessage: (messageId: string, updates: Partial<Message>) => void;
     setSessions: (sessions: Session[]) => void;
     addSession: (session: Session) => void;
     updateSession: (sessionId: string, updates: Partial<Session>) => void;
@@ -22,9 +22,10 @@ export type SessionState = {
     setLoading: (loading: boolean) => void;
     setStreaming: (streaming: boolean) => void;
     clear: () => void;
+    getSessions: () => Session[];
 };
 
-const sessionStore = createStore<SessionState>((set) => ({
+const sessionStore = create<SessionState>((set, get) => ({
     current_session: null,
     sessions: [],
     title: "",
@@ -32,25 +33,25 @@ const sessionStore = createStore<SessionState>((set) => ({
     isLoading: false,
     isStreaming: false,
 
-    setCurrentSessionId: (session) => set({ current_session: session }),
-    setTitle: (title) => set({ title: title }),
-    setMessages: (messages) => set({ messages }),
+    setCurrentSessionId: (session) => set({current_session: session}),
+    setTitle: (title) => set({title: title}),
+    setMessages: (messages) => set({messages}),
 
     addMessage: (message) =>
         set((state) => ({
             messages: [...state.messages, message],
         })),
 
-    updateMessage: (messageId, content) =>
+    updateMessage: (messageId, updates) =>
         set((state) => ({
             messages: state.messages.map((message) =>
                 message.message_id === messageId
-                    ? { ...message, content }
+                    ? {...message, ...updates}
                     : message
             ),
         })),
 
-    setSessions: (sessions) => set({ sessions }),
+    setSessions: (sessions) => set({sessions}),
 
     addSession: (session) =>
         set((state) => ({
@@ -61,7 +62,7 @@ const sessionStore = createStore<SessionState>((set) => ({
         set((state) => ({
             sessions: state.sessions.map((session) =>
                 session.session_id === sessionId
-                    ? { ...session, ...updates }
+                    ? {...session, ...updates}
                     : session
             ),
         })),
@@ -72,10 +73,10 @@ const sessionStore = createStore<SessionState>((set) => ({
                 (session) => session.session_id !== sessionId
             ),
         })),
-
-    setLoading: (loading) => set({ isLoading: loading }),
-    setStreaming: (streaming) => set({ isStreaming: streaming }),
-    clear: () => set({ messages: [] }),
+    setLoading: (loading) => set({isLoading: loading}),
+    setStreaming: (streaming) => set({isStreaming: streaming}),
+    clear: () => set({messages: []}),
+    getSessions: () => get().sessions,
 }));
 
 export default sessionStore;

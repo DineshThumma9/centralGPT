@@ -4,10 +4,7 @@ import AvaterExpandable from "./AvaterExpandable";
 import SendRequest from "./SendRequest";
 import Response from "./Response";
 
-export interface Message {
-    role: "user" | "assistant";
-    content: string;
-}
+
 
 const ChatArea = () => {
     return (
@@ -25,7 +22,8 @@ const ChatArea = () => {
                 justifyContent="space-between"
                 alignItems="center"
                 p={4}
-                bg="app.card.bg"
+                bg="app.bg"
+                border={"0px"}
                 borderBottom="1px solid"
                 borderColor="app.border"
                 minH="70px"
@@ -34,7 +32,7 @@ const ChatArea = () => {
                 <AvaterExpandable />
             </HStack>
 
-            {/* Chat Messages Area */}
+            {/* SessionComponent Messages Area */}
             <Response />
 
             {/* Input Area */}

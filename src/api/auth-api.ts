@@ -6,7 +6,7 @@ import { getAuthState } from "../store/authStore.ts";
 
 
 export const API = axios.create({
-  baseURL: "http://localhost:8001/",
+  baseURL: "http://localhost:8000/auth",
   withCredentials: true,
 });
 
@@ -23,7 +23,7 @@ export const login = (
   form.append("password", data.password);
 
 
-  return API.post("/auth/login", form, {
+  return API.post("/login", form, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
@@ -46,11 +46,15 @@ export const register = async (username: string, email: string, password: string
       JSON.stringify({ username, email, password }, null, 2)
     );
 
+
+
+   console.log("Sending request")
     const response = await API.post(
-      "/auth/register",
+      "/register",
       { username, email, password },
       { headers: { "Content-Type": "application/json" } }
     );
+   console.log("Response collected")
 
 
 

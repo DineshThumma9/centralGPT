@@ -1,10 +1,17 @@
 import { Box, Text, VStack, Center } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
 import type Message from "../entities/Message.ts";
+import ReactMarkdown from "react-markdown"
+import rehypeHighlight from "rehype-highlight";
+import 'highlight.js/styles/github-dark.css'; // or any other theme you like
+
 
 const Response = () => {
     const [messages, setMessages] = useState<Message[]>([]);
+
+    const scrollRef = useRef<HTMLDivElement | null>(null)
+
 
     useEffect(() => {
         // Subscribe to store changes
@@ -16,10 +23,26 @@ const Response = () => {
         setMessages(sessionStore.getState().messages);
 
         return unsubscribe;
+
+
     }, []);
+
+
+    useEffect(() => {
+        const isNearBottom =
+            scrollRef.current &&
+            scrollRef.current.getBoundingClientRect().top <
+            window.innerHeight - 100;
+
+        if (isNearBottom) {
+            scrollRef.current?.scrollIntoView({behavior: "smooth"});
+        }
+    }, [messages]);
+
 
     return (
         <Box
+
             flex="1"
             w="full"
             overflowY="auto"
@@ -66,26 +89,29 @@ const Response = () => {
                         <Box
                             key={msg.message_id || idx}
                             alignSelf={msg.role === "user" ? "flex-end" : "flex-start"}
-                            bg={msg.role === "user" ? "app.accent" : "app.card.bg"}
+                            bg={msg.role === "user" ? "app.accent" : "app.bg"}
                             color={msg.role === "user" ? "white" : "app.text.primary"}
                             px={4}
-                            py={3}
-                            borderRadius="xl"
-                            maxW="75%"
+                            py={4}
+                            maxW={"100%"}
+                            maxH={"100%"}
+                            boxSize={"auto"}
                             shadow="sm"
-                            border="1px solid"
-                            borderColor={msg.role === "user" ? "transparent" : "app.border"}
+                            borderRadius={msg.role === "user" ? "40px" : "Opx"}
+                            borderColor={"transparent"}
                             _hover={{
                                 transform: "translateY(-1px)",
                                 shadow: "md"
                             }}
                             transition="all 0.2s ease-in-out"
                         >
-                            <Text fontSize="sm" lineHeight="1.6">
+                            <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
                                 {msg.content}
-                            </Text>
+                            </ReactMarkdown>
+
                         </Box>
                     ))}
+                    <div ref={scrollRef}></div>
                 </VStack>
             )}
         </Box>

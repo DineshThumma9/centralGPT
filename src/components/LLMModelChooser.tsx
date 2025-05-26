@@ -36,14 +36,14 @@ const LLMModelChooser = () => {
 
     const handleApiKeySelect = (apiModel: string) => {
         axios
-            .get(`http://localhost:8000/api/${apiModel}`)
+            .post(`http://localhost:8000/api/${apiModel}`)
             .then((res) => console.log(res.data))
             .catch((err) => console.error("Error fetching API key:", err));
     };
 
     const handleLLMSelect = (llm: string) => {
         axios
-            .get(`http://localhost:8000/models/${llm}`)
+            .post(`http://localhost:8000/api/providers/${llm}`)
             .then((res) => console.log(res.data))
             .catch((err) => console.error("Error fetching LLM:", err));
         setSelectedLLM(llm);
@@ -51,7 +51,7 @@ const LLMModelChooser = () => {
 
     const handleModelSelect = (model: string) => {
         axios
-            .get(`http://localhost:8000/models/model/${model}`)
+            .post(`http://localhost:8000/api/models/${model}`)
             .then((res) => console.log(res.data))
             .catch((err) => console.error("Error fetching model:", err));
         setSelectedModel(model);
