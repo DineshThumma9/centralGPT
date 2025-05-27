@@ -1,6 +1,5 @@
-import {Box, HStack, IconButton, Input, InputGroup, InputLeftElement} from "@chakra-ui/react";
-import {Search2Icon} from "@chakra-ui/icons";
-import {FaPaperPlane} from "react-icons/fa";
+import {Box, HStack, IconButton, Input, Group} from "@chakra-ui/react";
+import {Search, Send} from "lucide-react";
 import {useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
@@ -10,7 +9,6 @@ import { v4 } from "uuid"
 const SendRequest = () => {
     const [input, setInput] = useState("");
     const {tstMsgFunc} = useSessions();
-
 
     const {addMessage} = sessionStore()
 
@@ -48,11 +46,18 @@ const SendRequest = () => {
             border = {"0px"}
             minH="80px"
         >
-            <HStack alignItems="center" spacing={3}>
-                <InputGroup flex="1">
-                    <InputLeftElement pointerEvents="none">
-                        <Search2Icon color="app.text.muted"/>
-                    </InputLeftElement>
+            <HStack alignItems="center" gap={3}>
+                <Group flex="1">
+                    <Box
+                        position="absolute"
+                        left={3}
+                        top="50%"
+                        transform="translateY(-50%)"
+                        pointerEvents="none"
+                        zIndex={1}
+                    >
+                        <Search color="var(--chakra-colors-app-text-muted)" size={16}/>
+                    </Box>
                     <Input
                         borderRadius="full"
                         type="text"
@@ -63,36 +68,42 @@ const SendRequest = () => {
                         bg="grey.600"
                         borderColor="app.border"
                         color="app.text.primary"
-                        _placeholder={{
-                            color: "app.text.muted"
-                        }}
-                        _hover={{
-                            borderColor: "app.accent"
-                        }}
-                        _focus={{
-                            borderColor: "app.accent",
-                            boxShadow: `0 0 0 1px var(--chakra-colors-brand-500)`
+                        pl={10}
+                        css={{
+                            "&::placeholder": {
+                                color: "var(--chakra-colors-app-text-muted)"
+                            },
+                            "&:hover": {
+                                borderColor: "var(--chakra-colors-app-accent)"
+                            },
+                            "&:focus": {
+                                borderColor: "var(--chakra-colors-app-accent)",
+                                boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                            }
                         }}
                         size="lg"
                     />
-                </InputGroup>
+                </Group>
 
                 <IconButton
                     aria-label="Send message"
-                    icon={<FaPaperPlane/>}
-                    colorScheme="brand"
+                    colorPalette="brand"
                     onClick={handleSendMessage}
-                    isDisabled={!input.trim()}
+                    disabled={!input.trim()}
                     size="lg"
                     borderRadius="full"
-                    _hover={{
-                        transform: "scale(1.05)"
+                    css={{
+                        "&:hover": {
+                            transform: "scale(1.05)"
+                        },
+                        "&:active": {
+                            transform: "scale(0.95)"
+                        },
+                        transition: "all 0.2s"
                     }}
-                    _active={{
-                        transform: "scale(0.95)"
-                    }}
-                    transition="all 0.2s"
-                />
+                >
+                    <Send />
+                </IconButton>
             </HStack>
         </Box>
     );

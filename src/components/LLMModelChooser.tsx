@@ -1,6 +1,6 @@
-import { Button, HStack, Menu, MenuButton, MenuItem, MenuList, Text, Badge } from "@chakra-ui/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
-import { useState } from "react";
+import {Badge, Button, HStack, Menu, MenuPositioner, Portal} from "@chakra-ui/react";
+import {ChevronDownIcon} from "lucide-react";
+import {useState} from "react";
 import axios from "axios";
 
 const LLMModelChooser = () => {
@@ -57,115 +57,138 @@ const LLMModelChooser = () => {
         setSelectedModel(model);
     };
 
+
+// ...your handler and state code...
+
     return (
-        <HStack spacing={3} flexWrap="wrap">
+        <HStack gap={3} flexWrap="wrap">
             {/* API Key Selector */}
-            <Menu>
-                <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    variant="outline"
-                    size="sm"
-                    borderColor="app.border"
-                    color="app.text.primary"
-                    _hover={{
-                        borderColor: "app.accent",
-                        bg: "surface.tertiary"
-                    }}
-                >
-                    API Keys
-                </MenuButton>
-                <MenuList
-                    bg="app.card.bg"
-                    borderColor="app.border"
-                >
-                    {apiModels.map((apiModel) => (
-                        <MenuItem
-                            key={apiModel}
-                            onClick={() => handleApiKeySelect(apiModel)}
-                            _hover={{ bg: "surface.tertiary" }}
-                            color="app.text.primary"
-                            textTransform="capitalize"
+            <Menu.Root>
+                <Menu.Trigger asChild>
+                    <Button
+                        // rightIcon={<ChevronDownIcon/>}
+                        variant="outline"
+                        size="sm"
+                        borderColor="app.border"
+                        color="app.text.primary"
+                        _hover={{
+                            borderColor: "app.accent",
+                            bg: "surface.tertiary"
+                        }}
+                    >
+                        <ChevronDownIcon/>
+                        API Keys
+                    </Button>
+                </Menu.Trigger>
+                <Portal>
+                    <MenuPositioner>
+                        <Menu.Content
+                            bg="app.card.bg"
+                            borderColor="app.border"
                         >
-                            {apiModel}
-                        </MenuItem>
-                    ))}
-                </MenuList>
-            </Menu>
+                            {apiModels.map((apiModel) => (
+                                <Menu.Item
+                                    value={apiModel}
+                                    key={apiModel}
+                                    onClick={() => handleApiKeySelect(apiModel)}
+                                    _hover={{bg: "surface.tertiary"}}
+                                    color="app.text.primary"
+                                    textTransform="capitalize"
+                                >
+                                    {apiModel}
+                                </Menu.Item>
+                            ))}
+                        </Menu.Content>
+                    </MenuPositioner>
+                </Portal>
+            </Menu.Root>
 
             {/* LLM Provider Selector */}
-            <Menu>
-                <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    variant="outline"
-                    size="sm"
-                    borderColor="app.border"
-                    color="app.text.primary"
-                    _hover={{
-                        borderColor: "app.accent",
-                        bg: "surface.tertiary"
-                    }}
-                >
-                    {selectedLLM || "Provider"}
-                </MenuButton>
-                <MenuList
-                    bg="app.card.bg"
-                    borderColor="app.border"
-                >
-                    {llms.map((llm) => (
-                        <MenuItem
-                            key={llm}
-                            onClick={() => handleLLMSelect(llm)}
-                            _hover={{ bg: "surface.tertiary" }}
-                            color="app.text.primary"
-                            textTransform="capitalize"
+            <Menu.Root>
+                <Menu.Trigger asChild>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        borderColor="app.border"
+                        color="app.text.primary"
+                        _hover={{
+                            borderColor: "app.accent",
+                            bg: "surface.tertiary"
+                        }}
+                    >
+                        <ChevronDownIcon/>
+                        {selectedLLM || "Provider"}
+                    </Button>
+                </Menu.Trigger>
+                <Portal>
+                    <MenuPositioner>
+                        <Menu.Content
+                            bg="app.card.bg"
+                            borderColor="app.border"
                         >
-                            {llm}
-                        </MenuItem>
-                    ))}
-                </MenuList>
-            </Menu>
+                            {llms.map((llm) => (
+                                <Menu.Item
+                                    value={llm}
+                                    key = {llm}
+                                    onClick={() => handleLLMSelect(llm)}
+                                    _hover={{bg: "surface.tertiary"}}
+                                    color="app.text.primary"
+                                    textTransform="capitalize"
+                                >
+                                    {llm}
+                                </Menu.Item>
+                            ))}
+                        </Menu.Content>
+                    </MenuPositioner>
+                </Portal>
+            </Menu.Root>
 
             {/* Model Selector */}
-            <Menu>
-                <MenuButton
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                    variant="outline"
-                    size="sm"
-                    borderColor="app.border"
-                    color="app.text.primary"
-                    _hover={{
-                        borderColor: "app.accent",
-                        bg: "surface.tertiary"
-                    }}
-                    isDisabled={!selectedLLM}
-                >
-                    {selectedModel || "Model"}
-                </MenuButton>
-                <MenuList
-                    bg="app.card.bg"
-                    borderColor="app.border"
-                >
-                    {(selectedLLM === "groq" ? groqModels :
-                      selectedLLM === "ollama" ? ollamaModels :
-                      [...groqModels, ...ollamaModels]).map((model) => (
-                        <MenuItem
-                            key={model}
-                            onClick={() => handleModelSelect(model)}
-                            _hover={{ bg: "surface.tertiary" }}
-                            color="app.text.primary"
-                        >
-                            {model}
-                        </MenuItem>
-                    ))}
-                </MenuList>
-            </Menu>
+            <Menu.Root>
+                <Menu.Trigger asChild>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        borderColor="app.border"
+                        color="app.text.primary"
+                        _hover={{
+                            borderColor: "app.accent",
+                            bg: "surface.tertiary"
+                        }}
+                        disabled={!selectedLLM}
+                    >
+                        <ChevronDownIcon/>
+                        {selectedModel || "Model"}
+                    </Button>
+                </Menu.Trigger>
+                <MenuPositioner>
+                    <Menu.Content
+                        bg="app.card.bg"
+                        borderColor="app.border"
+                    >
+                        {(selectedLLM === "groq"
+                                ? groqModels
+                                : selectedLLM === "ollama"
+                                    ? ollamaModels
+                                    : [...groqModels, ...ollamaModels]
+                        ).map((model) => (
+                            <Menu.Item
+                                value={model}
+                                key={model}
+                                onClick={() => handleModelSelect(model)}
+                                _hover={{bg: "surface.tertiary"}}
+                                color="app.text.primary"
+                            >
+                                {model}
+                            </Menu.Item>
+                        ))}
+                    </Menu.Content>
+                </MenuPositioner>
+            </Menu.Root>
 
             {/* Status Display */}
             {(selectedLLM || selectedModel) && (
-                <HStack spacing={2}>
+                <HStack gap={2}>
                     {selectedLLM && (
                         <Badge
                             colorScheme="brand"
@@ -187,6 +210,7 @@ const LLMModelChooser = () => {
             )}
         </HStack>
     );
+
 };
 
 export default LLMModelChooser;

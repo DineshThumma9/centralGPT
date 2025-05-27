@@ -65,7 +65,7 @@ const Response = () => {
         >
             {messages.length === 0 ? (
                 <Center h="full">
-                    <VStack spacing={4}>
+                    <VStack  gap={4}>
                         <Text
                             fontSize="xl"
                             color="app.text.secondary"
@@ -84,7 +84,7 @@ const Response = () => {
                     </VStack>
                 </Center>
             ) : (
-                <VStack spacing={4} align="stretch" p={6}>
+                <VStack gap={4} align="stretch" p={6}>
                     {messages.map((msg, idx) => (
                         <Box
                             key={msg.message_id || idx}

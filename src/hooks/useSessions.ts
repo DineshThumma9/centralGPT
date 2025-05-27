@@ -1,9 +1,16 @@
 import type Session from "../entities/Session.ts";
 import sessionStore from "../store/sessionStore.ts";
-import { useEffect, useRef } from "react";
-import { newSession, getChatHistory, deleteSession, updateSessionTitle, getAllSessions, streamChatResponse,testMsg } from "../api/session-api.ts";
+import {useEffect, useRef} from "react";
+import {
+  deleteSession,
+  getAllSessions,
+  getChatHistory,
+  newSession,
+  streamChatResponse,
+  testMsg,
+  updateSessionTitle
+} from "../api/session-api.ts";
 import type Message from "../entities/Message.ts";
-import type {AxiosResponse} from "axios";
 
 const useSessions = () => {
   const eventSourceRef = useRef<EventSource | null>(null);

@@ -1,117 +1,158 @@
-import { extendTheme, type ThemeConfig } from "@chakra-ui/react";
+import { createSystem, defineConfig, defaultConfig } from "@chakra-ui/react";
 
-const config: ThemeConfig = {
-    initialColorMode: "dark",
-    useSystemColorMode: false
+
+const tokens = {
+  colors: {
+    gray: {
+      50: { value: '#f9f9f9' },
+      100: { value: '#ededed' },
+      200: { value: '#d3d3d3' },
+      300: { value: '#b3b3b3' },
+      400: { value: '#a0a0a0' },
+      500: { value: '#898989' },
+      600: { value: '#6c6c6c' },
+      700: { value: '#202020' },
+      800: { value: '#121212' },
+      900: { value: '#111111' }
+    },
+    green: {
+      50: { value: '#e6f9f0' },
+      100: { value: '#b2f2d9' },
+      200: { value: '#7debc2' },
+      300: { value: '#48e4ab' },
+      400: { value: '#24d68f' },
+      500: { value: '#12b36f' },
+      600: { value: '#0e8a54' },
+      700: { value: '#09613a' },
+      800: { value: '#053820' },
+      900: { value: '#021107' }
+    },
+    brand: {
+      50: { value: '#e6f9f0' },
+      100: { value: '#b2f2d9' },
+      200: { value: '#7debc2' },
+      300: { value: '#48e4ab' },
+      400: { value: '#24d68f' },
+      500: { value: '#12b36f' },
+      600: { value: '#0e8a54' },
+      700: { value: '#09613a' },
+      800: { value: '#053820' },
+      900: { value: '#021107' }
+    },
+    surface: {
+      primary: { value: '#000000' },
+      secondary: { value: '#121212' },
+      tertiary: { value: '#202020' },
+      sidebar: { value: '#1a1a1a' },
+    },
+    text: {
+      primary: { value: '#ffffff' },
+      secondary: { value: '#b3b3b3' },
+      muted: { value: '#898989' },
+    }
+  },
+  fonts: {
+    heading: { value: "'Red Rose', sans-serif" },
+    body: { value: "'Jaldi', sans-serif" }
+  }
 };
 
-const theme = extendTheme({
-    config,
-    fonts: {
-        heading: "'Red Rose', sans-serif",
-        body: "'Jaldi', sans-serif",
-    },
-    colors: {
-        gray: {
-            50: '#f9f9f9',
-            100: '#ededed',
-            200: '#d3d3d3',
-            300: '#b3b3b3',
-            400: '#a0a0a0',
-            500: '#898989',
-            600: '#6c6c6c',
-            700: '#202020',
-            800: '#121212',
-            900: '#111111'
-        },
-        green: {
-            50: '#e6f9f0',
-            100: '#b2f2d9',
-            200: '#7debc2',
-            300: '#48e4ab',
-            400: '#24d68f',
-            500: '#12b36f',
-            600: '#0e8a54',
-            700: '#09613a',
-            800: '#053820',
-            900: '#021107'
-        },
-        brand: {
-            50: '#e6f9f0',
-            100: '#b2f2d9',
-            200: '#7debc2',
-            300: '#48e4ab',
-            400: '#24d68f',
-            500: '#12b36f', // Primary green
-            600: '#0e8a54',
-            700: '#09613a',
-            800: '#053820',
-            900: '#021107'
-        },
-        surface: {
-            primary: '#000000',    // Main black background
-            secondary: '#121212',  // Card/component backgrounds
-            tertiary: '#202020',   // Elevated surfaces
-            sidebar: '#1a1a1a',    // Sidebar background
-        },
-        text: {
-            primary: '#ffffff',    // Primary text (white)
-            secondary: '#b3b3b3',  // Secondary text (gray)
-            muted: '#898989',      // Muted text
-        }
-    },
-    semanticTokens: {
-        colors: {
-            // App-wide color tokens
-            'app.bg': 'surface.primary',
-            'app.sidebar.bg': 'surface.sidebar',
-            'app.card.bg': 'surface.secondary',
-            'app.text.primary': 'text.primary',
-            'app.text.secondary': 'text.secondary',
-            'app.accent': 'brand.500',
-            'app.border': 'gray.600',
-        }
-    },
-    styles: {
-        global: {
-            body: {
-                bg: 'app.bg',
-                color: 'app.text.primary',
-                fontFamily: 'body',
-            },
-            '*': {
-                borderColor: 'app.border !important',
-            }
-        },
-    },
-    components: {
-        // Override component defaults
-        Button: {
-            defaultProps: {
-                colorScheme: 'brand',
-            },
-        },
-        Input: {
-            defaultProps: {
-                focusBorderColor: 'brand.500',
-            },
-        },
-        Menu: {
-            baseStyle: {
-                list: {
-                    bg: 'app.card.bg',
-                    borderColor: 'app.border',
-                },
-                item: {
-                    bg: 'app.card.bg',
-                    color: 'app.text.primary',
-                    _hover: {
-                        bg: 'surface.tertiary',
-                    }
-                }
-            }
-        }
-    }
+// 2. Semantic tokens
+const semanticTokens = {
+  colors: {
+    "app.bg": { value: "{colors.surface.primary}" },
+    "app.sidebar.bg": { value: "{colors.surface.sidebar}" },
+    "app.card.bg": { value: "{colors.surface.secondary}" },
+    "app.text.primary": { value: "{colors.text.primary}" },
+    "app.text.secondary": { value: "{colors.text.secondary}" },
+    "app.accent": { value: "{colors.brand.500}" },
+    "app.border": { value: "{colors.gray.600}" },
+  }
+};
+
+// 3. Global CSS
+const globalCss = {
+  body: {
+    bg: "{colors.surface.primary}",
+    color: "{colors.text.primary}",
+    fontFamily: "{fonts.body}",
+  },
+  "*": {
+    borderColor: "{colors.gray.600} !important",
+  }
+};
+
+// 4. Create config and system
+const config = defineConfig({
+  theme: {
+    tokens,
+    semanticTokens,
+  },
+  globalCss,
 });
 
-export default theme;
+const system = createSystem(defaultConfig, config);
+
+
+export const buttonRecipe = system.cva({
+  base: {
+    fontWeight: "bold",
+    borderRadius: "md",
+  },
+  variants: {
+    variant: {
+      solid: {
+        bg: "brand.500",
+        color: "white",
+        _hover: {
+          bg: "brand.600",
+        },
+      },
+      outline: {
+        border: "2px solid",
+        borderColor: "brand.500",
+        color: "brand.500",
+        _hover: {
+          bg: "brand.50",
+        },
+      },
+    },
+  },
+  defaultVariants: {
+    variant: "solid",
+  },
+});
+
+// Example: Input recipe
+export const inputRecipe = system.cva({
+  base: {
+    borderRadius: "md",
+    borderColor: "gray.600",
+    _focus: {
+      borderColor: "brand.500",
+      boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)",
+    },
+  },
+});
+
+
+export const menuRecipe = system.sva({
+  slots: ["list", "item"],
+  base: {
+    list: {
+      bg: "surface.secondary",
+      borderColor: "gray.600",
+    },
+    item: {
+      bg: "surface.secondary",
+      color: "text.primary",
+      _hover: {
+        bg: "surface.tertiary",
+      },
+    },
+  },
+
+});
+
+
+export default system;

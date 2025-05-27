@@ -10,7 +10,7 @@ const ChatArea = () => {
     return (
         <VStack
             flex="1"
-            spacing={0}
+            gap={"0"}
             h="100vh"
             bg="app.bg"
             color="app.text.primary"

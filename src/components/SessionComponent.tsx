@@ -1,17 +1,24 @@
 import {
-    Editable, EditableInput, EditablePreview,
+    Editable,
     HStack,
     IconButton,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
     Text,
-    useToast,
+    createToaster,
 } from "@chakra-ui/react";
-import {BiDotsVerticalRounded, BiEdit, BiShare, BiTrash} from "react-icons/bi";
+import {MoreVertical, Edit, Share, Trash} from "lucide-react";
+import {
+    MenuContent,
+    MenuItem,
+    MenuRoot,
+    MenuTrigger,
+} from "./ui/menu.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import {useRef, useState} from "react";
+
+// Create toaster instance
+const toaster = createToaster({
+    placement: "top",
+});
 
 interface Props {
     title: string;
@@ -23,45 +30,39 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
     const {changeTitle, deleteSessionById} = useSessions();
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
-    const toast = useToast();
 
     const inputRef = useRef<HTMLInputElement>(null)
-
 
     const handleChangeTitleClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
         inputRef.current?.focus()
-
     };
 
-    const handleTitleUpdate = async (nextValue: string) => {
-        const trimmed = nextValue.trim();
+    const handleTitleUpdate = async (value: string) => {
+        const trimmed = value.trim();
         if (trimmed !== title) {
             setIsUpdatingTitle(true);
             try {
-                await changeTitle(trimmed); // call the passed-in prop
-                toast({
+                await changeTitle(trimmed);
+                toaster.create({
                     title: "Title updated",
                     description: `Session title changed to "${trimmed}"`,
-                    status: "success",
+                    type: "success",
                     duration: 2000,
-                    isClosable: true,
                 });
             } catch (error) {
                 console.error("Failed to change title:", error);
-                toast({
+                toaster.create({
                     title: "Error",
                     description: "Failed to update session title",
-                    status: "error",
+                    type: "error",
                     duration: 3000,
-                    isClosable: true,
                 });
             } finally {
                 setIsUpdatingTitle(false);
             }
         }
     };
-
 
     const handleDeleteSession = async (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -70,21 +71,19 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
             setIsDeleting(true);
             try {
                 await deleteSessionById(sessionId);
-                toast({
+                toaster.create({
                     title: "Session deleted",
                     description: `"${title}" has been deleted`,
-                    status: "success",
+                    type: "success",
                     duration: 2000,
-                    isClosable: true,
                 });
             } catch (error) {
                 console.error("Failed to delete session:", error);
-                toast({
+                toaster.create({
                     title: "Error",
                     description: "Failed to delete session",
-                    status: "error",
+                    type: "error",
                     duration: 3000,
-                    isClosable: true,
                 });
             } finally {
                 setIsDeleting(false);
@@ -92,15 +91,13 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
         }
     };
 
-
     const handleShare = (e: React.MouseEvent) => {
         e.stopPropagation();
-        toast({
+        toaster.create({
             title: "Coming Soon",
             description: "Share functionality will be available soon",
-            status: "info",
+            type: "info",
             duration: 2000,
-            isClosable: true,
         });
     };
 
@@ -109,12 +106,13 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
             justifyContent="space-between"
             w="100%"
             p={2.5}
-
-            _hover={{
-                bg: "surface.tertiary",
-                transform: "translateY(-1px)",
+            css={{
+                "&:hover": {
+                    bg: "var(--chakra-colors-surface-tertiary)",
+                    transform: "translateY(-1px)",
+                },
+                transition: "all 0.2s ease-in-out"
             }}
-            transition="all 0.2s ease-in-out"
             cursor="pointer"
             onClick={onSelect}
             border={"0px"}
@@ -123,22 +121,25 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
             opacity={isDeleting ? 0.5 : 1}
             pointerEvents={isDeleting ? "none" : "auto"}
         >
-            <Editable
+            <Editable.Root
                 defaultValue={title}
-                onSubmit={handleTitleUpdate}
-                isDisabled={isUpdatingTitle}
+                onValueChange={({ value }) => handleTitleUpdate(value)}
+                disabled={isUpdatingTitle}
             >
-                <EditablePreview
-                    as={Text}
-                    isTruncated
-                    border={"0px"}
-                    color="app.text.primary"
-                    fontSize="sm"
-                    fontWeight="medium"
-                    flex="1"
-                    opacity={isUpdatingTitle ? 0.7 : 1}
-                />
-                <EditableInput
+                <Editable.Preview
+                    asChild
+                >
+                    <Text
+                        truncate
+                        border={"0px"}
+                        color="app.text.primary"
+                        fontSize="sm"
+                        fontWeight="medium"
+                        flex="1"
+                        opacity={isUpdatingTitle ? 0.7 : 1}
+                    />
+                </Editable.Preview>
+                <Editable.Input
                     ref={inputRef}
                     fontSize="sm"
                     fontWeight="medium"
@@ -146,58 +147,74 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                     px={1}
                     borderRadius="md"
                 />
-            </Editable>
+            </Editable.Root>
 
-
-            <Menu>
-                <MenuButton
-                    as={IconButton}
-                    icon={<BiDotsVerticalRounded/>}
-                    variant="ghost"
-                    aria-label="More Options"
-                    size="sm"
-                    color="app.text.secondary"
-                    _hover={{
-                        bg: "surface.tertiary",
-                        color: "app.accent",
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                    isDisabled={isDeleting || isUpdatingTitle}
-                />
-                <MenuList
+            <MenuRoot>
+                <MenuTrigger asChild>
+                    <IconButton
+                        variant="ghost"
+                        aria-label="More Options"
+                        size="sm"
+                        color="app.text.secondary"
+                        css={{
+                            "&:hover": {
+                                bg: "var(--chakra-colors-surface-tertiary)",
+                                color: "var(--chakra-colors-app-accent)",
+                            }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        disabled={isDeleting || isUpdatingTitle}
+                    >
+                        <MoreVertical />
+                    </IconButton>
+                </MenuTrigger>
+                <MenuContent
                     bg="app.card.bg"
                     borderColor="app.border"
                     shadow="lg"
                 >
                     <MenuItem
-                        icon={<BiEdit/>}
-                        _hover={{bg: "surface.tertiary"}}
+                        value="edit"
+                        css={{
+                            "&:hover": { bg: "var(--chakra-colors-surface-tertiary)" }
+                        }}
                         onClick={handleChangeTitleClick}
                         color="app.text.primary"
-                        isDisabled={isUpdatingTitle}
+                        disabled={isUpdatingTitle}
                     >
+                        <Edit />
                         {isUpdatingTitle ? "Updating..." : "Change Title"}
                     </MenuItem>
 
                     <MenuItem
-                        icon={<BiShare/>}
-                        _hover={{bg: "surface.tertiary"}}
+                        value="share"
+                        css={{
+                            "&:hover": { bg: "var(--chakra-colors-surface-tertiary)" }
+                        }}
                         onClick={handleShare}
                         color="app.text.primary"
                     >
+                        <Share />
                         Share
                     </MenuItem>
+
                     <MenuItem
-                        icon={<BiTrash/>}
+                        value="delete"
                         onClick={handleDeleteSession}
-                        _hover={{bg: "red.600", color: "white"}}
+                        css={{
+                            "&:hover": {
+                                bg: "var(--chakra-colors-red-600)",
+                                color: "white"
+                            }
+                        }}
                         color="red.400"
-                        isDisabled={isDeleting}
+                        disabled={isDeleting}
                     >
+                        <Trash />
                         {isDeleting ? "Deleting..." : "Delete"}
                     </MenuItem>
-                </MenuList>
-            </Menu>
+                </MenuContent>
+            </MenuRoot>
         </HStack>
     );
 };

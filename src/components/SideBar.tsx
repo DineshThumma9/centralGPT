@@ -1,8 +1,8 @@
-import {Box, HStack, IconButton, Text, VStack} from "@chakra-ui/react";
+import {Box, Button, HStack, Text, VStack} from "@chakra-ui/react";
 import {FiChevronLeft, FiChevronRight} from "react-icons/fi";
 import {useEffect, useState} from "react";
 import SideBarNav from "./SideBarNav.tsx";
-import {SettingsIcon} from "@chakra-ui/icons";
+import {SettingsIcon} from "lucide-react";
 import SessionComponent from "./SessionComponent.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
@@ -26,7 +26,6 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         onCollapse?.(newCollapsed);
     };
 
-
     useEffect(() => {
         const unsubscribe = sessionStore.subscribe((state) => {
             setSessions(state.sessions);
@@ -34,7 +33,6 @@ export default function Sidebar({onCollapse}: SidebarProps) {
             setIsLoading(state.isLoading);
         });
 
-        // Get initial state
         const initialState = sessionStore.getState();
         setSessions(initialState.sessions);
         setCurrentSession(initialState.current_session);
@@ -43,15 +41,13 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         return unsubscribe;
     }, []);
 
-    // Load sessions on mount
     useEffect(() => {
         getSessions();
     }, []);
 
-    // Initial collapse state
     useEffect(() => {
         onCollapse?.(collapsed);
-    }, []);
+    }, [collapsed, onCollapse]);
 
     const handleSessionSelect = async (sessionId: string) => {
         try {
@@ -70,11 +66,10 @@ export default function Sidebar({onCollapse}: SidebarProps) {
             h="100vh"
             p={4}
             overflow="hidden"
-            border={"0px"}
+            border="0px"
             position="relative"
         >
-            <IconButton
-                icon={collapsed ? <FiChevronRight/> : <FiChevronLeft/>}
+            <Button
                 aria-label="Toggle sidebar"
                 size="sm"
                 mb={4}
@@ -83,38 +78,39 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                 color="app.text.primary"
                 _hover={{
                     bg: "surface.tertiary",
-                    transform: "scale(1.05)"
+                    transform: "scale(1.05)",
                 }}
                 _active={{
-                    transform: "scale(0.95)"
+                    transform: "scale(0.95)",
                 }}
                 transition="all 0.2s"
-            />
+            >
+                {collapsed ? <FiChevronRight/> : <FiChevronLeft/>}
+            </Button>
 
-            <VStack align="stretch" spacing={4} height="calc(100% - 60px)">
+            <VStack align="stretch" gap={4} height="calc(100% - 60px)">
                 {!collapsed && (
                     <>
                         <SideBarNav/>
 
-                        {/* Sessions List */}
                         <VStack
-                            spacing={2}
+                            gap={2}
                             align="stretch"
                             overflowY="auto"
                             flex="1"
                             css={{
-                                '&::-webkit-scrollbar': {
-                                    width: '6px',
+                                "&::-webkit-scrollbar": {
+                                    width: "6px",
                                 },
-                                '&::-webkit-scrollbar-track': {
-                                    background: 'transparent',
+                                "&::-webkit-scrollbar-track": {
+                                    background: "transparent",
                                 },
-                                '&::-webkit-scrollbar-thumb': {
-                                    background: '#404040',
-                                    borderRadius: '3px',
+                                "&::-webkit-scrollbar-thumb": {
+                                    background: "#404040",
+                                    borderRadius: "3px",
                                 },
-                                '&::-webkit-scrollbar-thumb:hover': {
-                                    background: '#505050',
+                                "&::-webkit-scrollbar-thumb:hover": {
+                                    background: "#505050",
                                 },
                             }}
                         >
@@ -157,7 +153,6 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                             })}
                         </VStack>
 
-                        {/* Settings */}
                         <HStack
                             justify="flex-start"
                             mt="auto"
@@ -171,20 +166,23 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                             transition="background 0.2s"
                         >
                             <SettingsIcon color="app.accent"/>
-                            <Text fontSize="sm" color="app.text.secondary">Settings</Text>
+                            <Text fontSize="sm" color="app.text.secondary">
+                                Settings
+                            </Text>
                         </HStack>
                     </>
                 )}
 
                 {collapsed && (
-                    <VStack spacing={4} align="center">
-                        <SettingsIcon
-                            color="app.accent"
-                            cursor="pointer"
-                            _hover={{transform: "scale(1.1)"}}
-                            transition="transform 0.2s"
-                        />
-                    </VStack>
+                    <Box
+                        color="app.accent"
+                        cursor="pointer"
+                        transition="transform 0.2s"
+                        _hover={{transform: "scale(1.1)"}}
+                    >
+                        <SettingsIcon/>
+                    </Box>
+
                 )}
             </VStack>
         </Box>
