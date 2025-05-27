@@ -93,10 +93,11 @@ const Response = () => {
                             color={msg.role === "user" ? "white" : "app.text.primary"}
                             px={4}
                             py={4}
-                            maxW={"100%"}
+                            maxW={msg.role === "user" ? "70%" : "100%"}
+
                             maxH={"100%"}
                             boxSize={"auto"}
-                            shadow="sm"
+                            // shadow="sm"
                             borderRadius={msg.role === "user" ? "40px" : "Opx"}
                             borderColor={"transparent"}
                             _hover={{

@@ -40,7 +40,7 @@ const tokens = {
       900: { value: '#021107' }
     },
     surface: {
-      primary: { value: '#000000' },
+      primary: { value: '#131313' },
       secondary: { value: '#121212' },
       tertiary: { value: '#202020' },
       sidebar: { value: '#1a1a1a' },

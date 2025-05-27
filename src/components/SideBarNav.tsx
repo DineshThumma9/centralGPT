@@ -50,6 +50,7 @@ const SideBarNav = () => {
                 aria-label="Create new chat"
                 variant="ghost"
                 size="sm"
+                borderRadius={"full"}
                 color="app.text.primary"
                 css={{
                     "&:hover": {
@@ -72,6 +73,7 @@ const SideBarNav = () => {
                 aria-label="Search chats"
                 variant="ghost"
                 size="sm"
+                borderRadius={"full"}
                 color="app.text.secondary"
                 css={{
                     "&:hover": {

@@ -2,10 +2,12 @@ import {Badge, Button, HStack, Menu, MenuPositioner, Portal} from "@chakra-ui/re
 import {ChevronDownIcon} from "lucide-react";
 import {useState} from "react";
 import axios from "axios";
+import useSessions from "../hooks/useSessions.ts";
 
 const LLMModelChooser = () => {
     const [selectedLLM, setSelectedLLM] = useState("");
     const [selectedModel, setSelectedModel] = useState("");
+    const {setUpLLM,setUpModel} = useSessions()
 
     const groqModels: string[] = [
         "qwen-qwq-32b",
@@ -41,19 +43,14 @@ const LLMModelChooser = () => {
             .catch((err) => console.error("Error fetching API key:", err));
     };
 
-    const handleLLMSelect = (llm: string) => {
-        axios
-            .post(`http://localhost:8000/api/providers/${llm}`)
-            .then((res) => console.log(res.data))
-            .catch((err) => console.error("Error fetching LLM:", err));
+    const handleLLMSelect = async (llm: string) => {
+
+        await setUpLLM(llm)
         setSelectedLLM(llm);
     };
 
-    const handleModelSelect = (model: string) => {
-        axios
-            .post(`http://localhost:8000/api/models/${model}`)
-            .then((res) => console.log(res.data))
-            .catch((err) => console.error("Error fetching model:", err));
+    const handleModelSelect = async (model: string) => {
+        await setUpModel(model)
         setSelectedModel(model);
     };
 

@@ -6,6 +6,11 @@ const API = axios.create({
     withCredentials: true
 });
 
+const apiSetUp = axios.create({
+    baseURL: "http://localhost:8000/setup",
+    withCredentials: true
+});
+
 
 
 interface SessionResponse {
@@ -13,6 +18,79 @@ interface SessionResponse {
     message: string;
 }
 
+    //
+    // const handleApiKeySelect = (apiModel: string) => {
+    //     axios
+    //         .post(`http://localhost:8000/api/${apiModel}`)
+    //         .then((res) => console.log(res.data))
+    //         .catch((err) => console.error("Error fetching API key:", err));
+    // };
+    //
+    // const handleLLMSelect = (llm: string) => {
+    //     axios
+    //         .post(`http://localhost:8000/api/providers/${llm}`)
+    //         .then((res) => console.log(res.data))
+    //         .catch((err) => console.error("Error fetching LLM:", err));
+    //     setSelectedLLM(llm);
+    // };
+    //
+    // const handleModelSelect = (model: string) => {
+    //     axios
+    //         .post(`http://localhost:8000/api/models/${model}`)
+    //         .then((res) => console.log(res.data))
+    //         .catch((err) => console.error("Error fetching model:", err));
+    //     setSelectedModel(model);
+    // };
+    //
+
+export const llmSelection = async (llm_class:string)=> {
+    try{
+
+        const res = await apiSetUp.post(`/providers` , {llm_class} , {
+                headers: { "Content-Type": "application/json" }
+            })
+
+        console.log("res is empty: ",res)
+        console.log("res is empty:res.data" , res.data)
+
+
+        if(!res?.data){
+            throw Error("Error in llm Selection")
+        }
+
+
+
+    }
+
+    catch (error){
+        console.log("Error has occures here IN llm selection")
+        throw  error
+
+    }
+}
+
+
+export const modelSelection= async (model:string)=> {
+
+    try{
+
+        const res = await apiSetUp.post(`/models`,{model} ,{
+            headers:{"Content-Type":"application/json"}
+        })
+
+        if(!res?.data){
+            throw Error("Error in model")
+        }
+
+
+
+    }
+    catch (error){
+
+        console.log("Error in Model selection")
+          throw error
+    }
+}
 
 
 

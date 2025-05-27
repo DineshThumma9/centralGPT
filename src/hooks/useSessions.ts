@@ -8,10 +8,26 @@ import {
   newSession,
   streamChatResponse,
   testMsg,
-  updateSessionTitle
+  updateSessionTitle,
+    llmSelection,
+    modelSelection
 } from "../api/session-api.ts";
 import type Message from "../entities/Message.ts";
 
+
+
+
+const setUpLLM = async (class_llm:string) => {
+
+  await llmSelection(class_llm)
+
+}
+
+const setUpModel = async (model_setup:string) => {
+
+  await modelSelection(model_setup)
+
+}
 const useSessions = () => {
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -319,6 +335,8 @@ const useSessions = () => {
     createNewSession,
     changeTitle,
     getHistory,
+    setUpLLM,
+    setUpModel,
     deleteSessionById,
     getSessions,
     fetchAllSessions,
