@@ -3,38 +3,14 @@ import {ChevronDownIcon} from "lucide-react";
 import {useState} from "react";
 import axios from "axios";
 import useSessions from "../hooks/useSessions.ts";
+import { Constants } from "../entities/Constants.ts";
 
 const LLMModelChooser = () => {
     const [selectedLLM, setSelectedLLM] = useState("");
     const [selectedModel, setSelectedModel] = useState("");
     const {setUpLLM,setUpModel} = useSessions()
 
-    const groqModels: string[] = [
-        "qwen-qwq-32b",
-        "compound-beta",
-        "gemma2-9b-it",
-        "compound-beta-mini",
-    ];
-
-    const apiModels: string[] = [
-        "openai",
-        "claude",
-        "gemini",
-        "vertex",
-        "azure",
-        "groq"
-    ];
-
-    const ollamaModels: string[] = [
-        "qwen3",
-        "codegemma:2b",
-        "gemma3:4b",
-        "llama3.1:latest",
-        "deepseek-coder:6.7b",
-        "mistral:latest"
-    ];
-
-    const llms: string[] = ["groq", "ollama"];
+   const { ollamaModels, apiModels, groqModels, llms } = Constants();
 
     const handleApiKeySelect = (apiModel: string) => {
         axios
@@ -55,7 +31,7 @@ const LLMModelChooser = () => {
     };
 
 
-// ...your handler and state code...
+
 
     return (
         <HStack gap={3} flexWrap="wrap">

@@ -8,8 +8,8 @@ export default interface Message {
     isError?:boolean,
     message_id:string
     content:string
-    role: "user" | "assistant"
-    created_at:string
+    sender: "user" | "assistant"
+    timestamp:string
     updates_at?:string
 
 

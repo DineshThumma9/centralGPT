@@ -50,34 +50,22 @@ const useSessions = () => {
 
 
 
-  const tstMsgFunc= async (msg:string) => {
-    try{
-      console.log("In tsgMegFunc")
-      const res = await testMsg(msg)
+const tstMsgFunc = async (msg: string) => {
+  try {
+    console.log("In tstMsgFunc");
+    const res = await testMsg(msg);
 
+    if (!res || !res.content) throw new Error("Res is empty");
 
-      const return_msg:Message  = {
-         message_id : res.message_id,
-        session_id: res.session_id,
-        content: res.content,
-         role : res.role,
-         created_at : res.created_at
-      }
-      console.log("Checking res object",res)
+    const return_msg = res as Message; // 🔄 Easy conversion
 
-      if(!res || !res.content){
-        throw Error("Res is empty")
-      }
-
-
-      addMessage(return_msg)
-      return return_msg
-    }
-    catch (error){
-       console.log("Found error in useSessiosn testMegFunc" , error)
-
-    }
+    addMessage(return_msg);
+    return return_msg;
+  } catch (error) {
+    console.error("Error in tstMsgFunc:", error);
   }
+};
+
 
 
   const createNewSession = async () => {
@@ -128,8 +116,8 @@ const useSessions = () => {
       session_id: activeSession!,
       message_id: userMsgId,
       content: msg,
-      role: "user",
-      created_at: new Date().toISOString()
+      sender: "user",
+      timestamp: new Date().toISOString()
     };
 
     // Add user message immediately
@@ -159,8 +147,8 @@ const useSessions = () => {
               session_id: activeSession!,
               message_id,
               content,
-              role: "assistant",
-              created_at: new Date().toISOString(),
+              sender: "assistant",
+              timestamp: new Date().toISOString(),
               isStreaming: true
             });
           }

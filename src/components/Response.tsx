@@ -88,17 +88,17 @@ const Response = () => {
                     {messages.map((msg, idx) => (
                         <Box
                             key={msg.message_id || idx}
-                            alignSelf={msg.role === "user" ? "flex-end" : "flex-start"}
-                            bg={msg.role === "user" ? "app.accent" : "app.bg"}
-                            color={msg.role === "user" ? "white" : "app.text.primary"}
+                            alignSelf={msg.sender === "user" ? "flex-end" : "flex-start"}
+                            bg={msg.sender === "user" ? "app.accent" : "app.bg"}
+                            color={msg.sender === "user" ? "white" : "app.text.primary"}
                             px={4}
                             py={4}
-                            maxW={msg.role === "user" ? "70%" : "100%"}
+                            maxW={msg.sender === "user" ? "70%" : "100%"}
 
                             maxH={"100%"}
                             boxSize={"auto"}
                             // shadow="sm"
-                            borderRadius={msg.role === "user" ? "40px" : "Opx"}
+                            borderRadius={msg.sender === "user" ? "40px" : "Opx"}
                             borderColor={"transparent"}
                             _hover={{
                                 transform: "translateY(-1px)",

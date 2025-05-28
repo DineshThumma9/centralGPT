@@ -30,8 +30,8 @@ const SendRequest = () => {
                 session_id: v4(),
                 message_id: v4(),
                 content: input,
-                role: "user", // Matches the expected type
-                created_at: new Date().toISOString()
+                sender: "user", // Matches the expected type
+                timestamp: new Date().toISOString()
             };
             addMessage(message)
             handleSendMessage();

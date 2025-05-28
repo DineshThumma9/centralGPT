@@ -1,5 +1,6 @@
 import axios from "axios";
 import type Message from "../entities/Message.ts";
+import {getAuthState} from "../store/authStore.ts";
 
 const API = axios.create({
     baseURL: "http://localhost:8000/sessions",
@@ -141,9 +142,9 @@ export const streamChatResponse = (
                 assistantMsg({
                     message_id: data.message_id,
                     content: data.content,
-                    role: "assistant",
+                    sender: "assistant",
                     session_id: sessionId,
-                    created_at: new Date().toISOString()
+                    timestamp: new Date().toISOString()
                 });
             } else if (data.type === "complete") {
                 evtSource.close();
@@ -204,7 +205,9 @@ export const deleteSession = async (session_id: string) => {
 };
 
 
+interface MessageRecived{
 
+}
 
 
 export const testMsg= async (msg: string) => {
@@ -212,11 +215,21 @@ export const testMsg= async (msg: string) => {
 
 
         const current_session_id = localStorage.getItem("current_session_id")
-        const res = await API.post(`/simple/${msg}`, {current_session_id}, {
+        const data = {
+            "session_id" : current_session_id,
+            "msg" : msg
+        }
+
+        console.log(data)
+
+        const res = await API.post(`/simple/`, data, {
             headers: { "Content-Type": "application/json" }
         });
-        console.log("In Sessions API ")
-        console.log("Res object is {res}")
+
+
+
+        console.log("In Sessions API \n here is res ",res)
+        console.log("Res object is {res}" , res.data)
 
 
         if (!res?.data) throw new Error("Res in Test Msg Failed");
@@ -257,3 +270,14 @@ export const getAllSessions = async () => {
         throw error;
     }
 };
+
+
+
+API.interceptors.request.use((config) => {
+  const token = getAuthState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+

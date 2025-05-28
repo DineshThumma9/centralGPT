@@ -31,14 +31,6 @@ export const login = (
 };
 
 
-
-
-
-
-
-
-
-
 export const register = async (username: string, email: string, password: string) => {
   try {
     console.log(
