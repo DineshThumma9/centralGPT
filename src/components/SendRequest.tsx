@@ -3,8 +3,10 @@ import {Search, Send} from "lucide-react";
 import {useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
-import type Message from "../entities/Message.ts";
+
 import { v4 } from "uuid"
+import Message from "../entities/Message.ts";
+import {z} from "zod/v4";
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
@@ -23,12 +25,13 @@ const SendRequest = () => {
         }
     };
 
+     type Message = z.infer<typeof Message>;
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
                const message: Message = {
-                session_id: v4(),
-                message_id: v4(),
+                session_id: v4() as string,
+                message_id: v4() as string,
                 content: input,
                 sender: "user", // Matches the expected type
                 timestamp: new Date().toISOString()
@@ -46,7 +49,7 @@ const SendRequest = () => {
             border = {"0px"}
             minH="80px"
         >
-            <HStack alignItems="center" gap={3}>
+            <HStack alignItems="center" gap={3} >
                 <Group flex="1">
                     <Box
                         position="absolute"
@@ -54,9 +57,9 @@ const SendRequest = () => {
                         top="50%"
                         transform="translateY(-50%)"
                         pointerEvents="none"
-                        zIndex={1}
+                        zIndex={1.5}
                     >
-                        <Search color="var(--chakra-colors-app-text-muted)" size={16}/>
+                        <Search color="black" size={16}/>
                     </Box>
                     <Input
                         borderRadius="full"
@@ -65,7 +68,7 @@ const SendRequest = () => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        bg="grey.600"
+                        bg="white"
                         borderColor="app.border"
                         color="app.text.primary"
                         pl={10}

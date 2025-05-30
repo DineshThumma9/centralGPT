@@ -4,11 +4,13 @@ import {useState} from "react";
 import axios from "axios";
 import useSessions from "../hooks/useSessions.ts";
 import { Constants } from "../entities/Constants.ts";
+import {llmSelection,modelSelection} from "../api/session-api.ts";
+import {MenuTrigger} from "./ui/menu.tsx";
 
 const LLMModelChooser = () => {
     const [selectedLLM, setSelectedLLM] = useState("");
     const [selectedModel, setSelectedModel] = useState("");
-    const {setUpLLM,setUpModel} = useSessions()
+
 
    const { ollamaModels, apiModels, groqModels, llms } = Constants();
 
@@ -21,12 +23,14 @@ const LLMModelChooser = () => {
 
     const handleLLMSelect = async (llm: string) => {
 
-        await setUpLLM(llm)
+
+        await llmSelection(llm)
         setSelectedLLM(llm);
     };
 
     const handleModelSelect = async (model: string) => {
-        await setUpModel(model)
+
+        await modelSelection(model)
         setSelectedModel(model);
     };
 
@@ -34,16 +38,17 @@ const LLMModelChooser = () => {
 
 
     return (
-        <HStack gap={3} flexWrap="wrap">
+        <HStack gap={3} flexWrap="wrap" margin={"0px"}>
             {/* API Key Selector */}
-            <Menu.Root>
+            <Menu.Root >
                 <Menu.Trigger asChild>
                     <Button
                         // rightIcon={<ChevronDownIcon/>}
                         variant="outline"
                         size="sm"
                         borderColor="app.border"
-                        color="app.text.primary"
+                        color="black"
+                        bg={"white"}
                         _hover={{
                             borderColor: "app.accent",
                             bg: "surface.tertiary"
@@ -64,8 +69,8 @@ const LLMModelChooser = () => {
                                     value={apiModel}
                                     key={apiModel}
                                     onClick={() => handleApiKeySelect(apiModel)}
-                                    _hover={{bg: "surface.tertiary"}}
-                                    color="app.text.primary"
+                                    _hover={{bg: "app.text.primary"}}
+                                    color="surface.tertiary"
                                     textTransform="capitalize"
                                 >
                                     {apiModel}
@@ -78,21 +83,27 @@ const LLMModelChooser = () => {
 
             {/* LLM Provider Selector */}
             <Menu.Root>
-                <Menu.Trigger asChild>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        borderColor="app.border"
-                        color="app.text.primary"
-                        _hover={{
-                            borderColor: "app.accent",
-                            bg: "surface.tertiary"
-                        }}
-                    >
-                        <ChevronDownIcon/>
-                        {selectedLLM || "Provider"}
-                    </Button>
-                </Menu.Trigger>
+
+
+                    <MenuTrigger asChild>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                               color="black"
+                        bg={"white"}
+
+                            _hover={{
+                                color: "app.border",
+                                borderColor: "app.text.primary",
+                            }}
+
+                        >
+                              <ChevronDownIcon/>
+                            {selectedLLM || "Provider"}
+                        </Button>
+                    </MenuTrigger>
+
+
                 <Portal>
                     <MenuPositioner>
                         <Menu.Content
@@ -122,8 +133,10 @@ const LLMModelChooser = () => {
                     <Button
                         variant="outline"
                         size="sm"
+                            color="black"
+                        bg={"white"}
                         borderColor="app.border"
-                        color="app.text.primary"
+
                         _hover={{
                             borderColor: "app.accent",
                             bg: "surface.tertiary"

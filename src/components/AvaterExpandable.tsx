@@ -2,7 +2,7 @@ import {Avatar, Button, Menu, MenuPositioner, Portal, VStack} from "@chakra-ui/r
 import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
 import Pc from "../assets/img.png";
 import {useAuth} from "../hooks/useAuth.ts";
-import { useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const AvatarExpandable = () => {
     const {logout} = useAuth();
@@ -12,13 +12,36 @@ const AvatarExpandable = () => {
         <VStack>
             <Menu.Root>
                 <Menu.Trigger asChild>
-                    <Button variant="ghost" size="sm" p={0}>
-                        <Avatar.Root size="sm">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        p={0}
+                        border="0px"
+                        bg="transparent"
+                        _hover={{
+                            borderRadius: "full",
+                            bg: "transparent",
+                            boxShadow: "none",
+                        }}
+                        _focus={{
+                            boxShadow: "none",
+                        }}
+                        zIndex = {2}
+                    >
+                        <Avatar.Root size="sm" border="0px">
                             <Avatar.Fallback name="Roronoa Zoro"/>
-                            <Avatar.Image src={Pc}/>
+                            <Avatar.Image
+                                zIndex ={2}
+                                src={Pc}
+                                borderRadius="full"
+                                _hover={{
+                                    borderRadius: "full",
+                                }}
+                            />
                         </Avatar.Root>
                     </Button>
                 </Menu.Trigger>
+
                 <Portal>
                     <MenuPositioner>
                         <Menu.Content>

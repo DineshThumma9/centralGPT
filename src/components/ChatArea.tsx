@@ -24,8 +24,10 @@ const ChatArea = () => {
                 p={4}
                 bg="app.bg"
                 border={"0px"}
+                margin={"0px"}
+
                 borderBottom="1px solid"
-                borderColor="app.border"
+                borderColor="app.bg"
                 minH="70px"
             >
                 <LLMModelChooser />

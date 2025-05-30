@@ -8,6 +8,10 @@ export const Constants = () => {
         "compound-beta",
         "gemma2-9b-it",
         "compound-beta-mini",
+            "llama3-70b-8192",
+            "llama-3.1-8b-instant",
+            "meta-llama/Llama-Guard-4-12",
+
     ];
 
     const apiModels: string[] = [

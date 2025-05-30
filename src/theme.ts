@@ -1,88 +1,112 @@
 import { createSystem, defineConfig, defaultConfig } from "@chakra-ui/react";
 
-
+// 1. Design Tokens
 const tokens = {
   colors: {
+    black: { value: '#000000' },
+    white: { value: '#FFFFFF' },
     gray: {
-      50: { value: '#f9f9f9' },
-      100: { value: '#ededed' },
-      200: { value: '#d3d3d3' },
-      300: { value: '#b3b3b3' },
-      400: { value: '#a0a0a0' },
-      500: { value: '#898989' },
-      600: { value: '#6c6c6c' },
-      700: { value: '#202020' },
-      800: { value: '#121212' },
-      900: { value: '#111111' }
-    },
-    green: {
-      50: { value: '#e6f9f0' },
-      100: { value: '#b2f2d9' },
-      200: { value: '#7debc2' },
-      300: { value: '#48e4ab' },
-      400: { value: '#24d68f' },
-      500: { value: '#12b36f' },
-      600: { value: '#0e8a54' },
-      700: { value: '#09613a' },
-      800: { value: '#053820' },
-      900: { value: '#021107' }
+      500: { value: 'rgba(255, 255, 255, 0.72)' },
     },
     brand: {
-      50: { value: '#e6f9f0' },
-      100: { value: '#b2f2d9' },
-      200: { value: '#7debc2' },
-      300: { value: '#48e4ab' },
-      400: { value: '#24d68f' },
-      500: { value: '#12b36f' },
-      600: { value: '#0e8a54' },
-      700: { value: '#09613a' },
-      800: { value: '#053820' },
-      900: { value: '#021107' }
+      primary: { value: '#171616' },
     },
-    surface: {
-      primary: { value: '#131313' },
-      secondary: { value: '#121212' },
-      tertiary: { value: '#202020' },
-      sidebar: { value: '#1a1a1a' },
+    whiteAlpha: {
+      200: { value: 'rgba(255, 255, 255, 0.08)' },
     },
-    text: {
-      primary: { value: '#ffffff' },
-      secondary: { value: '#b3b3b3' },
-      muted: { value: '#898989' },
-    }
   },
   fonts: {
     heading: { value: "'Red Rose', sans-serif" },
-    body: { value: "'Jaldi', sans-serif" }
-  }
+    body: { value: "'Jaldi', sans-serif" },
+  },
+  fontSizes: {
+    sm: { value: '12px' },
+    md: { value: '16px' },
+    lg: { value: '28px' },
+  },
+  fontWeights: {
+    normal: { value: '400' },
+    bold: { value: '700' },
+  },
+  lineHeights: {
+    base: { value: '1.69' },
+    tight: { value: '1.25' },
+  },
 };
 
-// 2. Semantic tokens
+// 2. Semantic Tokens
 const semanticTokens = {
   colors: {
-    "app.bg": { value: "{colors.surface.primary}" },
-    "app.sidebar.bg": { value: "{colors.surface.sidebar}" },
-    "app.card.bg": { value: "{colors.surface.secondary}" },
-    "app.text.primary": { value: "{colors.text.primary}" },
-    "app.text.secondary": { value: "{colors.text.secondary}" },
-    "app.accent": { value: "{colors.brand.500}" },
-    "app.border": { value: "{colors.gray.600}" },
-  }
+    "app.bg": { value: "{colors.brand.primary}" },
+    "app.text": { value: "{colors.white}" },
+    "app.text.secondary": { value: "{colors.gray.500}" },
+  },
 };
 
-// 3. Global CSS
+// 3. Global Styles (includes font smoothing + base font logic)
 const globalCss = {
   body: {
-    bg: "{colors.surface.primary}",
-    color: "{colors.text.primary}",
-    fontFamily: "{fonts.body}",
+    bg: "app.bg",
+    color: "app.text",
+    fontFamily: "fonts.body",
+    WebkitFontSmoothing: "antialiased",
+    MozOsxFontSmoothing: "grayscale",
+    margin: "0",
   },
-  "*": {
-    borderColor: "{colors.gray.600} !important",
-  }
+  code: {
+    fontFamily: "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace",
+  },
+  // Add global text styles
+  ".text-heading": {
+    fontFamily: "fonts.heading",
+    fontWeight: "fontWeights.normal",
+    fontSize: "fontSizes.lg",
+    lineHeight: "lineHeights.tight",
+    color: "app.text",
+  },
+  ".text-body": {
+    fontFamily: "fonts.body",
+    fontWeight: "fontWeights.normal",
+    fontSize: "fontSizes.md",
+    lineHeight: "lineHeights.base",
+    color: "app.text",
+  },
+  ".text-sidebar": {
+    fontFamily: "fonts.body",
+    fontWeight: "fontWeights.normal",
+    fontSize: "fontSizes.md",
+    lineHeight: "lineHeights.base",
+    color: "app.text",
+  },
+  ".text-sidebar-small": {
+    fontFamily: "fonts.heading",
+    fontWeight: "fontWeights.bold",
+    fontSize: "fontSizes.sm",
+    lineHeight: "lineHeights.tight",
+    color: "app.text.secondary",
+  },
+  ".button": {
+    fontWeight: "fontWeights.bold",
+    borderRadius: "md",
+    color: "app.text",
+    "&.solid": {
+      bg: "brand.primary",
+      color: "white",
+      "&:hover": {
+        opacity: 0.9,
+      },
+    },
+    "&.ghost": {
+      bg: "transparent",
+      color: "app.text",
+      "&:hover": {
+        bg: "whiteAlpha.200",
+      },
+    },
+  },
 };
 
-// 4. Create config and system
+// 4. Final Config and System
 const config = defineConfig({
   theme: {
     tokens,
@@ -92,67 +116,5 @@ const config = defineConfig({
 });
 
 const system = createSystem(defaultConfig, config);
-
-
-export const buttonRecipe = system.cva({
-  base: {
-    fontWeight: "bold",
-    borderRadius: "md",
-  },
-  variants: {
-    variant: {
-      solid: {
-        bg: "brand.500",
-        color: "white",
-        _hover: {
-          bg: "brand.600",
-        },
-      },
-      outline: {
-        border: "2px solid",
-        borderColor: "brand.500",
-        color: "brand.500",
-        _hover: {
-          bg: "brand.50",
-        },
-      },
-    },
-  },
-  defaultVariants: {
-    variant: "solid",
-  },
-});
-
-// Example: Input recipe
-export const inputRecipe = system.cva({
-  base: {
-    borderRadius: "md",
-    borderColor: "gray.600",
-    _focus: {
-      borderColor: "brand.500",
-      boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)",
-    },
-  },
-});
-
-
-export const menuRecipe = system.sva({
-  slots: ["list", "item"],
-  base: {
-    list: {
-      bg: "surface.secondary",
-      borderColor: "gray.600",
-    },
-    item: {
-      bg: "surface.secondary",
-      color: "text.primary",
-      _hover: {
-        bg: "surface.tertiary",
-      },
-    },
-  },
-
-});
-
 
 export default system;

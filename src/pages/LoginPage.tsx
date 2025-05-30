@@ -1,19 +1,35 @@
-import {Button, Flex, Heading, Input, Spinner,Field} from '@chakra-ui/react';
-// import {Field} from "../components/ui/field";
-import {toaster} from "../components/ui/toaster";
-import {useAuth} from "../hooks/useAuth.ts";
-import {useState} from "react";
-import {Link, useNavigate} from "react-router-dom";
+import {
+    Button,
+    Flex,
+    Heading,
+    Input,
+    Spinner,
+    Field,
+    Card,
+    CardHeader,
+    CardBody,
+    FieldLabel,
+    CardFooter,
+    ButtonGroup,
+    Separator,
+    useDisclosure,
+} from '@chakra-ui/react';
+import { toaster } from "../components/ui/toaster";
+import { useAuth } from "../hooks/useAuth.ts";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useColorModeValue } from "../components/ui/color-mode.tsx";
+import { Fade, SlideFade } from "@chakra-ui/transition";
 
 const LoginPage = () => {
-
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [fadeOut, setFadeOut] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
-
-
+    const cardBg = useColorModeValue("white", "gray.800");
+    const { isOpen, onToggle } = useDisclosure();
 
     const onSubmit = async (username: string, password: string) => {
         if (!username.trim() || !password.trim()) {
@@ -29,7 +45,6 @@ const LoginPage = () => {
         setIsLoading(true);
 
         try {
-            console.log("Attempting login with:", username, password);
             await login(username, password);
 
             toaster.create({
@@ -39,9 +54,9 @@ const LoginPage = () => {
                 duration: 3000,
             });
 
-            navigate("/app");
+            setFadeOut(true);
+            setTimeout(() => navigate("/app"), 300); // delay for fade
         } catch (error) {
-            console.error("Login error:", error);
             toaster.create({
                 title: "Login Failed",
                 description: "Invalid username or password",
@@ -54,66 +69,94 @@ const LoginPage = () => {
     };
 
     return (
-        <>
-            {isLoading && <Spinner />}
-
-            <Flex h="100vh" alignItems="center" justifyContent="center">
-                <Flex
-                    flexDirection="column"
-                    bg={{ base: "gray.100", _dark: "gray.700" }}
-                    p={12}
-                    borderRadius={8}
+        <Flex
+            minH="100vh"
+            align="center"
+            justify="center"
+            p={{ base: 4, md: 8 }}
+            background={"black"}
+        >
+            <Fade in={!fadeOut} unmountOnExit transition={{ exit: { duration: 0.3 } }}>
+                <Card.Root
+                    maxW="sm"
+                    w="full"
+                    bg={cardBg}
                     boxShadow="lg"
+                    borderRadius="xl"
+                    p={6}
                 >
-                    <Heading mb={6}>Log In</Heading>
+                    <CardHeader>
+                        <Heading as="h2" size="lg" textAlign="center">
+                            Sign Up for Free
+                        </Heading>
+                    </CardHeader>
 
-                    <Field.Root mb={3}>
-                        <Input
-                            placeholder="Username"
-                            type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </Field.Root>
+                    <CardBody>
+                        <Field.Root>
+                            <FieldLabel>Username</FieldLabel>
+                            <Input
+                                type="text"
+                                placeholder={"Enter Username"}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+                            <FieldLabel>Password</FieldLabel>
+                            <Input
+                                type={"password"}
+                                placeholder={"*********"}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter") {
+                                        onSubmit(username, password);
+                                    }
+                                }}
+                            />
+                        </Field.Root>
+                    </CardBody>
 
-                    <Field.Root mb={6}>
-                        <Input
-                            placeholder="**********"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    onSubmit(username, password);
-                                }
-                            }}
-                        />
-                    </Field.Root>
-
-                    <Flex gap={4} mb={8}>
-                        <Button
-                            colorPalette="teal"
-                            type="submit"
-                            loading={isLoading}
-                            loadingText="Logging in..."
-                            onClick={() => onSubmit(username, password)}
+                    <CardFooter>
+                        <ButtonGroup
+                            alignContent={"center"}
+                            alignSelf="start"
+                            flexDirection="column"
+                            alignItems="stretch"
+                            gap={2}
+                            width="100%"
                         >
-                            Log In
-                        </Button>
-                        <Link to="/signup">
-                            <Button
-                                colorPalette="teal"
-                                variant="outline"
-                            >
-                                Sign Up
-                            </Button>
-                        </Link>
-                    </Flex>
-
-
-                </Flex>
-            </Flex>
-        </>
+                            {/*<SlideFade in={isOpen}>*/}
+                                <Button
+                                    colorScheme="blue"
+                                    type="submit"
+                                    width="full"
+                                    onClick={() => {
+                                        onSubmit(username, password);
+                                        onToggle();
+                                    }}
+                                    loading={isLoading}
+                                    loadingText="Logging in"
+                                >
+                                    Submit
+                                </Button>
+                            {/*</SlideFade>*/}
+                            <Separator />
+                            {/*<Fade in={isOpen}>*/}
+                                <Link to="/signup">
+                                    <Button
+                                        colorScheme={"purple"}
+                                        type={"button"}
+                                        width={"full"}
+                                        transition={"smooth"}
+                                    >
+                                        Don't Have an account? Sign Up
+                                    </Button>
+                                </Link>
+                            {/*</Fade>*/}
+                        </ButtonGroup>
+                    </CardFooter>
+                </Card.Root>
+            </Fade>
+        </Flex>
     );
 };
 

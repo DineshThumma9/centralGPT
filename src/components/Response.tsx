@@ -87,16 +87,18 @@ const Response = () => {
                 <VStack gap={4} align="stretch" p={6}>
                     {messages.map((msg, idx) => (
                         <Box
+                            position={"center"}
                             key={msg.message_id || idx}
                             alignSelf={msg.sender === "user" ? "flex-end" : "flex-start"}
                             bg={msg.sender === "user" ? "app.accent" : "app.bg"}
-                            color={msg.sender === "user" ? "white" : "app.text.primary"}
+                            color={msg.sender === "user" ? "white" : "white"}
                             px={4}
                             py={4}
-                            maxW={msg.sender === "user" ? "70%" : "100%"}
+                            maxW={msg.sender === "user" ? "70%" : "75%"}
 
                             maxH={"100%"}
                             boxSize={"auto"}
+                            zIndex={1}
                             // shadow="sm"
                             borderRadius={msg.sender === "user" ? "40px" : "Opx"}
                             borderColor={"transparent"}

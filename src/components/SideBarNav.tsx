@@ -45,13 +45,14 @@ const SideBarNav = () => {
     };
 
     return (
-        <HStack width="100%" justifyContent="space-between" px={2}>
+        <HStack width="100%"  bg = "white"  borderRadius = "40px"  justifyContent="space-between" height = "50px" px={2}>
             <IconButton
                 aria-label="Create new chat"
                 variant="ghost"
                 size="sm"
                 borderRadius={"full"}
-                color="app.text.primary"
+                bg={"white"}
+                color="blackAlpha.900"
                 css={{
                     "&:hover": {
                         bg: "var(--chakra-colors-app-accent)",
@@ -74,7 +75,7 @@ const SideBarNav = () => {
                 variant="ghost"
                 size="sm"
                 borderRadius={"full"}
-                color="app.text.secondary"
+                color="black"
                 css={{
                     "&:hover": {
                         bg: "var(--chakra-colors-surface-tertiary)",

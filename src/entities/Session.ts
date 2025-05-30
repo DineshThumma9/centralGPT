@@ -1,10 +1,17 @@
+import {z} from "zod/v4";
 
 
-export default interface Session {
 
-    session_id:string
-    title:string
-    created_at:string
-    updated_at?:string
+
+const Session = z.object({
+
+    session_id:z.string(),
+    title:z.string().default("New Chat"),
+    created_at:z.string().default(new Date().toISOString()),
+    updated_at:z.string().optional(),
+
 
 }
+)
+
+export default Session

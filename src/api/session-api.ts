@@ -1,6 +1,10 @@
-import axios from "axios";
-import type Message from "../entities/Message.ts";
+import axios, {AxiosError} from "axios";
+import Message from "../entities/Message.ts";
 import {getAuthState} from "../store/authStore.ts";
+import {ZodError} from "zod";
+import {z} from "zod/v4";
+import Session from "../entities/Session.ts";
+
 
 const API = axios.create({
     baseURL: "http://localhost:8000/sessions",
@@ -14,88 +18,52 @@ const apiSetUp = axios.create({
 
 
 
-interface SessionResponse {
-    session_id: string;
-    message: string;
-}
 
-    //
-    // const handleApiKeySelect = (apiModel: string) => {
-    //     axios
-    //         .post(`http://localhost:8000/api/${apiModel}`)
-    //         .then((res) => console.log(res.data))
-    //         .catch((err) => console.error("Error fetching API key:", err));
-    // };
-    //
-    // const handleLLMSelect = (llm: string) => {
-    //     axios
-    //         .post(`http://localhost:8000/api/providers/${llm}`)
-    //         .then((res) => console.log(res.data))
-    //         .catch((err) => console.error("Error fetching LLM:", err));
-    //     setSelectedLLM(llm);
-    // };
-    //
-    // const handleModelSelect = (model: string) => {
-    //     axios
-    //         .post(`http://localhost:8000/api/models/${model}`)
-    //         .then((res) => console.log(res.data))
-    //         .catch((err) => console.error("Error fetching model:", err));
-    //     setSelectedModel(model);
-    // };
-    //
 
 export const llmSelection = async (llm_class:string)=> {
+
+
+
     try{
 
         const res = await apiSetUp.post(`/providers` , {llm_class} , {
                 headers: { "Content-Type": "application/json" }
             })
-
-        console.log("res is empty: ",res)
-        console.log("res is empty:res.data" , res.data)
-
-
-        if(!res?.data){
-            throw Error("Error in llm Selection")
-        }
-
-
-
+        console.log("Error has occurred in llmselection\n Here is res object:" , res)
     }
-
     catch (error){
-        console.log("Error has occures here IN llm selection")
+        console.log("Error has occurs here in llm selection")
         throw  error
 
     }
+
+
+
 }
 
 
 export const modelSelection= async (model:string)=> {
 
     try{
-
-        const res = await apiSetUp.post(`/models`,{model} ,{
+          await apiSetUp.post(`/models`,{model} ,{
             headers:{"Content-Type":"application/json"}
         })
-
-        if(!res?.data){
-            throw Error("Error in model")
-        }
-
-
 
     }
     catch (error){
 
         console.log("Error in Model selection")
-          throw error
+
     }
 }
 
 
 
-export const newSession = async (): Promise<string> => {
+
+
+
+
+export const newSession = async ()  => {
     try {
 
         const access = localStorage.getItem("refresh")
@@ -104,6 +72,8 @@ export const newSession = async (): Promise<string> => {
            headers: { "Authorization": `Bearer ${access}` }
 
         });
+
+
 
         console.log(res)
 
@@ -115,7 +85,9 @@ export const newSession = async (): Promise<string> => {
         const sessionId = res.data.session_id;
         localStorage.setItem("current_session_id", sessionId);
         console.log("Session Id Stored:", sessionId);
-        return sessionId;
+       return Session.parse({
+  session_id: res.data.session_id,
+});
     } catch (error) {
         console.error("Error occurred in newSession:", error);
         throw error;
@@ -196,8 +168,10 @@ export const getChatHistory = async (data: { session_id: string; limit?: number 
 export const deleteSession = async (session_id: string) => {
     try {
         const res = await API.delete(`/${session_id}`);
-        if (!res?.data) throw new Error("Delete session failed");
-        return res.data;
+
+        if(res.status !== 200){
+            throw Error("Error has occured while deleting Session" ,res.data?.errors)
+        }
     } catch (error) {
         console.error("Error while deleting session:", error);
         throw error;
@@ -205,41 +179,33 @@ export const deleteSession = async (session_id: string) => {
 };
 
 
-interface MessageRecived{
 
-}
+export type Message = z.infer<typeof Message>;
 
+export const testMsg = async (msg: string): Promise<Message> => {
+  const session_id = localStorage.getItem("current_session_id");
+  if (!session_id) throw new Error("Missing session ID in localStorage");
 
-export const testMsg= async (msg: string) => {
-    try {
+  const payload = { session_id, msg };
 
+  try {
+    const res = await API.post("/simple/", payload, {
+      headers: { "Content-Type": "application/json" }
+    });
 
-        const current_session_id = localStorage.getItem("current_session_id")
-        const data = {
-            "session_id" : current_session_id,
-            "msg" : msg
-        }
+    return Message.parse(res.data);
 
-        console.log(data)
-
-        const res = await API.post(`/simple/`, data, {
-            headers: { "Content-Type": "application/json" }
-        });
-
-
-
-        console.log("In Sessions API \n here is res ",res)
-        console.log("Res object is {res}" , res.data)
-
-
-        if (!res?.data) throw new Error("Res in Test Msg Failed");
-        return res.data;
-    } catch (error) {
-        console.log("Error while getting test message", error);
-        throw error;
+  } catch (error) {
+    if (error instanceof ZodError) {
+      console.error("❌ Zod validation failed:", error.errors);
+    } else if (error instanceof AxiosError) {
+      console.error("❌ Axios error:", error.response?.data || error.message);
+    } else {
+      console.error("❌ Unknown error:", error);
     }
+    throw error; // ✅ preserve error for caller
+  }
 };
-
 
 
 

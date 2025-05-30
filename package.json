@@ -12,6 +12,7 @@
   "dependencies": {
     "@babel/eslint-parser": "^7.27.1",
     "@chakra-ui/react": "^3.19.1",
+    "@chakra-ui/transition": "^2.1.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@sideway/address": "^5.0.0",
@@ -22,7 +23,7 @@
     "core-js": "^3.42.0",
     "eta": "^3.5.0",
     "firebase": "^11.8.1",
-    "framer-motion": "^12.14.0",
+    "framer-motion": "^12.15.0",
     "highlight.js": "^11.11.1",
     "lodash.flatten": "^4.4.0",
     "lru-cache": "^11.1.0",
@@ -44,8 +45,10 @@
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "svgo": "^3.3.2",
+    "tree-sitter-cli": "^0.25.5",
     "uuid": "^11.1.0",
     "vite-plugin-eslint": "^1.8.1",
+    "zod": "^3.25.34",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

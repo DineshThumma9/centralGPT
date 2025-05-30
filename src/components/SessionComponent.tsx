@@ -105,7 +105,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
         <HStack
             justifyContent="space-between"
             w="100%"
-            p={2.5}
+            p={1}
             css={{
                 "&:hover": {
                     bg: "var(--chakra-colors-surface-tertiary)",
@@ -117,6 +117,9 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
             onClick={onSelect}
             border={"0px"}
             borderRadius="lg"
+            bg={"white"}
+            color={"black"}
+
             textUnderlineOffset={"unset"}
             opacity={isDeleting ? 0.5 : 1}
             pointerEvents={isDeleting ? "none" : "auto"}
@@ -132,7 +135,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                     <Text
                         truncate
                         border={"0px"}
-                        color="app.text.primary"
+                        color="white"
                         fontSize="sm"
                         fontWeight="medium"
                         flex="1"

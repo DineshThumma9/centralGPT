@@ -1,20 +1,34 @@
-import {Button, Flex, Heading, Input,Field} from '@chakra-ui/react';
-// import {Field} from "../components/ui/field.tsx";
-import {toaster} from "../components/ui/toaster.tsx";
-import {useState} from "react";
-import {useAuth} from "../hooks/useAuth.ts";
-import {Link, useNavigate} from "react-router-dom";
+import {
+    Button,
+    Flex,
+    Heading,
+    Input,
+    Field,
+    Card,
+    CardHeader,
+    CardBody,
+    FieldLabel,
+    CardFooter,
+    ButtonGroup,
+    Separator
+} from '@chakra-ui/react';
+import { toaster } from "../components/ui/toaster.tsx";
+import { useState } from "react";
+import { useAuth } from "../hooks/useAuth.ts";
+import { Link, useNavigate } from "react-router-dom";
+import { useColorModeValue } from "../components/ui/color-mode.tsx";
+import { Fade } from '@chakra-ui/transition';
 
 const SignUpPage = () => {
-
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [fadeOut, setFadeOut] = useState(false);
+
     const { register } = useAuth();
     const navigate = useNavigate();
-
-
+    const cardBg = useColorModeValue("white", "gray.800");
 
     const onSubmit = async (username: string, email: string, password: string) => {
         if (!username.trim() || !email.trim() || !password.trim()) {
@@ -28,10 +42,8 @@ const SignUpPage = () => {
         }
 
         setIsLoading(true);
-        try {
-            console.log("Input has been read");
-            console.log("username: " + username + "  email:" + email + " password: " + password);
 
+        try {
             await register(username, email, password);
 
             toaster.create({
@@ -41,8 +53,8 @@ const SignUpPage = () => {
                 duration: 3000,
             });
 
-            // Navigate to chat page after successful registration
-            navigate("/app");
+            setFadeOut(true);
+            setTimeout(() => navigate("/app"), 300); // match fade duration
         } catch (error) {
             console.error("Registration error:", error);
             toaster.create({
@@ -57,68 +69,98 @@ const SignUpPage = () => {
     };
 
     return (
-        <Flex h="100vh" alignItems="center" justifyContent="center">
-            <Flex
-                flexDirection="column"
-                bg={{ base: "gray.100", _dark: "gray.700" }}
-                p={12}
-                borderRadius={8}
-                boxShadow="lg"
-            >
-                <Heading mb={6}>Sign Up</Heading>
+        <Flex
+            minH="100vh"
+            align="center"
+            justify="center"
+            p={{ base: 4, md: 8 }}
+            background={"black"}
+        >
+            <Fade in={!fadeOut} unmountOnExit transition={{ exit: { duration: 0.3 } }}>
+                <Card.Root
+                    maxW="sm"
+                    w="full"
+                    bg={cardBg}
+                    boxShadow="lg"
+                    borderRadius="xl"
+                    p={6}
+                >
+                    <CardHeader>
+                        <Heading as="h2" size="lg" textAlign="center">
+                            Sign Up for Free
+                        </Heading>
+                    </CardHeader>
 
-                <Field.Root mb={6}>
-                    <Input
-                        placeholder="John Doe"
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                </Field.Root>
+                    <CardBody>
+                        <Field.Root>
+                            <FieldLabel>Username</FieldLabel>
+                            <Input
+                                type="text"
+                                placeholder={"Enter Username"}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
 
-                <Field.Root mb={3}>
-                    <Input
-                        placeholder="johndoe@gmail.com"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </Field.Root>
+                            <FieldLabel>Password</FieldLabel>
+                            <Input
+                                type="password"
+                                placeholder={"*********"}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        onSubmit(username, email, password);
+                                    }
+                                }}
+                            />
 
-                <Field.Root mb={6}>
-                    <Input
-                        placeholder="**********"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                                onSubmit(username, email, password);
-                            }
-                        }}
-                    />
-                </Field.Root>
+                            <FieldLabel>Email address</FieldLabel>
+                            <Input
+                                type="email"
+                                placeholder={"Enter Email"}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </Field.Root>
+                    </CardBody>
 
-                <Flex gap={4} mb={8}>
-                    <Button
-                        colorPalette="teal"
-                        loading={isLoading}
-                        loadingText="Signing up..."
-                        onClick={() => onSubmit(username, email, password)}
-                    >
-                        Sign Up
-                    </Button>
-                    <Link to="/login">
-                        <Button
-                            colorPalette="teal"
-                            variant="outline"
+                    <CardFooter>
+                        <ButtonGroup
+                            alignSelf="start"
+                            alignContent="center"
+                            flexDirection="column"
+                            alignItems="stretch"
+                            gap={2}
+                            width="100%"
                         >
-                            Log In
-                        </Button>
-                    </Link>
-                </Flex>
+                            <Button
+                                colorScheme="blue"
+                                type="submit"
+                                width="100%"
+                                onClick={() => onSubmit(username, email, password)}
+                                loading={isLoading}
+                                loadingText="Registering"
+                            >
+                                Submit
+                            </Button>
 
-            </Flex>
+                            <Separator />
+
+                            <Link to="/login">
+                                <Button
+                                    colorScheme="blue"
+                                    variant="outline"
+                                    type="button"
+                                    width="100%"
+                                    transition="smooth"
+                                >
+                                    Already Have an Account? Log In
+                                </Button>
+                            </Link>
+                        </ButtonGroup>
+                    </CardFooter>
+                </Card.Root>
+            </Fade>
         </Flex>
     );
 };

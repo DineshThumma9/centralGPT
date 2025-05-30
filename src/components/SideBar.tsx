@@ -61,7 +61,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         <Box
             w={collapsed ? "60px" : "350px"}
             transition="all 0.3s ease-in-out"
-            bg="app.sidebar.bg"
+            bg="black"
             color="app.text.primary"
             h="100vh"
             p={4}
@@ -73,9 +73,10 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                 aria-label="Toggle sidebar"
                 size="sm"
                 mb={4}
+                borderRadius={"full"}
                 onClick={handleToggle}
-                bg="app.card.bg"
-                color="app.text.primary"
+                bg="lightgrey"
+                color="black"
                 _hover={{
                     bg: "surface.tertiary",
                     transform: "scale(1.05)",
@@ -92,6 +93,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                 {!collapsed && (
                     <>
                         <SideBarNav/>
+
 
                         <VStack
                             gap={2}
@@ -114,6 +116,8 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                 },
                             }}
                         >
+                               <HStack bg={"white"} color ="black" />
+
                             {isLoading && sessions.length === 0 && (
                                 <Box p={4}>
                                     <Text fontSize="sm" color="app.text.muted" textAlign="center">
@@ -154,9 +158,10 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                         </VStack>
 
                         <HStack
-                            justify="flex-start"
+                            justifyContent="flex-start"
                             mt="auto"
                             p={2}
+                            width={"100vw"}
                             bg="app.card.bg"
                             borderRadius="md"
                             cursor="pointer"
@@ -164,9 +169,11 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                 bg: "surface.tertiary",
                             }}
                             transition="background 0.2s"
+                            zIndex = {2}
                         >
-                            <SettingsIcon color="app.accent"/>
-                            <Text fontSize="sm" color="app.text.secondary">
+
+                            <SettingsIcon color="white"/>
+                            <Text fontSize="xl" color="app.text.secondary">
                                 Settings
                             </Text>
                         </HStack>
@@ -179,8 +186,9 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                         cursor="pointer"
                         transition="transform 0.2s"
                         _hover={{transform: "scale(1.1)"}}
+                        width = "100%"
                     >
-                        <SettingsIcon/>
+                        <SettingsIcon color={"white"}/>
                     </Box>
 
                 )}

@@ -8,26 +8,15 @@ import {
   newSession,
   streamChatResponse,
   testMsg,
-  updateSessionTitle,
-    llmSelection,
-    modelSelection
+  updateSessionTitle
 } from "../api/session-api.ts";
 import type Message from "../entities/Message.ts";
+import {z} from "zod/v4";
 
 
 
 
-const setUpLLM = async (class_llm:string) => {
 
-  await llmSelection(class_llm)
-
-}
-
-const setUpModel = async (model_setup:string) => {
-
-  await modelSelection(model_setup)
-
-}
 const useSessions = () => {
   const eventSourceRef = useRef<EventSource | null>(null);
 
@@ -52,15 +41,7 @@ const useSessions = () => {
 
 const tstMsgFunc = async (msg: string) => {
   try {
-    console.log("In tstMsgFunc");
-    const res = await testMsg(msg);
-
-    if (!res || !res.content) throw new Error("Res is empty");
-
-    const return_msg = res as Message; // 🔄 Easy conversion
-
-    addMessage(return_msg);
-    return return_msg;
+    addMessage(await testMsg(msg));
   } catch (error) {
     console.error("Error in tstMsgFunc:", error);
   }
@@ -71,22 +52,15 @@ const tstMsgFunc = async (msg: string) => {
   const createNewSession = async () => {
     try {
       setLoading(true);
-      const session_id = await newSession();
+      const session = await newSession();
 
-      const newSessionObj: Session = {
-        session_id: session_id,
-        title: "New SessionComponent",
-        created_at: new Date().toISOString()
-      };
-
-      // Add to store and make it current
-      addSession(newSessionObj);
-      setCurrentSessionId(session_id);
+      addSession(session);
+      setCurrentSessionId(session.session_id);
       setTitle("New SessionComponent");
-      clear(); // Clear messages for new session
+      clear();
 
-      console.log("New session created and set as current:", session_id);
-      return session_id;
+      console.log("New session created and set as current:", session.session_id);
+      return session.session_id;
     } catch (e) {
       console.error("Error in createNewSession:", e);
       throw e;
@@ -110,7 +84,7 @@ const tstMsgFunc = async (msg: string) => {
       console.warn("Message is already streaming");
       return;
     }
-
+   type Message = z.infer<typeof Message>;
     const userMsgId = Date.now().toString();
     const userMessage: Message = {
       session_id: activeSession!,
@@ -274,6 +248,7 @@ const tstMsgFunc = async (msg: string) => {
   const getSessions = async () => {
     try {
       setLoading(true);
+       type Session = z.infer<typeof Session>;
       const allSessions:Session[] = await getAllSessions();
       setSessions(allSessions);
 
@@ -323,8 +298,6 @@ const tstMsgFunc = async (msg: string) => {
     createNewSession,
     changeTitle,
     getHistory,
-    setUpLLM,
-    setUpModel,
     deleteSessionById,
     getSessions,
     fetchAllSessions,
