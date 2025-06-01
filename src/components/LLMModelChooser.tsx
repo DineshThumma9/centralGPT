@@ -32,15 +32,17 @@ const LLMModelChooser = () => {
 
    const handleProviderSelection = async (providers:string) => {
 
-        await llmSelection(providers)
+
         setCurrentLLMProvider(providers)
         setModelMap(providers_models.get(providers) || [])
+        await llmSelection(providers)
 
    }
 
    const handleModelSelection= async (model:string) => {
+        setCurrentModel(model)
         await modelSelection(model)
-       setCurrentModel(model)
+
    }
 
 
