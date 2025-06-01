@@ -1,12 +1,34 @@
-import { HStack, VStack } from "@chakra-ui/react";
+import {HStack, VStack} from "@chakra-ui/react";
 import LLMModelChooser from "./LLMModelChooser";
 import AvaterExpandable from "./AvaterExpandable";
 import SendRequest from "./SendRequest";
 import Response from "./Response";
-
+import type {Message} from "../entities/Message.ts";
+import {useEffect, useState} from "react";
+import sessionStore from "../store/sessionStore.ts";
 
 
 const ChatArea = () => {
+
+
+    const [messages, setMessages] = useState<Message[]>([]);
+
+
+    useEffect(() => {
+        // Subscribe to store changes
+        const unsubscribe = sessionStore.subscribe((state) => {
+            setMessages(state.messages);
+        });
+
+        // Get initial state
+        setMessages(sessionStore.getState().messages);
+
+        return unsubscribe;
+
+
+    }, []);
+
+
     return (
         <VStack
             flex="1"
@@ -30,15 +52,21 @@ const ChatArea = () => {
                 borderColor="app.bg"
                 minH="70px"
             >
-                <LLMModelChooser />
-                <AvaterExpandable />
+                <LLMModelChooser/>
+                <AvaterExpandable/>
             </HStack>
 
             {/* SessionComponent Messages Area */}
-            <Response />
+            <Response/>
 
             {/* Input Area */}
-            <SendRequest />
+
+
+            {
+                messages.length == 0 &&
+                <SendRequest/>
+            }
+
         </VStack>
     );
 };

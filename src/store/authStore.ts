@@ -20,7 +20,8 @@ const getInitialState = () => {
     }
 };
 
-// Create the vanilla store with initial state from localStorage
+
+
 const authStore = createStore<AuthState>((set) => {
     const initialState = getInitialState();
 

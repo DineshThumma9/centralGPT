@@ -18,6 +18,29 @@ const apiSetUp = axios.create({
 
 
 
+export const apiKeySelection =   async (api_provider:string,api_key:string)=> {
+
+
+    const data = {
+        "api_prov": api_provider,
+        "api_key": api_key
+    }
+    try {
+        const res = await apiSetUp.post("/init", data, {
+            headers: {"Content-Type": "application/json"}
+        })
+
+        if (res.status != 200) {
+            console.log(res.data)
+            throw Error("Some error has occures")
+        }
+    }catch(error){
+            console.log("Error has occurs here in llm selection")
+        throw  error
+
+    }
+}
+
 
 
 export const llmSelection = async (llm_class:string)=> {

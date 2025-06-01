@@ -4,6 +4,8 @@ import {
     IconButton,
     Text,
     createToaster,
+    MenuPositioner,
+    Portal,
 } from "@chakra-ui/react";
 import {MoreVertical, Edit, Share, Trash} from "lucide-react";
 import {
@@ -15,10 +17,7 @@ import {
 import useSessions from "../hooks/useSessions.ts";
 import {useRef, useState} from "react";
 
-// Create toaster instance
-const toaster = createToaster({
-    placement: "top",
-});
+const toaster = createToaster({placement: "top"});
 
 interface Props {
     title: string;
@@ -30,17 +29,20 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
     const {changeTitle, deleteSessionById} = useSessions();
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
-
-    const inputRef = useRef<HTMLInputElement>(null)
-
-    const handleChangeTitleClick = async (e: React.MouseEvent) => {
+    const [editKey, setEditKey] = useState(0); // force Editable remount
+    const [isEditing, setIsEditing] = useState(false);
+    const [clickDelete,setClickDelete] = useState(false);
+    const handleChangeTitleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        inputRef.current?.focus()
+        setIsEditing(true);
+        setEditKey(prev => prev + 1);
     };
 
-    const handleTitleUpdate = async (value: string) => {
-        const trimmed = value.trim();
-        if (trimmed !== title) {
+    const handleTitleUpdate = async (newTitle: string) => {
+        const trimmed = newTitle.trim();
+        setIsEditing(false);
+
+        if (trimmed && trimmed !== title) {
             setIsUpdatingTitle(true);
             try {
                 await changeTitle(trimmed);
@@ -50,8 +52,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                     type: "success",
                     duration: 2000,
                 });
-            } catch (error) {
-                console.error("Failed to change title:", error);
+            } catch {
                 toaster.create({
                     title: "Error",
                     description: "Failed to update session title",
@@ -66,8 +67,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
 
     const handleDeleteSession = async (e: React.MouseEvent) => {
         e.stopPropagation();
-
-        if (confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
+        if (confirm(`Delete "${title}"? This can't be undone.`)) {
             setIsDeleting(true);
             try {
                 await deleteSessionById(sessionId);
@@ -77,8 +77,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                     type: "success",
                     duration: 2000,
                 });
-            } catch (error) {
-                console.error("Failed to delete session:", error);
+            } catch {
                 toaster.create({
                     title: "Error",
                     description: "Failed to delete session",
@@ -95,7 +94,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
         e.stopPropagation();
         toaster.create({
             title: "Coming Soon",
-            description: "Share functionality will be available soon",
+            description: "Share functionality is not implemented yet",
             type: "info",
             duration: 2000,
         });
@@ -105,50 +104,57 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
         <HStack
             justifyContent="space-between"
             w="100%"
-            p={1}
-            css={{
-                "&:hover": {
-                    bg: "var(--chakra-colors-surface-tertiary)",
-                    transform: "translateY(-1px)",
-                },
-                transition: "all 0.2s ease-in-out"
-            }}
+            px={2}
+            py={2}
+            bg="gray.900"
+            _hover={{bg: "gray.800", transform: "scale(1.01)"}}
+            transition="all 0.2s ease-in-out"
+            borderRadius="md"
+            boxShadow="lg"
             cursor="pointer"
             onClick={onSelect}
-            border={"0px"}
-            borderRadius="lg"
-            bg={"white"}
-            color={"black"}
-
-            textUnderlineOffset={"unset"}
             opacity={isDeleting ? 0.5 : 1}
-            pointerEvents={isDeleting ? "none" : "auto"}
         >
             <Editable.Root
+                key={editKey}
                 defaultValue={title}
-                onValueChange={({ value }) => handleTitleUpdate(value)}
+                defaultEdit={isEditing}
+                onEditChange={({edit}) => setIsEditing(edit)}
+                onValueCommit={({value}) => handleTitleUpdate(value)}
+                onValueRevert={() => setIsEditing(false)}
                 disabled={isUpdatingTitle}
             >
+
+
                 <Editable.Preview
                     asChild
+                    onClick={(e) => e.stopPropagation()}
                 >
                     <Text
-                        truncate
-                        border={"0px"}
-                        color="white"
                         fontSize="sm"
                         fontWeight="medium"
-                        flex="1"
+                        color="white"
+                        lineClamp={1}
                         opacity={isUpdatingTitle ? 0.7 : 1}
-                    />
+                    >
+                        {title}
+                    </Text>
                 </Editable.Preview>
                 <Editable.Input
-                    ref={inputRef}
                     fontSize="sm"
                     fontWeight="medium"
-                    flex="1"
-                    px={1}
+                    px={2}
+                    py={1}
                     borderRadius="md"
+                    color="white"
+                    bg="gray.700"
+                    border="1px solid"
+                    borderColor="blue.400"
+                    _focus={{
+                        borderColor: "blue.500",
+                        boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)",
+                    }}
+                    onClick={(e) => e.stopPropagation()}
                 />
             </Editable.Root>
 
@@ -158,65 +164,45 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                         variant="ghost"
                         aria-label="More Options"
                         size="sm"
-                        color="app.text.secondary"
-                        css={{
-                            "&:hover": {
-                                bg: "var(--chakra-colors-surface-tertiary)",
-                                color: "var(--chakra-colors-app-accent)",
-                            }
-                        }}
+                        color="gray.400"
+                        _hover={{color: "blue.400", bg: "gray.800"}}
                         onClick={(e) => e.stopPropagation()}
                         disabled={isDeleting || isUpdatingTitle}
                     >
-                        <MoreVertical />
+                        <MoreVertical size={16}/>
                     </IconButton>
                 </MenuTrigger>
-                <MenuContent
-                    bg="app.card.bg"
-                    borderColor="app.border"
-                    shadow="lg"
-                >
-                    <MenuItem
-                        value="edit"
-                        css={{
-                            "&:hover": { bg: "var(--chakra-colors-surface-tertiary)" }
-                        }}
-                        onClick={handleChangeTitleClick}
-                        color="app.text.primary"
-                        disabled={isUpdatingTitle}
-                    >
-                        <Edit />
-                        {isUpdatingTitle ? "Updating..." : "Change Title"}
-                    </MenuItem>
+                <Portal>
+                    <MenuPositioner>
+                        <MenuContent bg="gray.800" borderColor="gray.700" shadow="md">
+                            <MenuItem
+                                value={"title"}
+                                onClick={handleChangeTitleClick}
+                                disabled={isUpdatingTitle}
+                            >
+                                <Edit size={16}/>
+                                {isUpdatingTitle ? "Updating..." : "Rename"}
+                            </MenuItem>
+                            <MenuItem value={"share"} onClick={handleShare}>
+                                <Share size={16}/>
+                                Share
+                            </MenuItem>
+                            <MenuItem
+                                onClick={handleDeleteSession}
+                                value={"delete"}
+                                color="red.400"
+                                _hover={{bg: "red.600", color: "white"}}
+                                disabled={isDeleting}
+                            >
+                                <Trash size={16} />
 
-                    <MenuItem
-                        value="share"
-                        css={{
-                            "&:hover": { bg: "var(--chakra-colors-surface-tertiary)" }
-                        }}
-                        onClick={handleShare}
-                        color="app.text.primary"
-                    >
-                        <Share />
-                        Share
-                    </MenuItem>
 
-                    <MenuItem
-                        value="delete"
-                        onClick={handleDeleteSession}
-                        css={{
-                            "&:hover": {
-                                bg: "var(--chakra-colors-red-600)",
-                                color: "white"
-                            }
-                        }}
-                        color="red.400"
-                        disabled={isDeleting}
-                    >
-                        <Trash />
-                        {isDeleting ? "Deleting..." : "Delete"}
-                    </MenuItem>
-                </MenuContent>
+                                {isDeleting ? "Deleting..."  : "Delete"}
+
+                            </MenuItem>
+                        </MenuContent>
+                    </MenuPositioner>
+                </Portal>
             </MenuRoot>
         </HStack>
     );

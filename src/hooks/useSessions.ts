@@ -224,8 +224,9 @@ const tstMsgFunc = async (msg: string) => {
         const remainingSessions = sessionStore.getState().sessions;
         if (remainingSessions.length > 0) {
           const latestSession = remainingSessions.sort((a, b) =>
-            new Date(b.updated_at || b.created_at).getTime() -
-            new Date(a.updated_at || a.created_at).getTime()
+
+            new Date(a.updated_at || a.created_at).getTime() -
+                new Date(b.updated_at || b.created_at).getTime()
           )[0];
           await getHistory(latestSession.session_id || latestSession.session_id!);
         } else {

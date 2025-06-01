@@ -1,6 +1,10 @@
 import type Session from "../entities/Session.ts";
 import type Message from "../entities/Message.ts";
+
+
 import {create} from "zustand";
+
+
 
 export type SessionState = {
     current_session: string | null;
@@ -55,7 +59,7 @@ const sessionStore = create<SessionState>((set, get) => ({
 
     addSession: (session) =>
         set((state) => ({
-            sessions: [...state.sessions, session],
+            sessions: [session,...state.sessions],
         })),
 
     updateSession: (sessionId, updates) =>

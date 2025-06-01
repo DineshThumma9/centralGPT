@@ -1,4 +1,4 @@
-import {Box, Button, HStack, Text, VStack} from "@chakra-ui/react";
+import {Box, Button, HStack, Stack, Text, VStack} from "@chakra-ui/react";
 import {FiChevronLeft, FiChevronRight} from "react-icons/fi";
 import {useEffect, useState} from "react";
 import SideBarNav from "./SideBarNav.tsx";
@@ -116,7 +116,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                 },
                             }}
                         >
-                               <HStack bg={"white"} color ="black" />
+                            <HStack bg={"white"} color="black"/>
 
                             {isLoading && sessions.length === 0 && (
                                 <Box p={4}>
@@ -136,25 +136,30 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                 </Box>
                             )}
 
-                            {sessions.map((session) => {
-                                const sessionId = session.session_id || session.session_id!;
-                                const isActive = currentSession === sessionId;
+                            {sessions
+                                .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+                                .map((session) => {
+                                    const sessionId = session.session_id!;
+                                    const isActive = currentSession === sessionId;
 
-                                return (
-                                    <Box
-                                        key={sessionId}
-                                        bg={isActive ? "app.accent" : "transparent"}
-                                        borderRadius="md"
-                                        transition="all 0.2s ease-in-out"
-                                    >
-                                        <SessionComponent
-                                            title={session.title}
-                                            sessionId={sessionId}
-                                            onSelect={() => handleSessionSelect(sessionId)}
-                                        />
-                                    </Box>
-                                );
-                            })}
+                                    return (
+                                        <Stack
+                                            key={sessionId}
+                                            bg={isActive ? "transparent" : "transparent"} // typo fix below
+                                            borderRadius="md"
+                                            padding="0px"
+                                            margin="0"
+                                            transition="all 0.2s ease-in-out"
+                                        >
+                                            <SessionComponent
+                                                title={"dgisgsosbso"}
+                                                sessionId={sessionId}
+                                                onSelect={() => handleSessionSelect(sessionId)}
+                                            />
+                                        </Stack>
+                                    );
+                                })}
+
                         </VStack>
 
                         <HStack
@@ -169,7 +174,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                 bg: "surface.tertiary",
                             }}
                             transition="background 0.2s"
-                            zIndex = {2}
+                            zIndex={2}
                         >
 
                             <SettingsIcon color="white"/>
@@ -186,7 +191,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                         cursor="pointer"
                         transition="transform 0.2s"
                         _hover={{transform: "scale(1.1)"}}
-                        width = "100%"
+                        width="100%"
                     >
                         <SettingsIcon color={"white"}/>
                     </Box>

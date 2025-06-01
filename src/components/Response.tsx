@@ -1,10 +1,10 @@
-import { Box, Text, VStack, Center } from "@chakra-ui/react";
+import {Box, Center, Heading, VStack} from "@chakra-ui/react";
 import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
-import type Message from "../entities/Message.ts";
 import ReactMarkdown from "react-markdown"
 import rehypeHighlight from "rehype-highlight";
-import 'highlight.js/styles/github-dark.css'; // or any other theme you like
+import 'highlight.js/styles/github-dark.css';
+import type {Message} from "../entities/Message.ts";
 
 
 const Response = () => {
@@ -66,21 +66,27 @@ const Response = () => {
             {messages.length === 0 ? (
                 <Center h="full">
                     <VStack  gap={4}>
-                        <Text
-                            fontSize="xl"
+                        <Heading
+                            fontSize="lg"
+                            fontStyle={"bold"}
                             color="app.text.secondary"
                             fontWeight="medium"
+                            as = "h1"
                         >
                             Start a conversation
-                        </Text>
-                        <Text
+                        </Heading>
+                        <Heading
                             fontSize="sm"
+                            fontStyle ="bold"
                             color="app.text.muted"
                             textAlign="center"
-                            maxW="md"
+                            maxW="breakpoint-lg"
+                            as={"h2"}
                         >
                             Choose a model and start chatting. Your messages will appear here.
-                        </Text>
+                        </Heading>
+
+
                     </VStack>
                 </Center>
             ) : (
