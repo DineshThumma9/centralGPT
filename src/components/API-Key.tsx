@@ -37,10 +37,10 @@ const APIKey = ({ provider, title }: Props) => {
         <Dialog.Positioner>
           <Dialog.Content>
             <Dialog.Header>
-              <Dialog.Title>Enter Your API Key - {provider}</Dialog.Title>
+              <Dialog.Title  fontStyle = "bold"  color = "black"  padding = {0}>Enter Your API Key - {provider}</Dialog.Title>
             </Dialog.Header>
-            <Dialog.Body pb="4">
-              <Stack gap="4">
+            <Dialog.Body >
+              <Stack >
                 <Field.Root>
                   <Field.Label>{title}</Field.Label>
                   <Input

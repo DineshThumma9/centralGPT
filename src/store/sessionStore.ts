@@ -1,10 +1,7 @@
-import type Session from "../entities/Session.ts";
-import type Message from "../entities/Message.ts";
-
 
 import {create} from "zustand";
-
-
+import type { Message } from "../entities/Message.ts";
+import type { Session } from "../entities/Session.ts";
 
 export type SessionState = {
     current_session: string | null;
@@ -55,12 +52,29 @@ const sessionStore = create<SessionState>((set, get) => ({
             ),
         })),
 
-    setSessions: (sessions) => set({sessions}),
+    setSessions: (sessions) => {
+        // Sort sessions by timestamp or creation date if available, newest first
+        const sortedSessions = [...sessions].sort((a, b) => {
+            // Assuming sessions have a created_at or timestamp field
+            // If not available, maintain the order they were passed in
+            if (a.created_at && b.created_at) {
+                return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            }
+            return 0;
+        });
+        set({sessions: sortedSessions});
+    },
 
+    // Add new sessions at the beginning (most recent first)
     addSession: (session) =>
-        set((state) => ({
-            sessions: [session,...state.sessions],
-        })),
+        set((state) => {
+            // Ensure the new session is added at the beginning
+            const newSessions = [session, ...state.sessions];
+            console.log('Adding session:', session.session_id, 'Total sessions:', newSessions.length);
+            return {
+                sessions: newSessions,
+            };
+        }),
 
     updateSession: (sessionId, updates) =>
         set((state) => ({
@@ -77,6 +91,7 @@ const sessionStore = create<SessionState>((set, get) => ({
                 (session) => session.session_id !== sessionId
             ),
         })),
+
     setLoading: (loading) => set({isLoading: loading}),
     setStreaming: (streaming) => set({isStreaming: streaming}),
     clear: () => set({messages: []}),

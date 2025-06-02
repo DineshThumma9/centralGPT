@@ -14,4 +14,6 @@ const Session = z.object({
 }
 )
 
+
+export type Session = z.infer<typeof Session>;
 export default Session

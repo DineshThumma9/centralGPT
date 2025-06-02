@@ -172,7 +172,7 @@ export const streamChatResponse = (
 export const getChatHistory = async (data: { session_id: string; limit?: number }) => {
     try {
         const res = await API.get(`/history/${data.session_id}`, {
-            params: { limit: data.limit || 50 }
+            // params: { limit: data.limit || 50 }
         });
 
         if (!res?.data) throw new Error("SessionComponent History Empty");

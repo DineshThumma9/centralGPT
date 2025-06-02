@@ -15,7 +15,7 @@ import {
     MenuTrigger,
 } from "./ui/menu.tsx";
 import useSessions from "../hooks/useSessions.ts";
-import {useRef, useState} from "react";
+import {useState} from "react";
 
 const toaster = createToaster({placement: "top"});
 
@@ -29,13 +29,11 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
     const {changeTitle, deleteSessionById} = useSessions();
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
-    const [editKey, setEditKey] = useState(0); // force Editable remount
     const [isEditing, setIsEditing] = useState(false);
-    const [clickDelete,setClickDelete] = useState(false);
+
     const handleChangeTitleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsEditing(true);
-        setEditKey(prev => prev + 1);
     };
 
     const handleTitleUpdate = async (newTitle: string) => {
@@ -52,7 +50,8 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                     type: "success",
                     duration: 2000,
                 });
-            } catch {
+            } catch (error) {
+                console.error("Failed to update title:", error);
                 toaster.create({
                     title: "Error",
                     description: "Failed to update session title",
@@ -63,6 +62,10 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                 setIsUpdatingTitle(false);
             }
         }
+    };
+
+    const handleEditCancel = () => {
+        setIsEditing(false);
     };
 
     const handleDeleteSession = async (e: React.MouseEvent) => {
@@ -116,19 +119,23 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
             opacity={isDeleting ? 0.5 : 1}
         >
             <Editable.Root
-                key={editKey}
-                defaultValue={title}
-                defaultEdit={isEditing}
+                value={title}
+                edit={isEditing}
                 onEditChange={({edit}) => setIsEditing(edit)}
                 onValueCommit={({value}) => handleTitleUpdate(value)}
-                onValueRevert={() => setIsEditing(false)}
+                onValueRevert={handleEditCancel}
                 disabled={isUpdatingTitle}
+                selectOnFocus={true}
+
             >
-
-
                 <Editable.Preview
                     asChild
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isUpdatingTitle) {
+                            setIsEditing(true);
+                        }
+                    }}
                 >
                     <Text
                         fontSize="sm"
@@ -136,6 +143,10 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                         color="white"
                         lineClamp={1}
                         opacity={isUpdatingTitle ? 0.7 : 1}
+                        cursor={isUpdatingTitle ? "default" : "text"}
+                        _hover={{
+                            opacity: isUpdatingTitle ? 0.7 : 0.8
+                        }}
                     >
                         {title}
                     </Text>
@@ -153,8 +164,14 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                     _focus={{
                         borderColor: "blue.500",
                         boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)",
+                        outline: "none"
                     }}
                     onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Escape') {
+                            handleEditCancel();
+                        }
+                    }}
                 />
             </Editable.Root>
 
@@ -176,29 +193,26 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                     <MenuPositioner>
                         <MenuContent bg="gray.800" borderColor="gray.700" shadow="md">
                             <MenuItem
-                                value={"title"}
+                                value="title"
                                 onClick={handleChangeTitleClick}
                                 disabled={isUpdatingTitle}
                             >
                                 <Edit size={16}/>
                                 {isUpdatingTitle ? "Updating..." : "Rename"}
                             </MenuItem>
-                            <MenuItem value={"share"} onClick={handleShare}>
+                            <MenuItem value="share" onClick={handleShare}>
                                 <Share size={16}/>
                                 Share
                             </MenuItem>
                             <MenuItem
                                 onClick={handleDeleteSession}
-                                value={"delete"}
+                                value="delete"
                                 color="red.400"
                                 _hover={{bg: "red.600", color: "white"}}
                                 disabled={isDeleting}
                             >
                                 <Trash size={16} />
-
-
-                                {isDeleting ? "Deleting..."  : "Delete"}
-
+                                {isDeleting ? "Deleting..." : "Delete"}
                             </MenuItem>
                         </MenuContent>
                     </MenuPositioner>

@@ -7,10 +7,7 @@ import BadgeCompo from "./BadgeCompo.tsx";
 import APIKey from "./API-Key.tsx";
 
 const LLMModelChooser = () => {
-
-
-
-    const {providers_models,modelsProviders} = Constants();
+    const {providers_models, modelsProviders} = Constants();
 
     const {
         setCurrentLLMProvider,
@@ -23,75 +20,79 @@ const LLMModelChooser = () => {
         modelMap,
         providerModels,
         currentModel
-    } = useInitStore()
+    } = useInitStore();
 
-   const handleAPIProviderKeySelection = (currentAPIProvider:string) => {
-        setCurrentAPIProvider(currentAPIProvider)
-       setDialogOpen(true)
-   }
+    const handleAPIProviderKeySelection = (currentAPIProvider: string) => {
+        setCurrentAPIProvider(currentAPIProvider);
+        setDialogOpen(true);
+    };
 
-   const handleProviderSelection = async (providers:string) => {
+    const handleProviderSelection = async (provider: string) => {
+        setCurrentLLMProvider(provider);
+        const models = providers_models.get(provider) || [];
+        setModelMap(models);
 
+        // Reset current model when switching providers
+        setCurrentModel("");
 
-        setCurrentLLMProvider(providers)
-        setModelMap(providers_models.get(providers) || [])
-        await llmSelection(providers)
+        try {
+            await llmSelection(provider);
+        } catch (error) {
+            console.error("Failed to set LLM provider:", error);
+        }
+    };
 
-   }
-
-   const handleModelSelection= async (model:string) => {
-        setCurrentModel(model)
-        await modelSelection(model)
-
-   }
-
+    const handleModelSelection = async (model: string) => {
+        setCurrentModel(model);
+        try {
+            await modelSelection(model);
+        } catch (error) {
+            console.error("Failed to set model:", error);
+        }
+    };
 
     return (
-
         <HStack gap={3} flexWrap="wrap" margin={"0px"}>
-            {/* API Key Selector */}
-
+            {/* API Provider Selector */}
             <MenuHelper
                 title={"API Provider"}
                 options={modelsProviders}
                 selected={currentAPIProvider}
-                onSelect={
-                handleAPIProviderKeySelection
-            } />
+                onSelect={handleAPIProviderKeySelection}
+            />
 
+            {/* LLM Providers Selector */}
             <MenuHelper
                 title={"LLM Providers"}
                 options={[...providerModels.keys()]}
-                // options={["fdff","ffff"]}
                 selected={currentLLMProvider}
                 onSelect={handleProviderSelection}
             />
+
+            {/* Models Selector */}
             <MenuHelper
                 title={"Models"}
                 options={modelMap}
                 selected={currentModel}
                 onSelect={handleModelSelection}
+                disabled={!currentLLMProvider || modelMap.length === 0}
             />
 
-
             {/* Status Display */}
-            {(currentLLMProvider || currentModel ) && (
+            {(currentLLMProvider || currentModel) && (
                 <HStack gap={2}>
-                    {
-                        currentLLMProvider && (
-                        <BadgeCompo label = {currentLLMProvider}/>
+                    {currentLLMProvider && (
+                        <BadgeCompo label={currentLLMProvider} key={`provider-${currentLLMProvider}`} />
                     )}
                     {currentModel && (
-                        <BadgeCompo label = {currentModel}/>
+                        <BadgeCompo label={currentModel} key={`model-${currentModel}`} />
                     )}
                 </HStack>
             )}
 
-            <APIKey  provider={currentAPIProvider} title={"API KEY"} />
-
+            <APIKey provider={currentAPIProvider} title={"API KEY"} />
         </HStack>
     );
-
 };
 
 export default LLMModelChooser;

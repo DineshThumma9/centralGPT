@@ -1,11 +1,11 @@
 import {Badge} from "@chakra-ui/react";
+import { memo } from "react";
 
-
-interface Props{
-    label:string
+interface Props {
+    label: string;
 }
-const BadgeCompo = ({label}: Props) => {
 
+const BadgeCompo = memo(({label}: Props) => {
     return (
         <Badge
             colorScheme="brand"
@@ -14,7 +14,9 @@ const BadgeCompo = ({label}: Props) => {
         >
             {label}
         </Badge>
-    )
-}
+    );
+});
 
-export default BadgeCompo
+BadgeCompo.displayName = "BadgeCompo";
+
+export default BadgeCompo;

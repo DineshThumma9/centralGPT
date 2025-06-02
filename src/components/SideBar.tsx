@@ -71,6 +71,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         >
             <Button
                 aria-label="Toggle sidebar"
+                w={collapsed ? "30px" : null}
                 size="sm"
                 mb={4}
                 borderRadius={"full"}
@@ -189,11 +190,14 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                     <Box
                         color="app.accent"
                         cursor="pointer"
+                        maxW = "30px"
                         transition="transform 0.2s"
                         _hover={{transform: "scale(1.1)"}}
                         width="100%"
+                        alignContent = "center"
+                        justifyContent={"center"}
                     >
-                        <SettingsIcon color={"white"}/>
+                        <SettingsIcon color={"white"} w = {"30px"} />
                     </Box>
 
                 )}
