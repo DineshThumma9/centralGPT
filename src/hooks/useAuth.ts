@@ -1,10 +1,11 @@
 import { login, register } from "../api/auth-api.ts";
 import {getAuthState, useAuthStore} from "../store/authStore";
+import useValidationStore from "../store/validationStore.ts";
 
 export const useAuth = () => {
   const setAuth = getAuthState().setAuth;
   const logout = useAuthStore(s=>s.logout)
-
+  const {clearAllFields} = useValidationStore();
   const loginUser = async (username: string, password: string) => {
     try {
       const res = await login({ username, password });
@@ -55,5 +56,10 @@ export const useAuth = () => {
     }
   };
 
-  return { login: loginUser, register: registerUser, logout };
+  const logoutUser=()=>{
+        clearAllFields()
+        logout()
+  }
+
+  return { login: loginUser, register: registerUser, logout:logoutUser };
 };

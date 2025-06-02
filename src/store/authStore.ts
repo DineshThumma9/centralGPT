@@ -1,6 +1,7 @@
 // src/store/authStore.ts
 import {createStore} from "zustand/vanilla";
 import {useStore} from "zustand";
+import useValidationStore from "./validationStore.ts";
 
 export type AuthState = {
     user: string | null;
@@ -25,6 +26,7 @@ const getInitialState = () => {
 const authStore = createStore<AuthState>((set) => {
     const initialState = getInitialState();
 
+
     return {
         user: initialState.user,
         token: initialState.token,
@@ -40,6 +42,7 @@ const authStore = createStore<AuthState>((set) => {
             localStorage.removeItem("refresh");
             localStorage.removeItem("user");
             set({token: null, user: null});
+
         },
     };
 });

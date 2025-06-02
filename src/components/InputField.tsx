@@ -1,18 +1,15 @@
-import React from "react";
-import {
-  Field,
-  FieldLabel,
-  Input,
-} from "@chakra-ui/react";
-import { css, keyframes } from "@emotion/react";
+import { Input, Box, Field, FieldLabel, FieldErrorText } from "@chakra-ui/react";
+import { css, cx, keyframes } from "@emotion/css";
 
 const shake = keyframes`
-  0% { transform: translateX(0); }
-  20% { transform: translateX(-5px); }
-  40% { transform: translateX(5px); }
-  60% { transform: translateX(-5px); }
-  80% { transform: translateX(5px); }
-  100% { transform: translateX(0); }
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+`;
+
+const shakeAnimation = css`
+  animation: ${shake} 0.5s ease;
 `;
 
 const InputField = ({
@@ -22,8 +19,11 @@ const InputField = ({
   error,
   onChange,
   onBlur,
+
   touched,
   shakey,
+  type = "text",
+     islast = false,
 }: {
   label: string;
   placeholder: string;
@@ -33,26 +33,34 @@ const InputField = ({
   onBlur: () => void;
   touched: boolean;
   shakey: number;
+  type?: string;
+  islast?:boolean;
 }) => {
-  const animationStyle =
-    error && touched
-      ? css`
-          animation: ${shake} 0.3s ease;
-        `
-      : undefined;
+  const shouldShake = error && touched;
 
   return (
-    <Field.Root>
+    <Field.Root width="100%">
       <FieldLabel>{label}</FieldLabel>
-      <Input
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        placeholder={placeholder}
-        key={shakey} // re-trigger animation on error
-        css={animationStyle}
-      />
-      {error && touched && <Field.ErrorText>{error}</Field.ErrorText>}
+      <Box w="full">
+        <Input
+          className={cx(shouldShake ? shakeAnimation : "")}
+          type={type}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          borderColor={shouldShake ? "red.500" : "gray.300"}
+          borderWidth="1px"
+          _focus={{ borderColor: shouldShake ? "red.500" : "blue.500" }}
+          width="100%"
+          key={shakey} // triggers re-render to restart animation
+        />
+      </Box>
+      {error && touched && (
+        <FieldErrorText color="red.500" fontSize="sm">
+          {error}
+        </FieldErrorText>
+      )}
     </Field.Root>
   );
 };

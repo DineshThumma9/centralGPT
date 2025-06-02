@@ -1,5 +1,5 @@
 import {Card, CardBody, CardFooter, CardHeader, Heading, Stack} from "@chakra-ui/react";
-import React, {type ReactNode} from "react";
+import  {type ReactNode} from "react";
 import NavGateButton from "./NavGateButton.tsx";
 
 
@@ -25,11 +25,16 @@ const CrediantialCard = ({heading, login_register, children, message, isLoading,
             borderRadius="xl"
             p={6}
         >
+
             <CardHeader width={"sm"}>
                 <Heading as="h1" size="lg" textAlign="center">
                     {heading}
                 </Heading>
             </CardHeader>
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                onSubmit();
+            }}>
 
             <CardBody width={"sm"}>
 
@@ -41,10 +46,13 @@ const CrediantialCard = ({heading, login_register, children, message, isLoading,
 
             </CardBody>
 
+
+
             <CardFooter>
                 <NavGateButton login_register={login_register} message={message} isLoading={isLoading}
                                onSubmit={onSubmit} altlink={altlink}/>
             </CardFooter>
+                 </form>
         </Card.Root>
 
     )

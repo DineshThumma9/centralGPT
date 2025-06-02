@@ -13,6 +13,7 @@
     "@babel/eslint-parser": "^7.27.1",
     "@chakra-ui/react": "^3.19.1",
     "@chakra-ui/transition": "^2.1.0",
+    "@emotion/css": "^11.13.5",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@sideway/address": "^5.0.0",
