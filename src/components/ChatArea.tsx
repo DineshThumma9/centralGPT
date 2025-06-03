@@ -60,21 +60,25 @@ const ChatArea = () => {
 
             <Box
                 flex="1"
-                height={"full"}
                 overflowY="auto"
                 w="full"
+                maxW="80%"
+                mx="auto"  // centers the box horizontally within parent
+                px={4}
+
+
             >
                 {/* SessionComponent Messages Area */}
                 <Response/>
 
                 {/* Input Area */}
 
-                <div ref={scrollRef}></div>
 
-                <SendRequest/>
             </Box>
 
+            <SendRequest/>
 
+            <div ref={scrollRef}></div>
         </VStack>
     );
 };

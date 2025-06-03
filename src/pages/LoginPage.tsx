@@ -10,6 +10,7 @@ import useFieldForm from "../hooks/useFieldForm.ts";
 import InputField from "../components/InputField.tsx";
 import CrediantialCard from "../components/CrediantialCard.tsx";
 import useValidationStore from "../store/validationStore.ts";
+import useInitStore from "../store/initStore.ts";
 
 const loginSchema = z.object({
     username: z.string().min(1, "Username is required"),
@@ -27,7 +28,7 @@ const LoginPage = () => {
     const {login} = useAuth();
     const navigate = useNavigate();
     const cardBg = useColorModeValue("white", "gray.800");
-
+    const {setUsername}=useInitStore()
     // Clear fields on component mount
     useEffect(() => {
         clearAllFields();
@@ -67,6 +68,7 @@ const LoginPage = () => {
                 type: "success",
                 duration: 3000,
             });
+            setUsername(values.username)
             setFadeOut(true);
             setTimeout(() => navigate("/app"), 300);
         } catch (error) {

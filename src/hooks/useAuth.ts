@@ -1,11 +1,18 @@
 import { login, register } from "../api/auth-api.ts";
-import {getAuthState, useAuthStore} from "../store/authStore";
 import useValidationStore from "../store/validationStore.ts";
+import useAuthStore from "../store/authStore.ts";
+import useInitStore from "../store/initStore.ts";
 
 export const useAuth = () => {
-  const setAuth = getAuthState().setAuth;
-  const logout = useAuthStore(s=>s.logout)
+
+
+
+  const logout = useAuthStore.getState().clearAuth
   const {clearAllFields} = useValidationStore();
+
+  const {setAccessToken,setRefreshToken} = useAuthStore()
+  const {clearInit} = useInitStore()
+
   const loginUser = async (username: string, password: string) => {
     try {
       const res = await login({ username, password });
@@ -15,12 +22,14 @@ export const useAuth = () => {
 
       const { access, refresh } = res.data;
 
-      // Store tokens in localStorage
-      localStorage.setItem("access", access); // Fixed: removed extra colon
-      localStorage.setItem("refresh", refresh);
+
+
+      setAccessToken(access)
+      setRefreshToken(refresh)
+
 
       // Update auth store
-      setAuth(access, username);
+      // setAuth(access, username);
 
       console.log("Login successful, tokens stored");
     } catch (error) {
@@ -43,11 +52,13 @@ export const useAuth = () => {
       const { access, refresh } = res;
 
       // Store tokens in localStorage
-      localStorage.setItem("access", access);
-      localStorage.setItem("refresh", refresh);
+
+            setAccessToken(access)
+      setRefreshToken(refresh)
+
 
       // Update auth store
-      setAuth(access, username);
+      // setAuth(access, username);
 
       console.log("Registration successful, tokens stored");
     } catch (error) {
@@ -58,6 +69,7 @@ export const useAuth = () => {
 
   const logoutUser=()=>{
         clearAllFields()
+        clearInit()
         logout()
   }
 

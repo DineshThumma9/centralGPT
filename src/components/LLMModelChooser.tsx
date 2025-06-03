@@ -5,6 +5,8 @@ import MenuHelper from "./MenuHelper.tsx";
 import useInitStore from "../store/initStore.ts";
 import BadgeCompo from "./BadgeCompo.tsx";
 import APIKey from "./API-Key.tsx";
+import {useEffect} from "react";
+import axios from "axios";
 
 const LLMModelChooser = () => {
     const {providers_models, modelsProviders} = Constants();
@@ -21,6 +23,15 @@ const LLMModelChooser = () => {
         providerModels,
         currentModel
     } = useInitStore();
+
+
+    useEffect(() => {
+        if (!currentLLMProvider) return;
+
+        const models = providerModels.get(currentLLMProvider) ?? [];
+        setModelMap(models);
+    }, [currentLLMProvider, providerModels]);
+
 
     const handleAPIProviderKeySelection = (currentAPIProvider: string) => {
         setCurrentAPIProvider(currentAPIProvider);
@@ -50,6 +61,7 @@ const LLMModelChooser = () => {
             console.error("Failed to set model:", error);
         }
     };
+
 
     return (
         <HStack gap={3} flexWrap="wrap" margin={"0px"}>
@@ -82,15 +94,15 @@ const LLMModelChooser = () => {
             {(currentLLMProvider || currentModel) && (
                 <HStack gap={2}>
                     {currentLLMProvider && (
-                        <BadgeCompo label={currentLLMProvider} key={`provider-${currentLLMProvider}`} />
+                        <BadgeCompo label={currentLLMProvider} key={`provider-${currentLLMProvider}`}/>
                     )}
                     {currentModel && (
-                        <BadgeCompo label={currentModel} key={`model-${currentModel}`} />
+                        <BadgeCompo label={currentModel} key={`model-${currentModel}`}/>
                     )}
                 </HStack>
             )}
 
-            <APIKey provider={currentAPIProvider} title={"API KEY"} />
+            <APIKey provider={currentAPIProvider} title={"API KEY"}/>
         </HStack>
     );
 };

@@ -1,13 +1,15 @@
-import {Avatar, Button, Menu, MenuPositioner, Portal, VStack} from "@chakra-ui/react";
+import {Avatar, Button, Menu, MenuPositioner, Portal, Separator, VStack} from "@chakra-ui/react";
 import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
 import Pc from "../assets/img.png";
 import {useAuth} from "../hooks/useAuth.ts";
 import {useNavigate} from "react-router-dom";
+import useValidationStore from "../store/validationStore.ts";
+import useInitStore from "../store/initStore.ts";
 
 const AvatarExpandable = () => {
     const {logout} = useAuth();
     const navigate = useNavigate()
-
+    const {username,email} = useInitStore()
     return (
         <VStack>
             <Menu.Root>
@@ -29,10 +31,9 @@ const AvatarExpandable = () => {
                         zIndex = {2}
                     >
                         <Avatar.Root size="sm" border="0px">
-                            <Avatar.Fallback name="Roronoa Zoro"/>
+                            <Avatar.Fallback name={username}/>
                             <Avatar.Image
                                 zIndex ={2}
-                                src={Pc}
                                 borderRadius="full"
                                 _hover={{
                                     borderRadius: "full",
@@ -47,7 +48,11 @@ const AvatarExpandable = () => {
                         <Menu.Content>
                             <Menu.Item value="profile">
                                 <BiUser style={{marginRight: 8}}/>
-                                Roronoa Zoro
+                                {username}
+                            </Menu.Item>
+                            <Separator/>
+                            <Menu.Item value="profile">
+                                {email}
                             </Menu.Item>
                             <Menu.Item value="customize">
                                 <BiCog style={{marginRight: 8}}/>

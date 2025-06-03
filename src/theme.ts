@@ -1,6 +1,7 @@
-import { createSystem, defineConfig, defaultConfig } from "@chakra-ui/react";
-
+import {createSystem, defineConfig, defaultConfig} from "@chakra-ui/react";
 // 1. Design Tokens
+
+
 const tokens = {
   colors: {
     black: { value: '#000000' },
@@ -45,74 +46,93 @@ const semanticTokens = {
 
 // 3. Global Styles (includes font smoothing + base font logic)
 const globalCss = {
-  body: {
-    bg: "app.bg",
-    color: "app.text",
-    fontFamily: "fonts.body",
-    WebkitFontSmoothing: "antialiased",
-    MozOsxFontSmoothing: "grayscale",
-    margin: "0",
-  },
-  code: {
-    fontFamily: "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace",
-  },
-  // Add global text styles
-  ".text-heading": {
-    fontFamily: "fonts.heading",
-    fontWeight: "fontWeights.normal",
-    fontSize: "fontSizes.lg",
-    lineHeight: "lineHeights.tight",
-    color: "app.text",
-  },
-  ".text-body": {
-    fontFamily: "fonts.body",
-    fontWeight: "fontWeights.normal",
-    fontSize: "fontSizes.md",
-    lineHeight: "lineHeights.base",
-    color: "app.text",
-  },
-  ".text-sidebar": {
-    fontFamily: "fonts.body",
-    fontWeight: "fontWeights.normal",
-    fontSize: "fontSizes.md",
-    lineHeight: "lineHeights.base",
-    color: "app.text",
-  },
-  ".text-sidebar-small": {
-    fontFamily: "fonts.heading",
-    fontWeight: "fontWeights.bold",
-    fontSize: "fontSizes.sm",
-    lineHeight: "lineHeights.tight",
-    color: "app.text.secondary",
-  },
-  ".button": {
-    fontWeight: "fontWeights.bold",
-    borderRadius: "md",
-    color: "app.text",
-    "&.solid": {
-      bg: "brand.primary",
-      color: "white",
-      "&:hover": {
-        opacity: 0.9,
-      },
+    body: {
+        bg: "app.bg",
+        color: "app.text",
+        fontFamily: "fonts.body",
+        WebkitFontSmoothing: "antialiased",
+        MozOsxFontSmoothing: "grayscale",
+        margin: "0",
     },
-    "&.ghost": {
-      bg: "transparent",
-      color: "app.text",
-      "&:hover": {
-        bg: "whiteAlpha.200",
-      },
+    code: {
+        fontFamily: "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace",
     },
-  },
+
+    "::webkit-scrollbars": {
+        width: "2px",
+        height: "5px",
+    },
+
+    "::webkit-scrollbar-thumb": {
+        color: "black",
+        "borderRadius": "4px",
+    },
+
+    '::-webkit-scrollbar-track': {
+        background: 'transparent',
+    },
+    '*': {
+        scrollbarColor: '#718096 transparent',
+        scrollbarWidth: 'thin',
+    },
+
+    // Add global text styles
+    ".text-heading": {
+        fontFamily: "fonts.heading",
+        fontWeight: "fontWeights.normal",
+        fontSize: "fontSizes.lg",
+        lineHeight: "lineHeights.tight",
+        color: "app.text",
+    },
+    ".text-body": {
+        fontFamily: "fonts.body",
+        fontWeight: "fontWeights.normal",
+        fontSize: "fontSizes.md",
+        lineHeight: "lineHeights.base",
+        color: "app.text",
+    },
+    ".text-sidebar": {
+        fontFamily: "fonts.body",
+        fontWeight: "fontWeights.normal",
+        fontSize: "fontSizes.md",
+        lineHeight: "lineHeights.base",
+        color: "app.text",
+    },
+    ".text-sidebar-small": {
+        fontFamily: "fonts.heading",
+        fontWeight: "fontWeights.bold",
+        fontSize: "fontSizes.sm",
+        lineHeight: "lineHeights.tight",
+        color: "app.text.secondary",
+    },
+    ".button": {
+        fontWeight: "fontWeights.bold",
+        borderRadius: "md",
+        color: "app.text",
+        "&.solid": {
+            bg: "brand.primary",
+            color: "white",
+            "&:hover": {
+                opacity: 0.9,
+            },
+        },
+        "&.ghost": {
+            bg: "transparent",
+            color: "app.text",
+            "&:hover": {
+                bg: "whiteAlpha.200",
+            },
+        },
+    },
 };
 
 // 4. Final Config and System
 const config = defineConfig({
-  theme: {
-    tokens,
-    semanticTokens,
-  },
-  globalCss,
+    theme: {
+        tokens,
+        semanticTokens,
+    },
+    globalCss,
 });
 
 const system = createSystem(defaultConfig, config);

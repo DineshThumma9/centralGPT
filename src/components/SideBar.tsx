@@ -71,7 +71,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         >
             <Button
                 aria-label="Toggle sidebar"
-                w={collapsed ? "30px" : null}
+                width={collapsed ? "30px" : "50px"}
                 size="sm"
                 mb={4}
                 borderRadius={"full"}

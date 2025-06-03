@@ -18,8 +18,9 @@ const SendRequest = () => {
         if (!input.trim()) return;
 
         try {
+            setInput("");
             console.log(await tstMsgFunc(input.trim()));
-            setInput(""); // Clear input after sending
+           // Clear input after sending
         } catch (error) {
             console.error("Failed to send message:", error);
         }

@@ -1,9 +1,11 @@
 import axios, {AxiosError} from "axios";
 import Message from "../entities/Message.ts";
-import {getAuthState} from "../store/authStore.ts";
+import useAuthStore from "../store/authStore.ts";
 import {ZodError} from "zod";
 import {z} from "zod/v4";
 import Session from "../entities/Session.ts";
+import useSessionStore from "../store/sessionStore.ts";
+import useInitStore from "../store/initStore.ts";
 
 
 const API = axios.create({
@@ -34,6 +36,8 @@ export const apiKeySelection =   async (api_provider:string,api_key:string)=> {
             console.log(res.data)
             throw Error("Some error has occures")
         }
+
+        useInitStore.getState().setCurrentAPIProvider(api_provider)
     }catch(error){
             console.log("Error has occurs here in llm selection")
         throw  error
@@ -89,7 +93,7 @@ export const modelSelection= async (model:string)=> {
 export const newSession = async ()  => {
     try {
 
-        const access = localStorage.getItem("refresh")
+        const access = useAuthStore.getState().accessToken
         console.log("access token :" ,access)
         const res = await API.post("/new", null, {
            headers: { "Authorization": `Bearer ${access}` }
@@ -106,7 +110,7 @@ export const newSession = async ()  => {
 
 
         const sessionId = res.data.session_id;
-        localStorage.setItem("current_session_id", sessionId);
+        useSessionStore.getState().setCurrentSessionId(sessionId)
         console.log("Session Id Stored:", sessionId);
        return Session.parse({
   session_id: res.data.session_id,
@@ -206,7 +210,9 @@ export const deleteSession = async (session_id: string) => {
 export type Message = z.infer<typeof Message>;
 
 export const testMsg = async (msg: string): Promise<Message> => {
-  const session_id = localStorage.getItem("current_session_id");
+  const session_id = useSessionStore.getState().current_session
+
+
   if (!session_id) throw new Error("Missing session ID in localStorage");
 
   const payload = { session_id, msg };
@@ -263,7 +269,7 @@ export const getAllSessions = async () => {
 
 
 API.interceptors.request.use((config) => {
-  const token = getAuthState().token;
+  const token = useAuthStore.getState().accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

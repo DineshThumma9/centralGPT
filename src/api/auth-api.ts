@@ -1,5 +1,4 @@
 import axios, { AxiosError } from "axios";
-import { getAuthState } from "../store/authStore.ts";
 
 
 
@@ -74,11 +73,13 @@ export const register = async (username: string, email: string, password: string
 
 
 
+
+import useAuthStore from "../store/authStore";
+
 API.interceptors.request.use((config) => {
-  const token = getAuthState().token;
+  const token = useAuthStore.getState().accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
-

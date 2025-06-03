@@ -1,55 +1,35 @@
-// src/store/authStore.ts
-import {createStore} from "zustand/vanilla";
-import {useStore} from "zustand";
-import useValidationStore from "./validationStore.ts";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export type AuthState = {
-    user: string | null;
-    token: string | null;
-    setAuth: (token: string, user: string) => void;
-    logout: () => void;
+type AuthState = {
+  accessToken: string | null;        // access token
+  refreshToken: string | null; // refresh
+
+
+  setAccessToken: (token: string | null) => void;
+
+  setRefreshToken: (refreshToken: string | null) => void;
+  clearAuth: () => void;
 };
 
-// Helper function to get initial state from localStorage
-const getInitialState = () => {
-    try {
-        const token = localStorage.getItem("access");
-        const user = localStorage.getItem("user");
-        return {token, user};
-    } catch {
-        return {token: null, user: null};
+const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      accessToken: null,
+      refreshToken: null,
+
+
+
+      setAccessToken: (accessToken) => set({ accessToken }),
+
+      setRefreshToken: (refreshToken) => set({ refreshToken }),
+      clearAuth: () => set({accessToken: null, refreshToken: null }),
+    }),
+    {
+      name: "auth-persist", // localStorage key
+      // Optionally, you can serialize/deserialize or encrypt here
     }
-};
+  )
+);
 
-
-
-const authStore = createStore<AuthState>((set) => {
-    const initialState = getInitialState();
-
-
-    return {
-        user: initialState.user,
-        token: initialState.token,
-        setAuth: (token: string, user: string) => {
-            // Update both store and localStorage
-            localStorage.setItem("access", token);
-            localStorage.setItem("user", user);
-            set({token, user});
-        },
-        logout: () => {
-            // Clear both store and localStorage
-            localStorage.removeItem("access");
-            localStorage.removeItem("refresh");
-            localStorage.removeItem("user");
-            set({token: null, user: null});
-
-        },
-    };
-});
-
-// Create a hook version of the store for use in React components
-export const useAuthStore = <T>(selector: (state: AuthState) => T) =>
-    useStore(authStore, selector);
-
-// Export getState and other methods for non-React environments
-export const getAuthState = authStore.getState;
+export default useAuthStore;
