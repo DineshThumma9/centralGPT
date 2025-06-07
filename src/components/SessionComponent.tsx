@@ -5,7 +5,7 @@ import {
     Text,
     createToaster,
     MenuPositioner,
-    Portal,
+    Portal, Center,
 } from "@chakra-ui/react";
 import {MoreVertical, Edit, Share, Trash} from "lucide-react";
 import {
@@ -23,9 +23,11 @@ interface Props {
     title: string;
     sessionId: string;
     onSelect?: () => void;
+    color:string
+    bg:string
 }
 
-const SessionComponent = ({title, sessionId, onSelect}: Props) => {
+const SessionComponent = ({title, sessionId, onSelect,color,bg}: Props) => {
     const {changeTitle, deleteSessionById} = useSessions();
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
@@ -43,7 +45,8 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
         if (trimmed && trimmed !== title) {
             setIsUpdatingTitle(true);
             try {
-                await changeTitle(trimmed);
+                // Fix: Pass sessionId to changeTitle function
+                await changeTitle(sessionId, trimmed);
                 toaster.create({
                     title: "Title updated",
                     description: `Session title changed to "${trimmed}"`,
@@ -104,19 +107,24 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
     };
 
     return (
-        <HStack
+        <Center
             justifyContent="space-between"
             w="100%"
             px={2}
             py={2}
-            bg="gray.900"
+            height={"40px"}
+            width = {"1fr"}
+            bg= {bg}
+            color={color}
+            overflow = "hidden"
             _hover={{bg: "gray.800", transform: "scale(1.01)"}}
             transition="all 0.2s ease-in-out"
-            borderRadius="md"
+            borderRadius="lg"
             boxShadow="lg"
             cursor="pointer"
             onClick={onSelect}
             opacity={isDeleting ? 0.5 : 1}
+
         >
             <Editable.Root
                 value={title}
@@ -126,7 +134,6 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                 onValueRevert={handleEditCancel}
                 disabled={isUpdatingTitle}
                 selectOnFocus={true}
-
             >
                 <Editable.Preview
                     asChild
@@ -142,6 +149,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                         fontWeight="medium"
                         color="white"
                         lineClamp={1}
+                        overflow={"hidden"}
                         opacity={isUpdatingTitle ? 0.7 : 1}
                         cursor={isUpdatingTitle ? "default" : "text"}
                         _hover={{
@@ -171,6 +179,12 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                         if (e.key === 'Escape') {
                             handleEditCancel();
                         }
+                        // Fix: Handle Enter key to save changes
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const target = e.target as HTMLInputElement;
+                            handleTitleUpdate(target.value);
+                        }
                     }}
                 />
             </Editable.Root>
@@ -191,7 +205,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                 </MenuTrigger>
                 <Portal>
                     <MenuPositioner>
-                        <MenuContent bg="gray.800" borderColor="gray.700" shadow="md">
+                        <MenuContent bg="white" borderColor="gray.700" shadow="md">
                             <MenuItem
                                 value="title"
                                 onClick={handleChangeTitleClick}
@@ -218,7 +232,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                     </MenuPositioner>
                 </Portal>
             </MenuRoot>
-        </HStack>
+        </Center>
     );
 };
 

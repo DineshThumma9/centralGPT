@@ -76,6 +76,7 @@ const useValidationStore = create<ValidationState>((set) => ({
   clearAllFields: () =>
     set(() => ({
       fields: {},
+
     })),
 
   clearField: (name) =>

@@ -6,7 +6,7 @@ import useInitStore from "../store/initStore.ts";
 import BadgeCompo from "./BadgeCompo.tsx";
 import APIKey from "./API-Key.tsx";
 import {useEffect} from "react";
-import axios from "axios";
+
 
 const LLMModelChooser = () => {
     const {providers_models, modelsProviders} = Constants();

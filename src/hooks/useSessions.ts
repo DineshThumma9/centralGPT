@@ -165,12 +165,12 @@ const tstMsgFunc = async (msg: string) => {
     }
   };
 
-  const changeTitle = async (title: string) => {
+  const changeTitle = async (sessionId:string,title: string) => {
     try {
       setLoading(true);
       if (!current_session) throw new Error("No active session.");
 
-      const newTitle = await updateSessionTitle(current_session, title);
+      const newTitle = await updateSessionTitle(sessionId, title);
       setTitle(newTitle);
 
       // Update the session in the sessions list reactively

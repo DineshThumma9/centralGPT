@@ -7,6 +7,7 @@ import SessionComponent from "./SessionComponent.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
 import type Session from "../entities/Session.ts";
+import MultiMediaDropDown from "./MultiMediaDropDown.tsx";
 
 interface SidebarProps {
     onCollapse?: (collapsed: boolean) => void;
@@ -26,6 +27,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         onCollapse?.(newCollapsed);
     };
 
+    // Fix: Combine useEffect for sessionStore subscription
     useEffect(() => {
         const unsubscribe = sessionStore.subscribe((state) => {
             setSessions(state.sessions);
@@ -38,16 +40,11 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         setCurrentSession(initialState.current_session);
         setIsLoading(initialState.isLoading);
 
+        // Load sessions on mount
+        getSessions();
+
         return unsubscribe;
     }, []);
-
-    useEffect(() => {
-        getSessions();
-    }, []);
-
-    useEffect(() => {
-        onCollapse?.(collapsed);
-    }, [collapsed, onCollapse]);
 
     const handleSessionSelect = async (sessionId: string) => {
         try {
@@ -59,7 +56,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
 
     return (
         <Box
-            w={collapsed ? "60px" : "350px"}
+            w={collapsed ? "60px" : "270px"}
             transition="all 0.3s ease-in-out"
             bg="black"
             color="app.text.primary"
@@ -117,8 +114,6 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                 },
                             }}
                         >
-                            <HStack bg={"white"} color="black"/>
-
                             {isLoading && sessions.length === 0 && (
                                 <Box p={4}>
                                     <Text fontSize="sm" color="app.text.muted" textAlign="center">
@@ -137,29 +132,39 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                 </Box>
                             )}
 
-                            {sessions
-                                .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-                                .map((session) => {
+                            {(() => {
+                                const sortedSessions = sessions
+                                    .filter((s) => s.session_id !== currentSession)
+                                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+                                const current = sessions.find((s) => s.session_id === currentSession);
+
+                                const allSessions = current ? [current, ...sortedSessions] : sortedSessions;
+
+                                return allSessions.map((session) => {
                                     const sessionId = session.session_id!;
                                     const isActive = currentSession === sessionId;
 
                                     return (
                                         <Stack
                                             key={sessionId}
-                                            bg={isActive ? "transparent" : "transparent"} // typo fix below
+                                            bg={isActive ? "grey.900" : "transparent"}
                                             borderRadius="md"
                                             padding="0px"
                                             margin="0"
                                             transition="all 0.2s ease-in-out"
                                         >
                                             <SessionComponent
-                                                title={"dgisgsosbso"}
+                                                bg={isActive ? "darkgrey" : "black"}
+                                                color={isActive ? "black" : "white"}
+                                                title={session.title || "New Chat"}
                                                 sessionId={sessionId}
                                                 onSelect={() => handleSessionSelect(sessionId)}
                                             />
                                         </Stack>
                                     );
-                                })}
+                                });
+                            })()}
 
                         </VStack>
 
@@ -167,7 +172,6 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                             justifyContent="flex-start"
                             mt="auto"
                             p={2}
-                            width={"100vw"}
                             bg="app.card.bg"
                             borderRadius="md"
                             cursor="pointer"
@@ -177,7 +181,6 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                             transition="background 0.2s"
                             zIndex={2}
                         >
-
                             <SettingsIcon color="white"/>
                             <Text fontSize="xl" color="app.text.secondary">
                                 Settings
@@ -190,16 +193,16 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                     <Box
                         color="app.accent"
                         cursor="pointer"
-                        maxW = "30px"
+                        maxW="30px"
                         transition="transform 0.2s"
                         _hover={{transform: "scale(1.1)"}}
                         width="100%"
-                        alignContent = "center"
-                        justifyContent={"center"}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
                     >
-                        <SettingsIcon color={"white"} w = {"30px"} />
+                        <SettingsIcon color={"white"} size={24}/>
                     </Box>
-
                 )}
             </VStack>
         </Box>

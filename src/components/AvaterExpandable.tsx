@@ -1,15 +1,13 @@
 import {Avatar, Button, Menu, MenuPositioner, Portal, Separator, VStack} from "@chakra-ui/react";
 import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
-import Pc from "../assets/img.png";
 import {useAuth} from "../hooks/useAuth.ts";
 import {useNavigate} from "react-router-dom";
-import useValidationStore from "../store/validationStore.ts";
 import useInitStore from "../store/initStore.ts";
 
 const AvatarExpandable = () => {
     const {logout} = useAuth();
     const navigate = useNavigate()
-    const {username,email} = useInitStore()
+    const {username, email} = useInitStore()
     return (
         <VStack>
             <Menu.Root>
@@ -28,12 +26,12 @@ const AvatarExpandable = () => {
                         _focus={{
                             boxShadow: "none",
                         }}
-                        zIndex = {2}
+                        zIndex={2}
                     >
                         <Avatar.Root size="sm" border="0px">
-                            <Avatar.Fallback name={username}/>
+                            <Avatar.Fallback name={username || "user"}/>
                             <Avatar.Image
-                                zIndex ={2}
+                                zIndex={2}
                                 borderRadius="full"
                                 _hover={{
                                     borderRadius: "full",

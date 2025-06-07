@@ -11,7 +11,7 @@ import sessionStore from "../store/sessionStore.ts";
 const ChatArea = () => {
 
 
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [,setMessages] = useState<Message[]>([]);
 
 
     const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -65,6 +65,21 @@ const ChatArea = () => {
                 maxW="80%"
                 mx="auto"  // centers the box horizontally within parent
                 px={4}
+                   css={{
+                '&::-webkit-scrollbar': {
+                    width: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                    background: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    background: '#404040',
+                    borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                    background: '#505050',
+                },
+            }}
 
 
             >

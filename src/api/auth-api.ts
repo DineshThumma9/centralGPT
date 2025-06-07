@@ -9,6 +9,8 @@ export const API = axios.create({
   withCredentials: true,
 });
 
+
+
 export const login = (
                    data:
                       {
@@ -31,45 +33,13 @@ export const login = (
 
 
 export const register = async (username: string, email: string, password: string) => {
-  try {
-    console.log(
-      "Sending registration data:",
-      JSON.stringify({ username, email, password }, null, 2)
-    );
-
-
-
-   console.log("Sending request")
-    const response = await API.post(
-      "/register",
-      { username, email, password },
-      { headers: { "Content-Type": "application/json" } }
-    );
-   console.log("Response collected")
-
-
-
-    console.log("Registration response:", response.data);
-    return response.data;
-
-
-
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      console.error("Registration error status:", error.response?.status);
-      console.error("Registration error details:", error.response?.data);
-      if (error.response?.data?.detail) {
-        console.error(
-          "Validation errors:",
-          JSON.stringify(error.response.data.detail, null, 2)
-        );
-      }
-    } else {
-      console.error("An unexpected error occurred:", error);
-    }
-    throw error;
-  }
+  const response = await API.post("/register",
+    { username, email, password },
+    { headers: { "Content-Type": "application/json" } }
+  );
+  return response.data;
 };
+
 
 
 
@@ -83,3 +53,19 @@ API.interceptors.request.use((config) => {
   }
   return config;
 });
+
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+      if (error.response) {
+          console.error(`API Response Error : ${error.response.status}`, error.response.data);
+      } else if (error.request) {
+          // error.response might be undefined here, so don't access it
+          console.error(`API Request Error`, error.request, error.message);
+      } else {
+          console.error(`Some Error has occurred`, error.message);
+      }
+      return Promise.reject(error);
+  }
+);

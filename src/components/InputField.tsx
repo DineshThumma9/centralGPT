@@ -1,5 +1,6 @@
 import { Input, Box, Field, FieldLabel, FieldErrorText } from "@chakra-ui/react";
 import { css, cx, keyframes } from "@emotion/css";
+import {PasswordInput} from "./ui/password-input.tsx";
 
 const shake = keyframes`
   10%, 90% { transform: translateX(-1px); }
@@ -19,11 +20,10 @@ const InputField = ({
   error,
   onChange,
   onBlur,
-
   touched,
   shakey,
   type = "text",
-     islast = false,
+
 }: {
   label: string;
   placeholder: string;
@@ -39,7 +39,7 @@ const InputField = ({
   const shouldShake = error && touched;
 
   return (
-    <Field.Root width="100%">
+    <Field.Root width="100%" zIndex = {5}>
       <FieldLabel>{label}</FieldLabel>
       <Box w="full">
         <Input

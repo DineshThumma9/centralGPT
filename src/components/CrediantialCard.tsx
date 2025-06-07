@@ -23,6 +23,7 @@ const CrediantialCard = ({heading, login_register, children, message, isLoading,
             // bg={"white"}
             boxShadow="lg"
             borderRadius="xl"
+            zIndex = {10}
             p={6}
         >
 

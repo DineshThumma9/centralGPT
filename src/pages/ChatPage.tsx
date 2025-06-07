@@ -13,8 +13,24 @@ const ChatPage = () => {
             h="100vh"
             bg="app.bg"
             color="app.text.primary"
-            overflow="hidden"
+            overflow="auto"
+            padding={"0px"}
             transition="all 0.3s ease-in-out"
+               css={{
+                '&::-webkit-scrollbar': {
+                    width: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                    background: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    background: '#404040',
+                    borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                    background: '#505050',
+                },
+            }}
         >
             <GridItem
                 area="aside"
@@ -25,9 +41,10 @@ const ChatPage = () => {
             </GridItem>
             <GridItem
                 area="main"
-                overflow="hidden"
+                overflow="auto"
                 bg="app.bg"
                 transition="all 0.3s ease-in-out"
+
             >
                 <ChatArea />
             </GridItem>
