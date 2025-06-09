@@ -1,6 +1,6 @@
 import { Input, Box, Field, FieldLabel, FieldErrorText } from "@chakra-ui/react";
 import { css, cx, keyframes } from "@emotion/css";
-import {PasswordInput} from "./ui/password-input.tsx";
+import { PasswordInput } from "./ui/password-input";
 
 const shake = keyframes`
   10%, 90% { transform: translateX(-1px); }
@@ -23,7 +23,6 @@ const InputField = ({
   touched,
   shakey,
   type = "text",
-
 }: {
   label: string;
   placeholder: string;
@@ -34,29 +33,30 @@ const InputField = ({
   touched: boolean;
   shakey: number;
   type?: string;
-  islast?:boolean;
 }) => {
-  const shouldShake = error && touched;
+  const shouldShake = !!(error && touched);
+  const isPassword = label.toLowerCase().includes("password");
+  const commonProps = {
+    className: cx(shouldShake && shakeAnimation),
+    type,
+    value,
+    onChange,
+    onBlur,
+    placeholder,
+    borderColor: shouldShake ? "red.500" : "gray.300",
+    borderWidth: "1px",
+    _focus: { borderColor: shouldShake ? "red.500" : "blue.500" },
+    width: "100%",
+    key: shakey,
+  };
 
   return (
-    <Field.Root width="100%" zIndex = {5}>
+    <Field.Root width="100%" zIndex={5}>
       <FieldLabel>{label}</FieldLabel>
       <Box w="full">
-        <Input
-          className={cx(shouldShake ? shakeAnimation : "")}
-          type={type}
-          value={value}
-          onChange={onChange}
-          onBlur={onBlur}
-          placeholder={placeholder}
-          borderColor={shouldShake ? "red.500" : "gray.300"}
-          borderWidth="1px"
-          _focus={{ borderColor: shouldShake ? "red.500" : "blue.500" }}
-          width="100%"
-          key={shakey} // triggers re-render to restart animation
-        />
+        {isPassword ? <PasswordInput {...commonProps} /> : <Input {...commonProps} />}
       </Box>
-      {error && touched && (
+      {shouldShake && (
         <FieldErrorText color="red.500" fontSize="sm">
           {error}
         </FieldErrorText>

@@ -4,6 +4,8 @@ import {
     Heading,
     VStack,
     Flex,
+    Avatar,
+    Text,
 } from "@chakra-ui/react";
 import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
@@ -11,6 +13,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 import type {Message} from "../entities/Message.ts";
+import {Bot} from "lucide-react";
 
 const Response = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -38,84 +41,141 @@ const Response = () => {
     return (
         <Box
             ref={containerRef}
-            flex="1"
+            h="100%"
             overflowY="auto"
+            overflowX="hidden"
             w="full"
-            maxW="80%"
-            mx="auto"
-            px={4}
             bg="app.bg"
+            position="relative"
             css={{
                 '&::-webkit-scrollbar': {
-                    width: '8px',
+                    width: '6px',
+                    position: 'absolute',
+                    right: 0,
                 },
                 '&::-webkit-scrollbar-track': {
                     background: 'transparent',
                 },
                 '&::-webkit-scrollbar-thumb': {
-                    background: '#404040',
-                    borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb:hover': {
-                    background: '#505050',
+                    background: 'rgba(0,0,0,0.2)',
+                    borderRadius: '3px',
+                    '&:hover': {
+                        background: 'rgba(0,0,0,0.4)',
+                    }
                 },
             }}
         >
             {messages.length === 0 ? (
-                <Center h="full">
-                    <VStack gap={4}>
+                <Center h="full" px={4}>
+                    <VStack gap={4} textAlign="center">
+                        <Box>
+                            <Bot size={48} color="gray"/>
+                        </Box>
                         <Heading
-                            fontSize="lg"
-                            color="app.text.secondary"
+                            fontSize="xl"
+                            color="gray.600"
                             fontWeight="medium"
                         >
                             Start a conversation
                         </Heading>
-                        <Heading
-                            fontSize="sm"
-                            color="app.text.muted"
-                            textAlign="center"
-                            maxW="breakpoint-lg"
+                        <Text
+                            fontSize="md"
+                            color="gray.500"
+                            maxW="400px"
+                            lineHeight="1.5"
                         >
                             Choose a model and start chatting. Your messages will appear here.
-                        </Heading>
+                        </Text>
                     </VStack>
                 </Center>
             ) : (
-                <VStack gap={4} py={6} align="stretch">
+                <VStack
+                    gap={0}
+                    align="stretch"
+                    w="full"
+                    pb={4}
+                >
                     {messages.map((msg, idx) => (
-                        <Flex
+                        <Box
                             key={msg.message_id || idx}
-                            justify={msg.sender === "user" ? "flex-end" : "center"}
+                            w="full"
+                            py={4}
+                            px={4}
+                            bg={msg.sender === "user" ? "transparent" : "gray.50"}
+                            borderBottom="1px solid"
+                            borderColor="gray.100"
                         >
-                            <Box
-                                className="markdown-body"
-                                px={4}
-                                py={2}
-                                sx={{
-                                    "& h1": {fontSize: "2xl", mt: 4, mb: 2, fontWeight: "bold"},
-                                    "& h2": {fontSize: "xl", mt: 4, mb: 2, fontWeight: "semibold"},
-                                    "& p": {mt: 2, mb: 2, color: "app.text.primary"},
-                                    "& ul": {pl: 6, mt: 2, mb: 2},
-                                    "& li": {mb: 1},
-                                    "& pre": {
-                                        background: "#1e1e1e",
-                                        padding: "1em",
-                                        borderRadius: "md",
-                                        overflowX: "auto",
-                                    },
-                                    "& code": {
-                                        background: "rgba(0,0,0,0.06)",
-                                        borderRadius: "sm",
-                                        px: "1",
-                                        fontSize: "sm",
-                                    },
-                                }}
+                            <Flex
+                                maxW="1200px"
+                                mx="auto"
+                                gap={4}
+                                align="flex-start"
                             >
-                                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{msg.content}</ReactMarkdown>
-                            </Box>
+                                {/* Avatar */}
+                                <Box flexShrink={0}>
+                                    {msg.sender === "user" ? (
+                                        <Avatar.Root size="sm" border="0px">
+                                            <Avatar.Fallback name="user" />
+                                            <Avatar.Image
+                                                zIndex={2}
+                                                borderRadius="full"
+                                                _hover={{
+                                                    borderRadius: "full",
+                                                }}
+                                            />
+                                        </Avatar.Root>
+                                    ) : (
+                                        <Avatar.Root size="sm" border="0px">
+                                            <Avatar.Fallback name="bot" />
+                                            <Avatar.Image
+                                                zIndex={2}
+                                                borderRadius="full"
+                                                _hover={{
+                                                    borderRadius: "full",
+                                                }}
+                                            />
+                                        </Avatar.Root>
+                                    )}
+                                </Box>
 
-                        </Flex>
+                                {/* Message Content */}
+                                <Box
+                                    flex="1"
+                                    minW={0}
+                                    pt={1}
+                                >
+                                    {msg.sender === "user" ? (
+                                        <Text
+                                            color="gray.800"
+                                            fontSize="md"
+                                            lineHeight="1.6"
+                                            whiteSpace="pre-wrap"
+                                            wordBreak="break-word"
+                                        >
+                                            {msg.content}
+                                        </Text>
+                                    ) : (
+                                        <Box
+                                            className="ai-response"
+                                            css={{
+                                                "& p": {
+                                                    // color: "gray.800",
+                                                    fontSize: "md",
+                                                    lineHeight: "1.6",
+                                                    mb: 3,
+                                                    wordBreak: "break-word",
+                                                    "&:last-child": { mb: 0 },
+                                                },
+                                            }}
+                                        >
+                                            <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
+                                                {msg.content}
+                                            </ReactMarkdown>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Flex>
+                        </Box>
                     ))}
                 </VStack>
             )}

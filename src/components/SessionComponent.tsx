@@ -1,19 +1,6 @@
-import {
-    Editable,
-    HStack,
-    IconButton,
-    Text,
-    createToaster,
-    MenuPositioner,
-    Portal, Center,
-} from "@chakra-ui/react";
-import {MoreVertical, Edit, Share, Trash} from "lucide-react";
-import {
-    MenuContent,
-    MenuItem,
-    MenuRoot,
-    MenuTrigger,
-} from "./ui/menu.tsx";
+import {Center, createToaster, Editable, IconButton, MenuPositioner, Portal, Text,} from "@chakra-ui/react";
+import {Edit, MoreVertical, Share, Trash} from "lucide-react";
+import {MenuContent, MenuItem, MenuRoot, MenuTrigger,} from "./ui/menu.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
 
@@ -23,11 +10,11 @@ interface Props {
     title: string;
     sessionId: string;
     onSelect?: () => void;
-    color:string
-    bg:string
+    color: string
+    bg: string
 }
 
-const SessionComponent = ({title, sessionId, onSelect,color,bg}: Props) => {
+const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
     const {changeTitle, deleteSessionById} = useSessions();
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
@@ -113,10 +100,10 @@ const SessionComponent = ({title, sessionId, onSelect,color,bg}: Props) => {
             px={2}
             py={2}
             height={"40px"}
-            width = {"1fr"}
-            bg= {bg}
+            width={"1fr"}
+            bg={bg}
             color={color}
-            overflow = "hidden"
+            overflow="hidden"
             _hover={{bg: "gray.800", transform: "scale(1.01)"}}
             transition="all 0.2s ease-in-out"
             borderRadius="lg"
@@ -225,7 +212,7 @@ const SessionComponent = ({title, sessionId, onSelect,color,bg}: Props) => {
                                 _hover={{bg: "red.600", color: "white"}}
                                 disabled={isDeleting}
                             >
-                                <Trash size={16} />
+                                <Trash size={16}/>
                                 {isDeleting ? "Deleting..." : "Delete"}
                             </MenuItem>
                         </MenuContent>

@@ -7,14 +7,10 @@ import type {Message} from "../entities/Message.ts";
 import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
 
-
 const ChatArea = () => {
-
-
     const [,setMessages] = useState<Message[]>([]);
+    const scrollRef = useRef<HTMLDivElement | null>(null);
 
-
-    const scrollRef = useRef<HTMLDivElement | null>(null)
     useEffect(() => {
         // Subscribe to store changes
         const unsubscribe = sessionStore.subscribe((state) => {
@@ -23,75 +19,63 @@ const ChatArea = () => {
 
         // Get initial state
         setMessages(sessionStore.getState().messages);
-
         return unsubscribe;
-
-
     }, []);
 
-
     return (
-
         <VStack
             flex="1"
-            gap={"0"}
+            gap="0"
             h="100vh"
             bg="app.bg"
             color="app.text.primary"
             overflow="hidden"
+            position="relative"
         >
-            {/* Header */}
-            <HStack
-                w="full"
-                justifyContent="space-between"
-                alignItems="center"
-                p={4}
-                bg="app.bg"
-                border={"0px"}
-                margin={"0px"}
-
-                borderBottom="1px solid"
-                borderColor="app.bg"
-                minH="70px"
-            >
-                <LLMModelChooser/>
-                <AvaterExpandable/>
-            </HStack>
-
+            {/* Fixed Header */}
             <Box
-                flex="1"
-                overflowY="auto"
                 w="full"
-                maxW="80%"
-                mx="auto"  // centers the box horizontally within parent
-                px={4}
-                   css={{
-                '&::-webkit-scrollbar': {
-                    width: '8px',
-                },
-                '&::-webkit-scrollbar-track': {
-                    background: 'transparent',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                    background: '#404040',
-                    borderRadius: '4px',
-                },
-                '&::-webkit-scrollbar-thumb:hover': {
-                    background: '#505050',
-                },
-            }}
-
-
+                bg="app.bg"
+                borderBottom="1px solid"
+                borderColor="gray.200"
+                zIndex={100}
+                flexShrink={0}
             >
-                {/* SessionComponent Messages Area */}
-                <Response/>
-
-                {/* Input Area */}
-
-
+                <HStack
+                    w="full"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    p={4}
+                    minH="70px"
+                    maxW="1200px"
+                    mx="auto"
+                >
+                    <LLMModelChooser/>
+                    <AvaterExpandable/>
+                </HStack>
             </Box>
 
-            <SendRequest/>
+            {/* Messages Container - Takes remaining space */}
+            <Box
+                flex="1"
+                w="full"
+                overflow="hidden"
+                position="relative"
+            >
+                <Response/>
+            </Box>
+
+            {/* Fixed Input Area */}
+            <Box
+                w="full"
+                bg="app.bg"
+                borderTop="1px solid"
+                borderColor="gray.200"
+                flexShrink={0}
+                zIndex={100}
+            >
+                <SendRequest/>
+            </Box>
 
             <div ref={scrollRef}></div>
         </VStack>
