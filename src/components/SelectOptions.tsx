@@ -1,7 +1,7 @@
 "use client"
 
 import {Portal, Select, createListCollection, HStack, FileUpload, FileUploadList} from "@chakra-ui/react"
-import FileUploader from "./FileUploader.tsx";
+import FileUploader from "../../later/FileUploader.tsx";
 
 interface Props {
     collection: string

@@ -1,19 +1,102 @@
-import {
-    Box,
-    Center,
-    Heading,
-    VStack,
-    Flex,
-    Avatar,
-    Text,
-} from "@chakra-ui/react";
+import {Box, Center, Flex, Heading, IconButton, Text, VStack,} from "@chakra-ui/react";
 import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
 import ReactMarkdown from "react-markdown";
-import rehypeHighlight from "rehype-highlight";
+
+import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
+import {oneDark} from 'react-syntax-highlighter/dist/esm/styles/prism';
 import "highlight.js/styles/github-dark.css";
 import type {Message} from "../entities/Message.ts";
-import {Bot} from "lucide-react";
+import {Bot, Check, Copy} from "lucide-react";
+import {toaster} from "./ui/toaster.tsx";
+
+const backgroundColor = "app.bg";
+
+const CodeBlock = ({children, className, ...props}: any) => {
+    const [copied, setCopied] = useState(false);
+
+
+    const match = /language-(\w+)/.exec(className || '');
+    const language = match ? match[1] : '';
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(String(children).replace(/\n$/, ''));
+            setCopied(true);
+            toaster.create({
+                title: "Copied to clipboard",
+                type: "success",
+                duration: 2000,
+
+            });
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            toaster.create({
+                title: "Failed to copy",
+                type: "error",
+                duration: 2000,
+
+            });
+        }
+    };
+
+    if (match) {
+        return (
+            <Box position="relative" my={4}>
+                <Flex
+                    justify="space-between"
+                    align="center"
+                    bg="gray.800"
+                    px={4}
+                    py={2}
+                    borderTopRadius="md"
+                >
+                    <Text fontSize="sm" color="gray.300" fontFamily="mono">
+                        {language}
+                    </Text>
+                    <IconButton
+                        aria-label="Copy code"
+                        icon={copied ? <Check size={16}/> : <Copy size={16}/>}
+                        size="sm"
+                        variant="ghost"
+                        colorScheme={copied ? "green" : "gray"}
+                        onClick={handleCopy}
+                        _hover={{bg: "gray.700"}}
+                    />
+                </Flex>
+                <SyntaxHighlighter
+                    style={oneDark}
+                    language={language}
+                    PreTag="div"
+                    customStyle={{
+                        margin: 0,
+                        borderTopLeftRadius: 0,
+                        borderTopRightRadius: 0,
+                        borderBottomLeftRadius: '6px',
+                        borderBottomRightRadius: '6px',
+                    }}
+                >
+                    {String(children).replace(/\n$/, '')}
+                </SyntaxHighlighter>
+            </Box>
+        );
+    }
+
+    return (
+        <Box
+            as="code"
+            bg="gray.700"
+            px={2}
+            py={1}
+            borderRadius="sm"
+            fontSize="0.9em"
+            fontFamily="mono"
+            color="white"
+        >
+            {children}
+        </Box>
+    );
+};
 
 const Response = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -28,7 +111,6 @@ const Response = () => {
         return unsubscribe;
     }, []);
 
-    // Scroll to bottom on message change
     useEffect(() => {
         if (containerRef.current) {
             containerRef.current.scrollTo({
@@ -38,144 +120,115 @@ const Response = () => {
         }
     }, [messages]);
 
+    // Group messages into conversation pairs
+    const groupedMessages = [];
+    for (let i = 0; i < messages.length; i += 2) {
+        const userMsg = messages[i];
+        const aiMsg = messages[i + 1];
+        groupedMessages.push({userMsg, aiMsg});
+    }
+
     return (
         <Box
             ref={containerRef}
             h="100%"
-            overflowY="auto"
-            overflowX="hidden"
             w="full"
-            bg="app.bg"
-            position="relative"
+            overflowY="auto"
+            bg={backgroundColor}
             css={{
-                '&::-webkit-scrollbar': {
-                    width: '6px',
-                    position: 'absolute',
-                    right: 0,
-                },
-                '&::-webkit-scrollbar-track': {
-                    background: 'transparent',
-                },
+                '&::-webkit-scrollbar': {width: '6px'},
                 '&::-webkit-scrollbar-thumb': {
-                    background: 'rgba(0,0,0,0.2)',
+                    backgroundColor: 'rgba(0,0,0,0.2)',
                     borderRadius: '3px',
-                    '&:hover': {
-                        background: 'rgba(0,0,0,0.4)',
-                    }
                 },
             }}
         >
             {messages.length === 0 ? (
-                <Center h="full" px={4}>
-                    <VStack gap={4} textAlign="center">
-                        <Box>
-                            <Bot size={48} color="gray"/>
+                <Center h="full">
+                    <VStack gap={6} textAlign="center">
+                        <Box p={4} bg="gray.50" borderRadius="full">
+                            <Bot size={32} color="#666"/>
                         </Box>
-                        <Heading
-                            fontSize="xl"
-                            color="gray.600"
-                            fontWeight="medium"
-                        >
-                            Start a conversation
-                        </Heading>
-                        <Text
-                            fontSize="md"
-                            color="gray.500"
-                            maxW="400px"
-                            lineHeight="1.5"
-                        >
-                            Choose a model and start chatting. Your messages will appear here.
-                        </Text>
+                        <VStack gap={2}>
+                            <Heading fontSize="xl" fontWeight="600" color="gray.700">
+                                Start a conversation
+                            </Heading>
+                            <Text fontSize="md" color="gray.500" maxW="400px" lineHeight="1.6">
+                                Choose a model and start chatting. Your messages will appear here.
+                            </Text>
+                        </VStack>
                     </VStack>
                 </Center>
             ) : (
-                <VStack
-                    gap={0}
-                    align="stretch"
-                    w="full"
-                    pb={4}
-                >
-                    {messages.map((msg, idx) => (
-                        <Box
-                            key={msg.message_id || idx}
-                            w="full"
-                            py={4}
-                            px={4}
-                            bg={msg.sender === "user" ? "transparent" : "gray.50"}
-                            borderBottom="1px solid"
-                            borderColor="gray.100"
-                        >
-                            <Flex
-                                maxW="1200px"
-                                mx="auto"
-                                gap={4}
-                                align="flex-start"
-                            >
-                                {/* Avatar */}
-                                <Box flexShrink={0}>
-                                    {msg.sender === "user" ? (
-                                        <Avatar.Root size="sm" border="0px">
-                                            <Avatar.Fallback name="user" />
-                                            <Avatar.Image
-                                                zIndex={2}
-                                                borderRadius="full"
-                                                _hover={{
-                                                    borderRadius: "full",
-                                                }}
-                                            />
-                                        </Avatar.Root>
-                                    ) : (
-                                        <Avatar.Root size="sm" border="0px">
-                                            <Avatar.Fallback name="bot" />
-                                            <Avatar.Image
-                                                zIndex={2}
-                                                borderRadius="full"
-                                                _hover={{
-                                                    borderRadius: "full",
-                                                }}
-                                            />
-                                        </Avatar.Root>
-                                    )}
-                                </Box>
+                <VStack gap={8} align="stretch" w="full" maxW="4xl" mx="auto" py={6}>
+                    {groupedMessages.map((pair, pairIdx) => (
+                        <VStack key={pairIdx} gap={3} align="stretch">
+                            {/* User Message */}
+                            {pair.userMsg && (
+                                <Flex justify="flex-end" px={6}>
+                                    <Box
+                                        bg="gray.700"
+                                        px={4}
+                                        py={3}
+                                        borderRadius="lg"
+                                        fontSize="md"
+                                        color="white"
+                                        lineHeight="1.6"
+                                        whiteSpace="pre-wrap"
+                                        wordBreak="break-word"
+                                        maxW="80%"
+                                    >
+                                        {pair.userMsg.content}
+                                    </Box>
+                                </Flex>
+                            )}
 
-                                {/* Message Content */}
-                                <Box
-                                    flex="1"
-                                    minW={0}
-                                    pt={1}
-                                >
-                                    {msg.sender === "user" ? (
-                                        <Text
-                                            color="gray.800"
+                            {/* AI Message */}
+                            {pair.aiMsg && (
+                                <Flex justify="flex-start" px={6}>
+                                    <Flex align="flex-start" maxW="80%">
+                                        <Box mr={3} mt={1}>
+                                            <Box p={2} bg="green.500" borderRadius="full">
+                                                <Bot size={16} color="white"/>
+                                            </Box>
+                                        </Box>
+                                        <Box
                                             fontSize="md"
-                                            lineHeight="1.6"
+                                            color="white"
                                             whiteSpace="pre-wrap"
                                             wordBreak="break-word"
-                                        >
-                                            {msg.content}
-                                        </Text>
-                                    ) : (
-                                        <Box
-                                            className="ai-response"
                                             css={{
-                                                "& p": {
-                                                    // color: "gray.800",
-                                                    fontSize: "md",
-                                                    lineHeight: "1.6",
+                                                '& p': {mb: 3},
+                                                '& p:last-child': {mb: 0},
+                                                '& ul, & ol': {pl: 4, mb: 3},
+                                                '& li': {mb: 1},
+                                                '& h1, & h2, & h3': {
+                                                    fontWeight: 'bold',
+                                                    mb: 2,
+                                                    mt: 4,
+                                                    '&:first-child': {mt: 0}
+                                                },
+                                                '& blockquote': {
+                                                    borderLeft: '4px solid',
+                                                    borderColor: 'gray.300',
+                                                    pl: 4,
+                                                    fontStyle: 'italic',
                                                     mb: 3,
-                                                    wordBreak: "break-word",
-                                                    "&:last-child": { mb: 0 },
                                                 },
                                             }}
                                         >
-                                            <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
-                                                {msg.content}
+                                            <ReactMarkdown
+                                                components={{
+                                                    code: CodeBlock,
+                                                }}
+                                            >
+                                                {pair.aiMsg.content}
                                             </ReactMarkdown>
                                         </Box>
-                                    )}
-                                </Box>
-                            </Flex>
-                        </Box>
+                                    </Flex>
+                                </Flex>
+                            )}
+                        </VStack>
                     ))}
                 </VStack>
             )}

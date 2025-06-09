@@ -7,7 +7,7 @@ import SessionComponent from "./SessionComponent.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
 import type Session from "../entities/Session.ts";
-import MultiMediaDropDown from "./MultiMediaDropDown.tsx";
+import MultiMediaDropDown from "../../later/MultiMediaDropDown.tsx";
 
 interface SidebarProps {
     onCollapse?: (collapsed: boolean) => void;
@@ -58,13 +58,25 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         <Box
             w={collapsed ? "60px" : "270px"}
             transition="all 0.3s ease-in-out"
-            bg="black"
+            bg="#121212"
             color="app.text.primary"
             h="100vh"
             p={4}
             overflow="hidden"
             border="0px"
             position="relative"
+            css={{
+                "&::-webkit-scrollbar": {
+                    width: "6px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "rgba(0, 0, 0, 0.2)",
+                    borderRadius: "3px",
+                },
+                "&::-webkit-scrollbar-track": {
+                    backgroundColor: "transparent",
+                },
+            }}
         >
             <Button
                 aria-label="Toggle sidebar"
@@ -155,8 +167,8 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                             transition="all 0.2s ease-in-out"
                                         >
                                             <SessionComponent
-                                                bg={isActive ? "darkgrey" : "black"}
-                                                color={isActive ? "black" : "white"}
+                                                bg={isActive ? "#121212" : "#131313"}
+                                                color={isActive ? "#121212" : "#131313"}
                                                 title={session.title || "New Chat"}
                                                 sessionId={sessionId}
                                                 onSelect={() => handleSessionSelect(sessionId)}

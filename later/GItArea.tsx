@@ -1,11 +1,11 @@
 import {HStack, VStack} from "@chakra-ui/react";
-import LLMModelChooser from "./LLMModelChooser";
-import AvaterExpandable from "./AvaterExpandable";
-import SendRequest from "./SendRequest";
-import Response from "./Response";
-import type {Message} from "../entities/Message.ts";
+import LLMModelChooser from "../src/components/LLMModelChooser";
+import AvaterExpandable from "../src/components/AvaterExpandable";
+import SendRequest from "../src/components/SendRequest";
+import Response from "../src/components/Response";
+import type {Message} from "../src/entities/Message.ts";
 import {useEffect, useState} from "react";
-import sessionStore from "../store/sessionStore.ts";
+import sessionStore from "../src/store/sessionStore.ts";
 
 
 const GitArea = () => {

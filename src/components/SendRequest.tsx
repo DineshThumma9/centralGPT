@@ -25,6 +25,7 @@ const SendRequest = () => {
 
     type MessageType = z.infer<typeof Message>;
 
+
     const handleSendMessage = async () => {
         if (!input.trim() || sending) return;
 
@@ -85,18 +86,43 @@ const SendRequest = () => {
             bg="app.bg"
             py={4}
             px={4}
+            overflow={"auto"}
+            css={{
+                "&::-webkit-scrollbar": {
+                    width: "6px",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "rgba(0, 0, 0, 0.2)",
+                    borderRadius: "3px",
+                },
+                "&::-webkit-scrollbar-track": {
+                    backgroundColor: "transparent",
+                },
+            }}
         >
             <Box
-                maxW="1200px"
+                maxW="1000px"
                 mx="auto"
                 w="full"
+                overflow={"auto"}
+                css={{
+                    "&::-webkit-scrollbar": {
+                        width: "6px",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: "rgba(0, 0, 0, 0.2)",
+                        borderRadius: "3px",
+                    },
+                    "&::-webkit-scrollbar-track": {
+                        backgroundColor: "transparent",
+                    },
+                }}
+
             >
                 {/* Input Container */}
                 <HStack
                     bg="white"
                     borderRadius="xl"
-                    border="1px solid"
-                    borderColor="gray.200"
                     px={4}
                     py={3}
                     gap={3}
@@ -109,122 +135,7 @@ const SendRequest = () => {
                     transition="all 0.2s"
                 >
                     {/* Media Upload Button */}
-                    <Menu.Root>
-                        <Menu.Trigger asChild>
-                            <IconButton
-                                variant="ghost"
-                                size="sm"
-                                color="gray.500"
-                                _hover={{
-                                    color: "gray.700",
-                                    bg: "gray.100"
-                                }}
-                                aria-label="Attach media"
-                            >
-                                <Paperclip size={18} />
-                            </IconButton>
-                        </Menu.Trigger>
-                        <Portal>
-                            <Menu.Positioner>
-                                <Menu.Content
-                                    bg="white"
-                                    border="1px solid"
-                                    borderColor="gray.200"
-                                    borderRadius="lg"
-                                    boxShadow="lg"
-                                    p={2}
-                                    minW="200px"
-                                >
-                                    <Menu.Item
-                                        value="pdf"
-                                        p={0}
-                                        border="none"
-                                        _hover={{ bg: "transparent" }}
-                                    >
-                                        <FileUpload.Root maxFiles={5} accept=".pdf">
-                                            <FileUpload.HiddenInput />
-                                            <FileUpload.Trigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    w="full"
-                                                    justifyContent="flex-start"
-                                                    color="gray.700"
-                                                    _hover={{ bg: "gray.50" }}
-                                                >
-                                                    <HiUpload />
-                                                    Upload PDFs
-                                                </Button>
-                                            </FileUpload.Trigger>
-                                            <FileUpload.ItemGroup>
-                                                <FileUpload.Context>
-                                                    {({acceptedFiles}) =>
-                                                        acceptedFiles.map((file) => (
-                                                            <HStack key={file.name} p={2} bg="gray.50" borderRadius="md" mt={2}>
-                                                                <FileUpload.Item file={file}>
-                                                                    <Text fontSize="sm" flex="1">{file.name}</Text>
-                                                                    <FileUpload.ItemDeleteTrigger>
-                                                                        <IconButton size="xs" variant="ghost">
-                                                                            <LuX />
-                                                                        </IconButton>
-                                                                    </FileUpload.ItemDeleteTrigger>
-                                                                </FileUpload.Item>
-                                                            </HStack>
-                                                        ))
-                                                    }
-                                                </FileUpload.Context>
-                                            </FileUpload.ItemGroup>
-                                        </FileUpload.Root>
-                                    </Menu.Item>
 
-                                    <Menu.Item
-                                        value="img"
-                                        p={0}
-                                        border="none"
-                                        _hover={{ bg: "transparent" }}
-                                    >
-                                        <FileUpload.Root maxFiles={5} accept="image/*">
-                                            <FileUpload.HiddenInput />
-                                            <FileUpload.Trigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    w="full"
-                                                    justifyContent="flex-start"
-                                                    color="gray.700"
-                                                    _hover={{ bg: "gray.50" }}
-                                                >
-                                                    <HiUpload />
-                                                    Upload Images
-                                                </Button>
-                                            </FileUpload.Trigger>
-                                            <FileUpload.ItemGroup>
-                                                <FileUpload.Context>
-                                                    {({acceptedFiles}) =>
-                                                        acceptedFiles.map((file) => (
-                                                            <HStack key={file.name} p={2} bg="gray.50" borderRadius="md" mt={2}>
-                                                                <FileUpload.Item file={file}>
-                                                                    <FileUpload.ItemPreviewImage boxSize="8" />
-                                                                    <Text fontSize="sm" flex="1">{file.name}</Text>
-                                                                    <Float placement="top-end">
-                                                                        <FileUpload.ItemDeleteTrigger>
-                                                                            <IconButton size="xs" variant="ghost">
-                                                                                <LuX />
-                                                                            </IconButton>
-                                                                        </FileUpload.ItemDeleteTrigger>
-                                                                    </Float>
-                                                                </FileUpload.Item>
-                                                            </HStack>
-                                                        ))
-                                                    }
-                                                </FileUpload.Context>
-                                            </FileUpload.ItemGroup>
-                                        </FileUpload.Root>
-                                    </Menu.Item>
-                                </Menu.Content>
-                            </Menu.Positioner>
-                        </Portal>
-                    </Menu.Root>
 
                     {/* Text Input */}
                     <Textarea
@@ -232,25 +143,34 @@ const SendRequest = () => {
                         resize="none"
                         minH="44px"
                         maxH="120px"
+                        color="black"
                         border="none"
-                        outline="none"
                         px={0}
                         py={2}
+                        overflow="auto" // ✅ Enables scroll when needed
                         value={input}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyPress}
                         placeholder="Type your message..."
                         fontSize="md"
                         lineHeight="1.5"
-                        _placeholder={{ color: "gray.400" }}
+                        _placeholder={{color: "gray.400"}}
                         _focus={{
                             boxShadow: "none",
                             outline: "none"
                         }}
                         disabled={sending}
-                        style={{
-                            height: 'auto',
-                            overflow: 'hidden'
+                        css={{
+                            "&::-webkit-scrollbar": {
+                                width: "6px",
+                            },
+                            "&::-webkit-scrollbar-thumb": {
+                                backgroundColor: "rgba(0, 0, 0, 0.2)",
+                                borderRadius: "3px",
+                            },
+                            "&::-webkit-scrollbar-track": {
+                                backgroundColor: "transparent",
+                            },
                         }}
                     />
 
@@ -276,18 +196,10 @@ const SendRequest = () => {
                             opacity: 0.6
                         }}
                     >
-                        <Send size={18} />
+                        <Send size={18}/>
                     </IconButton>
                 </HStack>
 
-                {/* Character count or status */}
-                {input.length > 0 && (
-                    <HStack justify="flex-end" mt={2}>
-                        <Text fontSize="xs" color="gray.500">
-                            {sending ? "Sending..." : `${input.length} characters`}
-                        </Text>
-                    </HStack>
-                )}
             </Box>
         </Box>
     );

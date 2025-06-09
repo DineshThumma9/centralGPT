@@ -22,6 +22,8 @@ const ChatArea = () => {
         return unsubscribe;
     }, []);
 
+
+
     return (
         <VStack
             flex="1"
@@ -36,8 +38,8 @@ const ChatArea = () => {
             <Box
                 w="full"
                 bg="app.bg"
-                borderBottom="1px solid"
-                borderColor="gray.200"
+                // borderBottom="1px solid"
+                // borderColor="gray.200"
                 zIndex={100}
                 flexShrink={0}
             >
@@ -69,8 +71,7 @@ const ChatArea = () => {
             <Box
                 w="full"
                 bg="app.bg"
-                borderTop="1px solid"
-                borderColor="gray.200"
+
                 flexShrink={0}
                 zIndex={100}
             >
