@@ -10,6 +10,7 @@ export type SessionState = {
   title: string;
   isLoading: boolean;
   isStreaming: boolean;
+  sending:boolean
 
   setCurrentSessionId: (session: string | null) => void;
   setMessages: (messages: Message[]) => void;
@@ -20,6 +21,7 @@ export type SessionState = {
   addSession: (session: Session) => void;
   updateSession: (sessionId: string, updates: Partial<Session>) => void;
   removeSession: (sessionId: string) => void;
+  setSending:(sending:boolean) => void;
   setLoading: (loading: boolean) => void;
   setStreaming: (streaming: boolean) => void;
   clear: () => void;
@@ -35,12 +37,14 @@ const useSessionStore = create<SessionState>()(
       messages: [],
       isLoading: false,
       isStreaming: false,
+        sending:false,
 
       setCurrentSessionId: (session) => set({ current_session: session }),
       setMessages: (messages) => set({ messages }),
       addMessage: (message) =>
         set((state) => ({ messages: [...state.messages, message] })),
       setTitle: (title) => set({ title }),
+        setSending:(sending:boolean) => set({sending:sending}),
       updateMessage: (messageId, updates) =>
         set((state) => ({
           messages: state.messages.map((message) =>

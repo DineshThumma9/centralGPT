@@ -15,12 +15,13 @@ import {z} from "zod/v4";
 import Message from "../entities/Message.ts";
 import {HiUpload} from "react-icons/hi";
 import {LuX} from "react-icons/lu";
+import useSessionStore from "../store/sessionStore.ts";
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
-    const [sending, setSending] = useState(false);
+    const {sending, setSending} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const {tstMsgFunc} = useSessions();
+    const {tstMsgFunc,sendRequest,streamMessage} = useSessions();
     const {addMessage} = sessionStore();
 
     type MessageType = z.infer<typeof Message>;
@@ -55,7 +56,7 @@ const SendRequest = () => {
                 textareaRef.current.style.height = 'auto';
             }
 
-            await tstMsgFunc(messageContent);
+            await streamMessage(messageContent);
         } catch (error) {
             console.error("Failed to send message:", error);
         } finally {

@@ -1,12 +1,11 @@
 
 
 import { EmptyState, VStack } from "@chakra-ui/react"
-import { LuShoppingCart } from "react-icons/lu"
 
 interface  Props{
   icon:string
   title:string
-  descriptionn:string
+  description:string
 }
 const Empty = ({icon,title,description}:Props) => {
   return (

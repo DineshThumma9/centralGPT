@@ -1,5 +1,5 @@
 import axios from "axios";
-import Message from "../entities/Message.ts";
+import type Message from "../entities/Message.ts";
 import useAuthStore from "../store/authStore.ts";
 import {z} from "zod/v4";
 import Session from "../entities/Session.ts";
@@ -17,6 +17,29 @@ const apiSetUp = axios.create({
     withCredentials: true,
     validateStatus: (status) => status >= 200 && status < 300
 });
+
+API.interceptors.request.use((config) => {
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+      if (error.response) {
+          console.error(`API Response Error : ${error.response.status}`, error.response.data);
+      } else if (error.request) {
+          // error.response might be undefined here, so don't access it
+          console.error(`API Request Error`, error.request, error.message);
+      } else {
+          console.error(`Some Error has occurred`, error.message);
+      }
+      return Promise.reject(error);
+  }
+);
 
 export const apiKeySelection = async (api_provider: string, api_key: string) => {
     const data = {
@@ -61,6 +84,10 @@ export const newSession = async () => {
         session_id: res.data.session_id,
     });
 };
+
+
+
+
 
 export const streamChatResponse = (
     sessionId: string,
