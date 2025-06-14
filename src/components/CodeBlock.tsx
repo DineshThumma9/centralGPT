@@ -35,10 +35,10 @@ const CodeBlock = ({ children, className }: any) => {
         position="relative"
         my={4}
         w="full"
-        overflowX="auto"
         maxW="100%"
         borderRadius="md"
         bg="gray.800"
+        overflow="hidden"
       >
         <Flex
           justify="space-between"
@@ -53,32 +53,42 @@ const CodeBlock = ({ children, className }: any) => {
           </Text>
           <IconButton
             aria-label="Copy code"
-            icon={copied ? <Check size={16} /> : <Copy size={16} />}
+
             size="sm"
             variant="ghost"
             colorScheme={copied ? "green" : "gray"}
             onClick={handleCopy}
             _hover={{ bg: "gray.700" }}
-          />
+          >
+             copied ? <Check size={16} /> : <Copy size={16} />
+          </IconButton>
         </Flex>
-        <SyntaxHighlighter
-          style={oneDark}
-          language={language}
-          PreTag="div"
-          customStyle={{
-            margin: 0,
-            padding: '1rem',
-            overflowX: 'auto',
-            fontSize: '0.85rem',
-            background: 'transparent',
-            borderBottomLeftRadius: '6px',
-            borderBottomRightRadius: '6px',
-            maxHeight: '400px',
-            overflowY: 'auto',
-          }}
+        <Box
+          overflowX="auto"
+          maxW="100%"
         >
-          {String(children).replace(/\n$/, '')}
-        </SyntaxHighlighter>
+          <SyntaxHighlighter
+            style={oneDark}
+            language={language}
+            PreTag="div"
+            customStyle={{
+              margin: 0,
+              padding: '1rem',
+              overflowX: 'auto',
+              fontSize: '0.85rem',
+              background: 'transparent',
+              borderBottomLeftRadius: '6px',
+              borderBottomRightRadius: '6px',
+              maxHeight: '400px',
+              overflowY: 'auto',
+              maxWidth: '100%',
+              whiteSpace: 'pre',
+              wordBreak: 'normal'
+            }}
+          >
+            {String(children).replace(/\n$/, '')}
+          </SyntaxHighlighter>
+        </Box>
       </Box>
     );
   }
@@ -94,7 +104,8 @@ const CodeBlock = ({ children, className }: any) => {
       fontFamily="mono"
       color="white"
       whiteSpace="pre-wrap"
-      overflowWrap="anywhere"
+      wordBreak="break-word"
+      display="inline"
     >
       {children}
     </Box>

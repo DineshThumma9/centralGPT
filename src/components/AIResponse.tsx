@@ -1,75 +1,83 @@
-import { Box, Flex } from "@chakra-ui/react";
-import { Bot } from "lucide-react";
-import TypingBubble from "./TypingBubble.tsx";
+// AIResponse.tsx
+import {Box, Flex} from "@chakra-ui/react";
+import {Bot} from "lucide-react";
+import TypingBubble from "./TypingBubble";
 import ReactMarkdown from "react-markdown";
-import CodeBlock from "./CodeBlock.tsx";
-import type { Message } from "../entities/Message.ts";
-import useSessionStore from "../store/sessionStore.ts";
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import rehypeHighlight from "rehype-highlight";
+import CodeBlock from "./CodeBlock";
+import type {Message} from "../entities/Message";
+import useSessionStore from "../store/sessionStore";
+import {useEffect, useState} from "react";
 
 interface Props {
-  msg: Message;
-  idx: number;
+    msg: Message;
+    idx: number;
 }
 
-const AIResponse = ({ msg, idx }: Props) => {
-  const { sending, messages } = useSessionStore();
+const AIResponse = ({msg, idx}: Props) => {
+    const {sending, messages} = useSessionStore();
+    const [displayed, setDisplayed] = useState("");
 
-  return (
-    <Flex align="flex-start" maxW="80%">
-      <Box mr={3} mt={1}>
-        <Box p={2} bg="green.500" borderRadius="full">
-          <Bot size={16} color="white" />
-        </Box>
-      </Box>
+    useEffect(() => {
+        if (!sending) {
+            setDisplayed(msg.content);
+            return;
+        }
+        let i = 0;
+        const interval = setInterval(() => {
+            setDisplayed((prev) => prev + msg.content[i]);
+            i++;
+            if (i >= msg.content.length) clearInterval(interval);
+        }, 15);
+        return () => clearInterval(interval);
+    }, [msg.content, sending]);
 
-      <Box
-        fontSize="md"
-        color="white"
-        width="100%"
-        overflowWrap="anywhere"
-        whiteSpace="pre-wrap"
-        css={{
-          '& p': { marginBottom: '0.75rem' },
-          '& h1, & h2, & h3': {
-            fontWeight: 'bold',
-            marginTop: '1rem',
-            marginBottom: '0.5rem',
-          },
-          '& ul, & ol': {
-            paddingLeft: '1.5rem',
-            marginBottom: '0.75rem',
-          },
-          '& li': { marginBottom: '0.25rem' },
-          '& blockquote': {
-            borderLeft: '4px solid #ccc',
-            paddingLeft: '1rem',
-            fontStyle: 'italic',
-            color: '#ccc',
-            marginBottom: '0.75rem',
-          },
-          '& pre': {
-            overflowX: 'auto',
-            maxWidth: '100%',
-          },
-          '& code': {
-            background: '#1a1a1a',
-            padding: '0.2rem 0.4rem',
-            borderRadius: '0.3rem',
-            fontSize: '0.9rem',
-            fontFamily: 'monospace',
-          },
-        }}
-      >
-        {msg.sender === "assistant" && idx === messages.length - 1 && sending && (
-          <TypingBubble />
-        )}
+    return (
+        <Flex align="flex-start" maxW="85%" minW="200px">
+            <Box mr={3} mt={1} flexShrink={0}>
+                <Box p={2} bg="green.500" borderRadius="full">
+                    <Bot size={16} color="white"/>
+                </Box>
+            </Box>
 
-        <ReactMarkdown components={{ code: CodeBlock }}>
-          {msg.content}
-        </ReactMarkdown>
-      </Box>
-    </Flex>
-  );
+            <Box
+                fontSize="15px"
+                color="white"
+                width="100%"
+                lineHeight="1.65"
+                fontFamily="system-ui, -apple-system, sans-serif"
+                css={{
+                    '& p': {marginBottom: '1rem'},
+                    '& code:not(pre code)': {
+                        background: 'rgba(255,255,255,0.1)',
+                        color: '#ffd700',
+                        padding: '2px 6px',
+                        borderRadius: '4px'
+                    }
+                }}
+            >
+
+
+                {sending && idx === messages.length - 1 ? (
+                    <TypingBubble/>
+                ) : (
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkBreaks]}
+                        rehypePlugins={[rehypeHighlight]}
+                       
+                    >
+                        {msg.content}
+                    </ReactMarkdown>
+                )}
+
+
+            </Box>
+        </Flex>
+    );
 };
 
 export default AIResponse;
+
+// CodeBlock.tsx remains the same as you already had it. Consider styling tweak if needed.

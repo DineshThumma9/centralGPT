@@ -10,7 +10,8 @@ export type SessionState = {
   title: string;
   isLoading: boolean;
   isStreaming: boolean;
-  sending:boolean
+  sending:boolean;
+  shouldStream:boolean;
 
   setCurrentSessionId: (session: string | null) => void;
   setMessages: (messages: Message[]) => void;
@@ -24,6 +25,7 @@ export type SessionState = {
   setSending:(sending:boolean) => void;
   setLoading: (loading: boolean) => void;
   setStreaming: (streaming: boolean) => void;
+  setShouldStream: (streaming: boolean) => void;
   clear: () => void;
   getSessions: () => Session[];
 };
@@ -37,6 +39,7 @@ const useSessionStore = create<SessionState>()(
       messages: [],
       isLoading: false,
       isStreaming: false,
+        shouldStream:false,
         sending:false,
 
       setCurrentSessionId: (session) => set({ current_session: session }),
@@ -82,6 +85,7 @@ const useSessionStore = create<SessionState>()(
         })),
       setLoading: (loading) => set({ isLoading: loading }),
       setStreaming: (streaming) => set({ isStreaming: streaming }),
+        setShouldStream:(shouldStream) => set({shouldStream:shouldStream}),
       clear: () => set({ messages: [] }),
       getSessions: () => get().sessions,
     }),

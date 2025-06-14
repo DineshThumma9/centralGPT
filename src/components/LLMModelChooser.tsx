@@ -6,10 +6,13 @@ import useInitStore from "../store/initStore.ts";
 import BadgeCompo from "./BadgeCompo.tsx";
 import APIKey from "./API-Key.tsx";
 import {useEffect} from "react";
+import StreamSwitch from "./Switch.tsx";
+import useSessionStore from "../store/sessionStore.ts";
 
 
 const LLMModelChooser = () => {
     const {providers_models, modelsProviders} = Constants();
+    const {shouldStream} = useSessionStore();
 
     const {
         setCurrentLLMProvider,
@@ -91,16 +94,25 @@ const LLMModelChooser = () => {
             />
 
             {/* Status Display */}
-            {(currentLLMProvider || currentModel) && (
+            {(currentLLMProvider || currentModel || shouldStream) && (
                 <HStack gap={2}>
-                    {currentLLMProvider && (
-                        <BadgeCompo label={currentLLMProvider} key={`provider-${currentLLMProvider}`}/>
-                    )}
-                    {currentModel && (
-                        <BadgeCompo label={currentModel} key={`model-${currentModel}`}/>
-                    )}
+                    {currentLLMProvider && <BadgeCompo label={currentLLMProvider}/>}
+                    {currentModel && <BadgeCompo label={currentModel}/>}
+
                 </HStack>
             )}
+
+            {(
+                <HStack>
+                     {<BadgeCompo label={shouldStream ? "streaming" : "not streaming"} key={"stream"}/>}
+                </HStack>
+            )}
+
+              <StreamSwitch/>
+
+
+
+
 
             <APIKey provider={currentAPIProvider} title={"API KEY"}/>
         </HStack>

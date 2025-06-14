@@ -1,27 +1,18 @@
-import {
-    Box, Button, FileUpload, Float,
-    HStack,
-    IconButton,
-    Textarea,
-    Menu, Portal,
-    Text,
-} from "@chakra-ui/react";
-import {Send, Paperclip} from "lucide-react";
-import {useState, useRef} from "react";
+import {Box, HStack, IconButton, Textarea,} from "@chakra-ui/react";
+import {Send} from "lucide-react";
+import {useRef, useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
+import useSessionStore from "../store/sessionStore.ts";
 import {v4} from "uuid";
 import {z} from "zod/v4";
 import Message from "../entities/Message.ts";
-import {HiUpload} from "react-icons/hi";
-import {LuX} from "react-icons/lu";
-import useSessionStore from "../store/sessionStore.ts";
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
-    const {sending, setSending} = useSessionStore();
+    const {sending, setSending,shouldStream} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const {tstMsgFunc,sendRequest,streamMessage} = useSessions();
+    const {tstMsgFunc, streamMessage} = useSessions();
     const {addMessage} = sessionStore();
 
     type MessageType = z.infer<typeof Message>;
@@ -55,8 +46,12 @@ const SendRequest = () => {
             if (textareaRef.current) {
                 textareaRef.current.style.height = 'auto';
             }
+      if (shouldStream) {
+       await streamMessage(messageContent);
+      } else {
+    await tstMsgFunc(messageContent);
+      }
 
-            await streamMessage(messageContent);
         } catch (error) {
             console.error("Failed to send message:", error);
         } finally {
