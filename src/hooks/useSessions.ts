@@ -1,20 +1,37 @@
 import type Session from "../entities/Session.ts";
 import sessionStore from "../store/sessionStore.ts";
+
 import {useEffect, useRef} from "react";
 import {
     deleteSession,
     getAllSessions,
     getChatHistory,
     newSession,
-    streamChatResponse,
     testMsg,
     updateSessionTitle
 } from "../api/session-api.ts";
-import type Message from "../entities/Message.ts";
-import {uuidv4, z} from "zod/v4";
-import {v4} from "uuid";
+import {z} from "zod/v4";
+
+import type {Message} from "../entities/Message.ts";
+import {v4, v4 as uuidv4} from 'uuid';
+import {RiverClient} from 'river.ts/client';
+import {RiverEvents}  from 'river.ts';
 import useAuthStore from "../store/authStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
+
+export const events = new RiverEvents()
+    .defineEvent("ping",{
+       message: "pong"
+    })
+  .defineEvent('data',
+      {
+          data: '',
+          stream:true
+
+      },
+)
+  .build();
+
 
 
 const useSessions = () => {
@@ -40,7 +57,18 @@ const useSessions = () => {
 
     const tstMsgFunc = async (msg: string) => {
         try {
-            addMessage(await testMsg(msg));
+
+            const result = await testMsg(msg)
+            const aiMessage: Message = {
+                session_id: v4(),
+                message_id: v4(),
+                content: result.content, // ✅ ONLY THIS FIELD
+                sender: "assistant",
+                timestamp: new Date().toISOString()
+            };
+
+            addMessage(aiMessage); // ✅ correct way
+
         } catch (error) {
             console.error("Error in tstMsgFunc:", error);
         }
@@ -68,79 +96,46 @@ const useSessions = () => {
     };
 
 
-    const streamMessage = async (userMsg: string, sessionId: string) => {
-
-
+    async function streamMessage(userMsg: string, sessionId: string): Promise<void> {
         const token = useAuthStore.getState().accessToken;
+        const assistantMsgId = uuidv4();
 
-
-        const assistantMsgId = v4();
         addMessage({
             message_id: assistantMsgId,
             session_id: sessionId,
-            content: "",
-            sender: "assistant",
+            content: '',
+            sender: 'assistant',
             timestamp: new Date().toISOString(),
         });
-
         setStreaming(true);
 
         try {
             const session_id = useSessionStore.getState().current_session;
-            const token = useAuthStore.getState().accessToken;
-            const msg = userMsg
+            if (!session_id) throw new Error('Missing session ID');
 
-            if (!session_id) throw new Error("Missing session ID");
+            const client = RiverClient.init(events);
 
-            const res = await fetch("http://localhost:8000/sessions/simple-stream", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token && {Authorization: `Bearer ${token}`})
-                },
-                body: JSON.stringify({session_id, msg})
-            });
+            client
+                .prepare('http://localhost:8000/sessions/simple-stream', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && {Authorization: `Bearer ${token}`}),
+                    },
+                    body: JSON.stringify({session_id, msg: userMsg}),
+                })
+                .on('data', (data) => {
+                    updateMessage(assistantMsgId, (prev) => prev + data);
+                });
 
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.error("Backend error:", res.status, errorText);
-                throw new Error("Stream failed");
-            }
-
-            if (!res.body) {
-                throw new Error("Response body is null");
-            }
-            const reader = res.body.getReader();
-            const decoder = new TextDecoder("utf-8");
-
-            let fullText = "";
-
-            while (true) {
-                const {value, done} = await reader.read();
-                if (done) break;
-
-                const chunk = decoder.decode(value, {stream: true});
-                const tokens = chunk
-                    .split("data: ")
-                    .filter(Boolean)
-                    .map((t) => t.trim());
-
-                for (const token of tokens) {
-                    fullText += token;
-                    updateMessage(assistantMsgId, {content: fullText});
-                }
-            }
+            await client.stream();
         } catch (err) {
-            updateMessage(assistantMsgId, {
-                content: "[Error streaming response]",
-            });
-            console.error(err);
+            console.error('StreamMessage error:', err);
+            updateMessage(assistantMsgId, {content: '[Error streaming response]'});
         } finally {
             setStreaming(false);
         }
-    };
-
-
+    }
 
 
     const changeTitle = async (sessionId: string, title: string) => {

@@ -1,10 +1,11 @@
 import axios from "axios";
-import type Message from "../entities/Message.ts";
+
 import useAuthStore from "../store/authStore.ts";
 import {z} from "zod/v4";
 import Session from "../entities/Session.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import useInitStore from "../store/initStore.ts";
+import Message from "../entities/Message.ts";
 
 const API = axios.create({
     baseURL: "http://localhost:8000/sessions",
@@ -88,57 +89,6 @@ export const newSession = async () => {
 
 
 
-
-export const streamChatResponse = (
-    sessionId: string,
-    message: string,
-    assistantMsg: (msg: Message) => void,
-    _onUpdate: ({message_id, content}: { message_id: any; content: any; }) => void,
-    onComplete: () => void,
-    onError: (error: Error) => void,
-    onPersist: (error: any) => void
-): EventSource => {
-    const evtSource = new EventSource(
-        `http://localhost:8001/session/message/stream?sessionId=${sessionId}&message=${encodeURIComponent(message)}`
-    );
-
-    evtSource.onmessage = (event: MessageEvent) => {
-        try {
-            const data = JSON.parse(event.data);
-
-            if (data.type === "content") {
-                assistantMsg({
-                    message_id: data.message_id,
-                    content: data.content,
-                    sender: "assistant",
-                    session_id: sessionId,
-                    timestamp: new Date().toISOString()
-                });
-            } else if (data.type === "complete") {
-                evtSource.close();
-                onComplete();
-            } else if (data.type === "error") {
-                evtSource.close();
-                onError(new Error(data.error ?? "Unknown stream error"));
-            }
-        } catch (parseError) {
-            evtSource.close();
-            onError(parseError instanceof Error ? parseError : new Error("Unknown parse error"));
-        }
-    };
-
-    evtSource.onerror = (err: Event) => {
-        evtSource.close();
-        onError(new Error("EventSource connection error"));
-    };
-
-    evtSource.onopen = () => {
-        console.log("SSE connection opened");
-    };
-
-    return evtSource;
-};
-
 export const getChatHistory = async (data: { session_id: string; limit?: number }) => {
     const res = await API.get(`/history/${data.session_id}`);
 
@@ -150,9 +100,9 @@ export const deleteSession = async (session_id: string) => {
     await API.delete(`/${session_id}`);
 };
 
-export type Message = z.infer<typeof Message>;
+// export type Message = z.infer<typeof Message>;
 
-export const testMsg = async (msg: string): Promise<Message> => {
+export const testMsg = async (msg: string)=> {
     const session_id = useSessionStore.getState().current_session;
 
     if (!session_id) throw new Error("Missing session ID in localStorage");

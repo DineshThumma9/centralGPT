@@ -49,7 +49,7 @@ const SendRequest = () => {
       if (shouldStream) {
        await streamMessage(messageContent);
       } else {
-    await tstMsgFunc(messageContent);
+          await tstMsgFunc(messageContent);
       }
 
         } catch (error) {
