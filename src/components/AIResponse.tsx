@@ -16,14 +16,14 @@ interface Props {
 }
 
 const AIResponse = ({msg, idx}: Props) => {
-    const {sending, messages, shouldStream} = useSessionStore();
+    const {sending, messages, shouldStream, isStreaming} = useSessionStore();
     const [displayed, setDisplayed] = useState("");
     const [copied, setCopied] = useState(false);
     const [retry, setRetry] = useState(false);
 
     const handleCopy = async () => {
         try {
-            await navigator.clipboard.writeText(displayed.trimEnd()); // 🔥 FIX 1: correctly using displayed instead of `children`
+            await navigator.clipboard.writeText(displayed.trimEnd());
             setCopied(true);
             toaster.create({
                 title: "Copied to clipboard",
@@ -42,18 +42,18 @@ const AIResponse = ({msg, idx}: Props) => {
 
     const handleRetry = () => {
         setRetry(true);
-        // 🔥 FIX 2: you'd likely want to trigger a parent-side regeneration
-        // e.g., call a prop like onRetry(msg)
-        // For now we just fake a delay then restore
         setTimeout(() => {
             setRetry(false);
             toaster.create({title: "Retry simulated", type: "info", duration: 1500});
         }, 1500);
     };
 
+    // Simple fix: Just update displayed content when msg.content changes
     useEffect(() => {
-        setDisplayed(msg.content); // 🔥 FIX 3: display message on update
+        setDisplayed(msg.content);
     }, [msg.content]);
+
+    const isCurrentlyStreaming = isStreaming && idx === messages.length - 1;
 
     return (
         <Flex align="flex-start" maxW="85%" minW="200px">
@@ -70,27 +70,20 @@ const AIResponse = ({msg, idx}: Props) => {
                     width="100%"
                     lineHeight="1.65"
                     fontFamily="system-ui, -apple-system, sans-serif"
-                    css={{
-                        '& p': {marginBottom: '1rem'},
-                        '& code:not(pre code)': {
-                            background: 'rgba(255,255,255,0.1)',
-                            color: '#ffd700',
-                            padding: '2px 6px',
-                            borderRadius: '4px'
-                        }
-                    }}
                 >
-                    {sending && idx === messages.length - 1 && shouldStream ? (
-                        <TypingBubble/>
+                    {isCurrentlyStreaming ? (
+                        <Box as="pre" whiteSpace="pre-wrap" fontFamily="monospace">
+                            {displayed}
+                        </Box>
                     ) : (
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm, remarkBreaks]}
                             rehypePlugins={[rehypeHighlight]}
-                            // 🔥 FIX 4: enable custom code renderer
                         >
                             {displayed}
                         </ReactMarkdown>
                     )}
+
 
                     <HStack mt={3}>
                         <IconButton

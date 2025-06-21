@@ -14,25 +14,8 @@ import {z} from "zod/v4";
 
 import type {Message} from "../entities/Message.ts";
 import {v4, v4 as uuidv4} from 'uuid';
-import {RiverClient} from 'river.ts/client';
-import {RiverEvents}  from 'river.ts';
 import useAuthStore from "../store/authStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
-
-export const events = new RiverEvents()
-    .defineEvent("ping",{
-       message: "pong"
-    })
-  .defineEvent('data',
-      {
-          data: '',
-          stream:true
-
-      },
-)
-  .build();
-
-
 
 const useSessions = () => {
     const eventSourceRef = useRef<EventSource | null>(null);
@@ -54,26 +37,23 @@ const useSessions = () => {
         };
     }, []);
 
-
     const tstMsgFunc = async (msg: string) => {
         try {
-
             const result = await testMsg(msg)
             const aiMessage: Message = {
                 session_id: v4(),
                 message_id: v4(),
-                content: result.content, // ✅ ONLY THIS FIELD
+                content: result.content,
                 sender: "assistant",
                 timestamp: new Date().toISOString()
             };
 
-            addMessage(aiMessage); // ✅ correct way
+            addMessage(aiMessage);
 
         } catch (error) {
             console.error("Error in tstMsgFunc:", error);
         }
     };
-
 
     const createNewSession = async () => {
         try {
@@ -95,48 +75,107 @@ const useSessions = () => {
         }
     };
 
+  // Replace your streamMessage function with this optimized version:
 
-    async function streamMessage(userMsg: string, sessionId: string): Promise<void> {
-        const token = useAuthStore.getState().accessToken;
-        const assistantMsgId = uuidv4();
+async function streamMessage(userMsg: string, sessionId: string): Promise<void> {
+    const token = useAuthStore.getState().accessToken;
+    const assistantMsgId = uuidv4();
 
-        addMessage({
-            message_id: assistantMsgId,
-            session_id: sessionId,
-            content: '',
-            sender: 'assistant',
-            timestamp: new Date().toISOString(),
-        });
-        setStreaming(true);
+    const session_id = sessionId || useSessionStore.getState().current_session;
 
-        try {
-            const session_id = useSessionStore.getState().current_session;
-            if (!session_id) throw new Error('Missing session ID');
-
-            const client = RiverClient.init(events);
-
-            client
-                .prepare('http://localhost:8000/sessions/simple-stream', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token && {Authorization: `Bearer ${token}`}),
-                    },
-                    body: JSON.stringify({session_id, msg: userMsg}),
-                })
-                .on('data', (data) => {
-                    updateMessage(assistantMsgId, (prev) => prev + data);
-                });
-
-            await client.stream();
-        } catch (err) {
-            console.error('StreamMessage error:', err);
-            updateMessage(assistantMsgId, {content: '[Error streaming response]'});
-        } finally {
-            setStreaming(false);
-        }
+    if (!session_id) {
+        throw new Error('No session ID provided');
     }
 
+    console.log('Using session_id:', session_id);
+
+
+
+    addMessage({
+        message_id: assistantMsgId,
+        session_id: session_id,
+        content: '',
+        sender: 'assistant',
+        timestamp: new Date().toISOString(),
+    });
+
+    setStreaming(true);
+
+    // Keep accumulated content in local variable to avoid store lookups
+    let accumulatedContent = '';
+
+    try {
+        // Close any existing connection
+        if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+        }
+
+        console.log('Starting stream with sessionId:', sessionId, 'message:', userMsg);
+
+        const response = await fetch('http://localhost:8000/sessions/simple-stream', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token && { Authorization: `Bearer ${token}` }),
+            },
+            body: JSON.stringify({
+                session_id: session_id,
+                msg: userMsg
+            }),
+        });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+
+        if (!response.body) {
+            throw new Error('No response body for streaming');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        console.log(data);
+
+                        if (data.trim()) {
+                            // Accumulate content locally
+                            accumulatedContent += data;
+
+                            // Update message with accumulated content
+                            updateMessage(assistantMsgId, {
+                                content: accumulatedContent
+                            });
+                        }
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+
+    } catch (err) {
+        console.error('StreamMessage error:', err);
+        updateMessage(assistantMsgId, { content: '[Error streaming response]' });
+    } finally {
+        setStreaming(false);
+    }
+}
 
     const changeTitle = async (sessionId: string, title: string) => {
         try {
@@ -192,18 +231,15 @@ const useSessions = () => {
             await deleteSession(session_id);
             removeSession(session_id);
 
-
             if (current_session === session_id) {
                 const remainingSessions = sessionStore.getState().sessions;
                 if (remainingSessions.length > 0) {
                     const latestSession = remainingSessions.sort((a, b) =>
-
                         new Date(a.updated_at || a.created_at).getTime() -
                         new Date(b.updated_at || b.created_at).getTime()
                     )[0];
                     await getHistory(latestSession.session_id || latestSession.session_id!);
                 } else {
-
                     setCurrentSessionId(null);
                     clear();
                     setTitle("");
@@ -250,7 +286,6 @@ const useSessions = () => {
                 console.log("Session already selected:", session_id);
                 return;
             }
-
 
             if (eventSourceRef.current) {
                 eventSourceRef.current.close();
