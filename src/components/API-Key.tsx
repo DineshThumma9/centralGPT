@@ -33,30 +33,120 @@ const APIKey = ({ provider, title }: Props) => {
   return (
     <Dialog.Root open={dialogOpen} onOpenChange={handleDialogChange}>
       <Portal>
-        <Dialog.Backdrop />
+        <Dialog.Backdrop
+          bg="rgba(10, 10, 15, 0.8)"
+          backdropFilter="blur(20px)"
+        />
         <Dialog.Positioner>
-          <Dialog.Content>
-            <Dialog.Header>
-              <Dialog.Title  fontStyle = "bold"  color = "black"  padding = {0}>Enter Your API Key - {provider}</Dialog.Title>
+          <Dialog.Content
+            bg="linear-gradient(135deg, #1a0a2e 0%, #2d1b3d 100%)"
+            borderRadius="20px"
+            border="1px solid rgba(139, 69, 197, 0.2)"
+            boxShadow="0 20px 60px rgba(139, 69, 197, 0.3)"
+            backdropFilter="blur(20px)"
+            maxW="md"
+            mx={4}
+          >
+            <Dialog.Header p={6} pb={4}>
+              <Dialog.Title
+                fontSize="xl"
+                fontWeight="bold"
+                color="white"
+                textAlign="center"
+                bg="linear-gradient(135deg, #8b45c5 0%, #06b6d4 100%)"
+                bgClip="text"
+                css={{
+                  '-webkit-background-clip': 'text',
+                  '-webkit-text-fill-color': 'transparent',
+                }}
+              >
+                Enter Your API Key - {provider}
+              </Dialog.Title>
             </Dialog.Header>
-            <Dialog.Body >
-              <Stack >
+            <Dialog.Body p={6} pt={2}>
+              <Stack spacing={4}>
                 <Field.Root>
-                  <Field.Label>{title}</Field.Label>
+                  <Field.Label
+                    color="rgba(255, 255, 255, 0.9)"
+                    fontSize="sm"
+                    fontWeight="medium"
+                    mb={2}
+                  >
+                    {title}
+                  </Field.Label>
                   <Input
                     ref={ref}
                     placeholder="Enter your API KEY"
                     value={apiKey}
                     onChange={(e) => setAPIKey(e.target.value)}
+                    bg="rgba(26, 10, 46, 0.6)"
+                    border="1px solid rgba(139, 69, 197, 0.3)"
+                    borderRadius="12px"
+                    color="white"
+                    px={4}
+                    py={3}
+                    fontSize="sm"
+                    _placeholder={{
+                      color: "rgba(255, 255, 255, 0.5)"
+                    }}
+                    _focus={{
+                      borderColor: "#8b45c5",
+                      boxShadow: "0 0 0 3px rgba(139, 69, 197, 0.2)",
+                      bg: "rgba(26, 10, 46, 0.8)"
+                    }}
+                    _hover={{
+                      borderColor: "rgba(139, 69, 197, 0.5)",
+                      bg: "rgba(26, 10, 46, 0.7)"
+                    }}
+                    transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
                   />
                 </Field.Root>
               </Stack>
             </Dialog.Body>
-            <Dialog.Footer>
+            <Dialog.Footer p={6} pt={4} gap={3}>
               <Dialog.ActionTrigger asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button
+                  variant="outline"
+                  borderRadius="12px"
+                  border="1px solid rgba(139, 69, 197, 0.3)"
+                  color="rgba(255, 255, 255, 0.8)"
+                  bg="transparent"
+                  px={6}
+                  py={2}
+                  _hover={{
+                    bg: "rgba(139, 69, 197, 0.1)",
+                    borderColor: "rgba(139, 69, 197, 0.5)",
+                    color: "white"
+                  }}
+                  _active={{
+                    transform: "translateY(1px)"
+                  }}
+                  transition="all 0.2s"
+                >
+                  Cancel
+                </Button>
               </Dialog.ActionTrigger>
-              <Button onClick={handleApiKeySelect}>Save</Button>
+              <Button
+                onClick={handleApiKeySelect}
+                bg="linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)"
+                color="white"
+                borderRadius="12px"
+                px={6}
+                py={2}
+                fontWeight="medium"
+                border="none"
+                _hover={{
+                  bg: "linear-gradient(135deg, #9f4fd9 0%, #7c3aed 100%)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 8px 25px rgba(139, 69, 197, 0.4)"
+                }}
+                _active={{
+                  transform: "translateY(1px)"
+                }}
+                transition="all 0.2s"
+              >
+                Save
+              </Button>
             </Dialog.Footer>
           </Dialog.Content>
         </Dialog.Positioner>

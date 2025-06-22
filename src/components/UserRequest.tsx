@@ -1,6 +1,6 @@
 import {Box, HStack, IconButton, Editable, VStack} from "@chakra-ui/react";
 import type {Message} from "../entities/Message.ts";
-import {Copy, Trash} from "lucide-react";
+import {Check, Copy, Trash} from "lucide-react";
 import {LuCheck, LuPencilLine, LuX} from "react-icons/lu";
 import {toaster} from "./ui/toaster.tsx";
 import {useState} from "react";
@@ -32,76 +32,73 @@ const UserRequest = ({msg}: Props) => {
     };
 
     return (
-        <VStack  >
+        <VStack>
 
-        <Box
-            bg="gray.700"
-            px={4}
-            py={3}
-            borderRadius="lg"
-            fontSize="md"
-            color="white"
-            lineHeight="1.6"
-            whiteSpace="pre-wrap"
-            wordBreak="break-word"
-            maxW="80%"
-        >
-            <Editable.Root defaultValue={msg.content}>
-                <Editable.Preview />
-                <Editable.Input />
+            <Box
+                bg="gray.700"
+                px={4}
+                py={3}
+                borderRadius="lg"
+                fontSize="md"
+                color="white"
+                lineHeight="1.6"
+                whiteSpace="pre-wrap"
+                wordBreak="break-word"
+                maxW="80%"
+            >
+                <Editable.Root defaultValue={msg.content}>
+                    <Editable.Preview/>
+                    <Editable.Input/>
 
-                <Editable.Control>
-                    <Editable.CancelTrigger asChild>
-                        <IconButton variant="outline" size="xs">
-                            <LuX />
-                        </IconButton>
-                    </Editable.CancelTrigger>
-                    <Editable.SubmitTrigger asChild>
-                        <IconButton variant="outline" size="xs">
-                            <LuCheck />
-                        </IconButton>
-                    </Editable.SubmitTrigger>
-                </Editable.Control>
+                    <Editable.Control>
+                        <Editable.CancelTrigger asChild>
+                            <IconButton variant="outline" size="xs">
+                                <LuX/>
+                            </IconButton>
+                        </Editable.CancelTrigger>
+                        <Editable.SubmitTrigger asChild>
+                            <IconButton variant="outline" size="xs">
+                                <LuCheck/>
+                            </IconButton>
+                        </Editable.SubmitTrigger>
+                    </Editable.Control>
 
-            </Editable.Root>
-        </Box>
+                </Editable.Root>
+            </Box>
 
             <HStack mt={1}
-                    alignSelf = "flex-end"
+                    alignSelf="flex-end"
                     p={0}
                     m={0}>
-                    <IconButton
-                        aria-label="Copy"
-                        size="sm"
-                        variant="ghost"
-                        colorScheme={copied ? "green" : "gray"}
-                        onClick={handleCopy}
-                        p={0}
-                        m={0}
-                    >
-                        <Copy size={8} />
-                    </IconButton>
+                <IconButton
+                    aria-label="Copy code"
+                    size="sm"
+                    variant="ghost"
+                    colorScheme={copied ? "green" : "gray"}
+                    onClick={handleCopy}
+                    _hover={{bg: "gray.700"}}
+                >
+                    {copied ? <Check color={"white"} size={16}/> : <Copy color={"white"} size={16}/>}
+                </IconButton>
 
-
-
-                    <IconButton
-                        aria-label="Delete"
-                        size="sm"
-                        variant="ghost"
-                        onClick={() =>
-                            toaster.create({
-                                title: "Delete not implemented",
-                                type: "warning",
-                                duration: 1500,
-                            })
-                        }
-                         p={0}
-                        m={0}
-                    >
-                      <LuPencilLine size={8}/>
-                    </IconButton>
-                </HStack>
-            </VStack>
+                <IconButton
+                    aria-label="Delete"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                        toaster.create({
+                            title: "Delete not implemented",
+                            type: "warning",
+                            duration: 1500,
+                        })
+                    }
+                    p={0}
+                    m={0}
+                >
+                    <LuPencilLine color={"white"} size={8}/>
+                </IconButton>
+            </HStack>
+        </VStack>
 
     );
 };

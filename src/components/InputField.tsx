@@ -51,10 +51,10 @@ const InputField = ({
   };
 
   return (
-    <Field.Root width="100%" zIndex={5}>
+    <Field.Root   width="100%" zIndex={5}>
       <FieldLabel>{label}</FieldLabel>
       <Box w="full">
-        {isPassword ? <PasswordInput {...commonProps} /> : <Input {...commonProps} />}
+        {isPassword ? <PasswordInput  {...commonProps} /> : <Input {...commonProps} />}
       </Box>
       {shouldShake && (
         <FieldErrorText color="red.500" fontSize="sm">

@@ -3,6 +3,7 @@ import {Edit, MoreVertical, Share, Trash} from "lucide-react";
 import {MenuContent, MenuItem, MenuRoot, MenuTrigger,} from "./ui/menu.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
+import DeleteAlert from "./DeleteAlert.tsx";
 
 const toaster = createToaster({placement: "top"});
 
@@ -19,6 +20,7 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [dialog, setIsDialog] = useState(false)
 
     const handleChangeTitleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -32,7 +34,6 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
         if (trimmed && trimmed !== title) {
             setIsUpdatingTitle(true);
             try {
-                // Fix: Pass sessionId to changeTitle function
                 await changeTitle(sessionId, trimmed);
                 toaster.create({
                     title: "Title updated",
@@ -58,28 +59,26 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
         setIsEditing(false);
     };
 
-    const handleDeleteSession = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (confirm(`Delete "${title}"? This can't be undone.`)) {
-            setIsDeleting(true);
-            try {
-                await deleteSessionById(sessionId);
-                toaster.create({
-                    title: "Session deleted",
-                    description: `"${title}" has been deleted`,
-                    type: "success",
-                    duration: 2000,
-                });
-            } catch {
-                toaster.create({
-                    title: "Error",
-                    description: "Failed to delete session",
-                    type: "error",
-                    duration: 3000,
-                });
-            } finally {
-                setIsDeleting(false);
-            }
+    const handleDeleteSession = async () => {
+        setIsDialog(false);
+        setIsDeleting(true);
+        try {
+            await deleteSessionById(sessionId);
+            toaster.create({
+                title: "Session deleted",
+                description: `"${title}" has been deleted`,
+                type: "success",
+                duration: 2000,
+            });
+        } catch {
+            toaster.create({
+                title: "Error",
+                description: "Failed to delete session",
+                type: "error",
+                duration: 3000,
+            });
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -94,24 +93,29 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
     };
 
     return (
+        <>
         <Center
             justifyContent="space-between"
             w="100%"
-            px={2}
-            py={2}
-            height={"40px"}
-            width={"1fr"}
-            bg={bg}
-            color={color}
+            px={4}
+            py={3}
+            height="50px"
+            bg="linear-gradient(135deg, rgba(26, 10, 46, 0.6) 0%, rgba(45, 27, 61, 0.6) 100%)"
+            color="white"
             overflow="hidden"
-            _hover={{bg: "gray.800", transform: "scale(1.01)"}}
-            transition="all 0.2s ease-in-out"
-            borderRadius="lg"
-            boxShadow="lg"
+            _hover={{
+                bg: "linear-gradient(135deg, rgba(139, 69, 197, 0.2) 0%, rgba(107, 70, 193, 0.2) 100%)",
+                transform: "translateY(-1px)",
+                boxShadow: "0 8px 25px rgba(139, 69, 197, 0.15)"
+            }}
+            transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+            borderRadius="16px"
+            boxShadow="0 4px 15px rgba(26, 10, 46, 0.2)"
             cursor="pointer"
             onClick={onSelect}
             opacity={isDeleting ? 0.5 : 1}
-
+            border="1px solid rgba(139, 69, 197, 0.15)"
+            backdropFilter="blur(10px)"
         >
             <Editable.Root
                 value={title}
@@ -134,14 +138,18 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
                     <Text
                         fontSize="sm"
                         fontWeight="medium"
-                        color="white"
+                        color="rgba(255, 255, 255, 0.95)"
                         lineClamp={1}
-                        overflow={"hidden"}
+                        overflow="hidden"
+                        whiteSpace="nowrap"
+                        textOverflow="ellipsis"
                         opacity={isUpdatingTitle ? 0.7 : 1}
                         cursor={isUpdatingTitle ? "default" : "text"}
                         _hover={{
-                            opacity: isUpdatingTitle ? 0.7 : 0.8
+                            opacity: isUpdatingTitle ? 0.7 : 0.8,
+                            color: "rgba(139, 69, 197, 0.9)"
                         }}
+                        transition="all 0.2s"
                     >
                         {title}
                     </Text>
@@ -149,24 +157,23 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
                 <Editable.Input
                     fontSize="sm"
                     fontWeight="medium"
-                    px={2}
-                    py={1}
-                    borderRadius="md"
+                    px={3}
+                    py={2}
+                    borderRadius="10px"
                     color="white"
-                    bg="gray.700"
-                    border="1px solid"
-                    borderColor="blue.400"
+                    bg="rgba(26, 10, 46, 0.8)"
+                    border="1px solid rgba(139, 69, 197, 0.4)"
                     _focus={{
-                        borderColor: "blue.500",
-                        boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)",
-                        outline: "none"
+                        borderColor: "#8b45c5",
+                        boxShadow: "0 0 0 2px rgba(139, 69, 197, 0.2)",
+                        outline: "none",
+                        bg: "rgba(26, 10, 46, 0.9)"
                     }}
                     onClick={(e) => e.stopPropagation()}
                     onKeyDown={(e) => {
                         if (e.key === 'Escape') {
                             handleEditCancel();
                         }
-                        // Fix: Handle Enter key to save changes
                         if (e.key === 'Enter') {
                             e.preventDefault();
                             const target = e.target as HTMLInputElement;
@@ -182,44 +189,87 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
                         variant="ghost"
                         aria-label="More Options"
                         size="sm"
-                        color="gray.400"
-                        _hover={{color: "blue.400", bg: "gray.800"}}
+                        color="rgba(255, 255, 255, 0.6)"
+                        _hover={{
+                            color: "#8b45c5",
+                            bg: "rgba(139, 69, 197, 0.15)",
+                            transform: "scale(1.1)"
+                        }}
                         onClick={(e) => e.stopPropagation()}
                         disabled={isDeleting || isUpdatingTitle}
+                        borderRadius="10px"
+                        transition="all 0.2s"
                     >
                         <MoreVertical size={16}/>
                     </IconButton>
                 </MenuTrigger>
                 <Portal>
                     <MenuPositioner>
-                        <MenuContent bg="white" borderColor="gray.700" shadow="md">
+                        <MenuContent
+                            bg="linear-gradient(135deg, #1a0a2e 0%, #2d1b3d 100%)"
+                            borderColor="rgba(139, 69, 197, 0.3)"
+                            shadow="0 10px 40px rgba(26, 10, 46, 0.4)"
+                            borderRadius="12px"
+                            border="1px solid rgba(139, 69, 197, 0.2)"
+                            backdropFilter="blur(20px)"
+                        >
                             <MenuItem
                                 value="title"
                                 onClick={handleChangeTitleClick}
                                 disabled={isUpdatingTitle}
+                                color="rgba(255, 255, 255, 0.9)"
+                                _hover={{
+                                    bg: "rgba(139, 69, 197, 0.2)",
+                                    color: "white"
+                                }}
+                                borderRadius="8px"
+                                mx={1}
+                                my={1}
                             >
                                 <Edit size={16}/>
                                 {isUpdatingTitle ? "Updating..." : "Rename"}
                             </MenuItem>
-                            <MenuItem value="share" onClick={handleShare}>
+                            <MenuItem
+                                value="share"
+                                onClick={handleShare}
+                                color="rgba(255, 255, 255, 0.9)"
+                                _hover={{
+                                    bg: "rgba(6, 182, 212, 0.2)",
+                                    color: "white"
+                                }}
+                                borderRadius="8px"
+                                mx={1}
+                                my={1}
+                            >
                                 <Share size={16}/>
                                 Share
                             </MenuItem>
                             <MenuItem
-                                onClick={handleDeleteSession}
                                 value="delete"
-                                color="red.400"
-                                _hover={{bg: "red.600", color: "white"}}
+                                onClick={() => setIsDialog(true)}
+                                color="rgba(255, 255, 255, 0.9)"
+                                _hover={{bg: "rgba(239, 68, 68, 0.2)", color: "white"}}
                                 disabled={isDeleting}
+                                borderRadius="8px"
+                                mx={1}
+                                my={1}
                             >
                                 <Trash size={16}/>
-                                {isDeleting ? "Deleting..." : "Delete"}
+                                Delete
                             </MenuItem>
                         </MenuContent>
                     </MenuPositioner>
                 </Portal>
             </MenuRoot>
         </Center>
+
+        {dialog && (
+            <DeleteAlert
+                onCancel={() => setIsDialog(false)}
+                onConfirm={handleDeleteSession}
+            />
+        )}
+        </>
     );
 };
 
