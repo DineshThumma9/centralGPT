@@ -6,6 +6,7 @@ const Message = z.object({
   content: z.string(),
   sender: z.union([z.literal("user"), z.literal("assistant")]),
   timestamp: z.string(),
+  sessionTitle:z.string().optional(),
   client_id: z.string().optional(),
   updated_at: z.string().optional(),
   isStreaming: z.boolean().optional(),

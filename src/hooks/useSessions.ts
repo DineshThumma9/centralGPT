@@ -24,7 +24,7 @@ const useSessions = () => {
     const store = sessionStore.getState();
     const {
         addMessage, setSessions, removeSession, addSession, clear,
-        setCurrentSessionId, current_session, setTitle,
+        setCurrentSessionId, current_session, setTitle,messages,
         setMessages, setStreaming, updateMessage, isStreaming, setLoading,
     } = store;
 
@@ -75,22 +75,21 @@ const useSessions = () => {
         }
     };
 
-  // Replace your streamMessage function with this optimized version:
+  // In useSessions.ts - replace your streamMessage function
 
 async function streamMessage(userMsg: string, sessionId: string): Promise<void> {
     const token = useAuthStore.getState().accessToken;
     const assistantMsgId = uuidv4();
-
     const session_id = sessionId || useSessionStore.getState().current_session;
 
+    const isFirst  =  messages.length == 0
     if (!session_id) {
         throw new Error('No session ID provided');
     }
 
     console.log('Using session_id:', session_id);
 
-
-
+    // Add empty assistant message to start streaming
     addMessage({
         message_id: assistantMsgId,
         session_id: session_id,
@@ -101,8 +100,10 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
 
     setStreaming(true);
 
-    // Keep accumulated content in local variable to avoid store lookups
+    // Keep accumulated content in local variable
     let accumulatedContent = '';
+    let isStreamComplete = false;
+
 
     try {
         // Close any existing connection
@@ -120,7 +121,8 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
             },
             body: JSON.stringify({
                 session_id: session_id,
-                msg: userMsg
+                msg: userMsg,
+                isFirst:isFirst
             }),
         });
 
@@ -138,6 +140,7 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
+        let buffer = '';
 
         try {
             while (true) {
@@ -146,21 +149,64 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
                 if (done) break;
 
                 const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split('\n');
+                buffer += chunk;
+
+                // Process complete lines
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || ''; // Keep incomplete line in buffer
 
                 for (const line of lines) {
                     if (line.startsWith('data: ')) {
-                        const data = line.slice(6);
-                        console.log(data);
+                        try {
+                            const data = JSON.parse(line.slice(6));
 
-                        if (data.trim()) {
-                            // Accumulate content locally
-                            accumulatedContent += data;
+                            switch (data.type) {
+                                case 'start':
+                                    console.log('Stream started');
+                                    break;
 
-                            // Update message with accumulated content
-                            updateMessage(assistantMsgId, {
-                                content: accumulatedContent
-                            });
+                                case 'token':
+                                    if (data.content && !isStreamComplete) {
+                                        accumulatedContent += data.content;
+                                        // Update message with streaming content
+                                        updateMessage(assistantMsgId, {
+                                            content: accumulatedContent,
+                                            isStreaming: true
+                                        });
+                                    }
+                                    break;
+
+                                case 'done':
+                                    console.log('Stream completed');
+                                    isStreamComplete = true;
+                                    // Final update with complete content
+                                    updateMessage(assistantMsgId, {
+                                        content: data.content,
+                                        isStreaming: false
+                                    });
+                                    break;
+
+
+                                case 'title':
+                                    {
+
+                                        console.log(`Session Title has been generated ${data.content}`);
+                                    setTitle(data.content);
+                                    await changeTitle(current_session || v4(),data.content)
+                                    break;
+                                    }
+
+                                case 'error':
+                                    console.error('Stream error:', data.content);
+                                    updateMessage(assistantMsgId, {
+                                        content: `[Error: ${data.content}]`,
+                                        isStreaming: false
+                                    });
+                                    isStreamComplete = true;
+                                    break;
+                            }
+                        } catch (parseError) {
+                            console.error('Parse error:', parseError, 'Line:', line);
                         }
                     }
                 }
@@ -171,12 +217,14 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
 
     } catch (err) {
         console.error('StreamMessage error:', err);
-        updateMessage(assistantMsgId, { content: '[Error streaming response]' });
+        updateMessage(assistantMsgId, {
+            content: '[Error streaming response]',
+            isStreaming: false
+        });
     } finally {
         setStreaming(false);
     }
 }
-
     const changeTitle = async (sessionId: string, title: string) => {
         try {
             setLoading(true);

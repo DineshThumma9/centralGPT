@@ -3,6 +3,7 @@ import {Edit, MoreVertical, Share, Trash} from "lucide-react";
 import {MenuContent, MenuItem, MenuRoot, MenuTrigger,} from "./ui/menu.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
+import DeleteAlert from "./DeleteAlert.tsx";
 
 const toaster = createToaster({placement: "top"});
 
@@ -19,6 +20,10 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [dialog, setIsDialog] = useState(false)
+
+
+
 
     const handleChangeTitleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -58,30 +63,29 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
         setIsEditing(false);
     };
 
-    const handleDeleteSession = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (confirm(`Delete "${title}"? This can't be undone.`)) {
-            setIsDeleting(true);
-            try {
-                await deleteSessionById(sessionId);
-                toaster.create({
-                    title: "Session deleted",
-                    description: `"${title}" has been deleted`,
-                    type: "success",
-                    duration: 2000,
-                });
-            } catch {
-                toaster.create({
-                    title: "Error",
-                    description: "Failed to delete session",
-                    type: "error",
-                    duration: 3000,
-                });
-            } finally {
-                setIsDeleting(false);
-            }
-        }
-    };
+ const handleDeleteSession = async () => {
+    setIsDialog(false);
+    setIsDeleting(true);
+    try {
+        await deleteSessionById(sessionId);
+        toaster.create({
+            title: "Session deleted",
+            description: `"${title}" has been deleted`,
+            type: "success",
+            duration: 2000,
+        });
+    } catch {
+        toaster.create({
+            title: "Error",
+            description: "Failed to delete session",
+            type: "error",
+            duration: 3000,
+        });
+    } finally {
+        setIsDeleting(false);
+    }
+};
+
 
     const handleShare = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -94,11 +98,13 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
     };
 
     return (
+        <>
         <Center
             justifyContent="space-between"
             w="100%"
             px={2}
             py={2}
+            text-overflow={"clip"}
             height={"40px"}
             width={"1fr"}
             bg={bg}
@@ -115,6 +121,7 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
         >
             <Editable.Root
                 value={title}
+
                 edit={isEditing}
                 onEditChange={({edit}) => setIsEditing(edit)}
                 onValueCommit={({value}) => handleTitleUpdate(value)}
@@ -137,6 +144,10 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
                         color="white"
                         lineClamp={1}
                         overflow={"hidden"}
+                        // This ensures text truncation
+                        whiteSpace="nowrap" // Prevents text from wrapping
+
+                        textOverflow="ellipsis" // Adds ellipsis for overflow text
                         opacity={isUpdatingTitle ? 0.7 : 1}
                         cursor={isUpdatingTitle ? "default" : "text"}
                         _hover={{
@@ -155,6 +166,7 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
                     color="white"
                     bg="gray.700"
                     border="1px solid"
+                         _hover={{bg: "gray.800", transform: "scale(1.01)"}}
                     borderColor="blue.400"
                     _focus={{
                         borderColor: "blue.500",
@@ -205,21 +217,34 @@ const SessionComponent = ({title, sessionId, onSelect, color, bg}: Props) => {
                                 <Share size={16}/>
                                 Share
                             </MenuItem>
+
                             <MenuItem
-                                onClick={handleDeleteSession}
-                                value="delete"
-                                color="red.400"
-                                _hover={{bg: "red.600", color: "white"}}
-                                disabled={isDeleting}
-                            >
-                                <Trash size={16}/>
-                                {isDeleting ? "Deleting..." : "Delete"}
-                            </MenuItem>
+                            value="delete"
+                            onClick={() => setIsDialog(true)}
+                            color="black"
+                            _hover={{bg: "red.600", color: "white"}}
+                            disabled={isDeleting}
+                        >
+                            <Trash size={16}/>
+                            Delete
+                        </MenuItem>
+
                         </MenuContent>
                     </MenuPositioner>
                 </Portal>
+
+
             </MenuRoot>
         </Center>
+
+           {dialog && (
+                <DeleteAlert
+                    onCancel={() => setIsDialog(false)}
+                    onConfirm={handleDeleteSession}
+                />
+            )}
+
+    </>
     );
 };
 
