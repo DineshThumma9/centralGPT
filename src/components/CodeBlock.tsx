@@ -1,3 +1,5 @@
+
+// src/components/CodeBlock.tsx
 import { useState } from "react";
 import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
 import { Check, Copy } from "lucide-react";
@@ -36,49 +38,58 @@ const CodeBlock = ({ children, className }: any) => {
         my={4}
         w="full"
         maxW="100%"
-        borderRadius="md"
-        bg="gray.800"
+        borderRadius="lg"
+        bg="linear-gradient(135deg, #2d1b69 0%, #1a0b2e 100%)"
+        border="1px solid"
+        borderColor="purple.500"
         overflow="hidden"
+        boxShadow="0 8px 32px rgba(147, 51, 234, 0.2)"
       >
         <Flex
           justify="space-between"
           align="center"
-          bg="gray.900"
+          bg="rgba(45, 27, 105, 0.8)"
+          backdropFilter="blur(10px)"
           px={4}
-          py={2}
-          borderTopRadius="md"
+          py={3}
+          borderTopRadius="lg"
+          borderBottom="1px solid"
+          borderColor="purple.400"
         >
-          <Text fontSize="sm" color="gray.300" fontFamily="mono">
+          <Text fontSize="sm" color="purple.200" fontFamily="mono" fontWeight="medium">
             {language}
           </Text>
           <IconButton
             aria-label="Copy code"
-
             size="sm"
             variant="ghost"
-            colorScheme={copied ? "green" : "gray"}
+            colorScheme={copied ? "green" : "purple"}
             onClick={handleCopy}
-            _hover={{ bg: "gray.700" }}
+            bg={copied ? "green.600" : "purple.600"}
+            color="white"
+            _hover={{
+              bg: copied ? "green.500" : "purple.500",
+              transform: "scale(1.05)"
+            }}
+            _active={{ transform: "scale(0.95)" }}
+            transition="all 0.2s"
           >
-             copied ? <Check size={16} /> : <Copy size={16} />
+            {copied ? <Check size={16} /> : <Copy size={16} />}
           </IconButton>
         </Flex>
-        <Box
-          overflowX="auto"
-          maxW="100%"
-        >
+        <Box overflowX="auto" maxW="100%">
           <SyntaxHighlighter
             style={oneDark}
             language={language}
             PreTag="div"
             customStyle={{
               margin: 0,
-              padding: '1rem',
+              padding: '1.5rem',
               overflowX: 'auto',
-              fontSize: '0.85rem',
-              background: 'transparent',
-              borderBottomLeftRadius: '6px',
-              borderBottomRightRadius: '6px',
+              fontSize: '0.875rem',
+              background: 'linear-gradient(135deg, #1a0b2e 0%, #16213e 100%)',
+              borderBottomLeftRadius: '8px',
+              borderBottomRightRadius: '8px',
               maxHeight: '400px',
               overflowY: 'auto',
               maxWidth: '100%',
@@ -96,16 +107,19 @@ const CodeBlock = ({ children, className }: any) => {
   return (
     <Box
       as="code"
-      bg="gray.700"
-      px={2}
+      bg="linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)"
+      px={3}
       py={1}
-      borderRadius="sm"
-      fontSize="0.85rem"
+      borderRadius="md"
+      fontSize="0.875rem"
       fontFamily="mono"
       color="white"
       whiteSpace="pre-wrap"
       wordBreak="break-word"
       display="inline"
+      border="1px solid"
+      borderColor="purple.400"
+      boxShadow="0 2px 8px rgba(147, 51, 234, 0.3)"
     >
       {children}
     </Box>
@@ -113,3 +127,5 @@ const CodeBlock = ({ children, className }: any) => {
 };
 
 export default CodeBlock;
+
+// ===============================================

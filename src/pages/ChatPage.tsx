@@ -10,7 +10,7 @@ const ChatPage = () => {
         <Box
             h="100vh"
             w="100vw"
-            bg="app.bg"
+            color="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
             overflow="hidden"
             position="relative"
         >
@@ -19,6 +19,7 @@ const ChatPage = () => {
                 templateColumns={isSidebarCollapsed ? "60px 1fr" : "280px 1fr"}
                 h="100vh"
                 w="100vw"
+                color="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
                 transition="all 0.3s ease-in-out"
                 overflow="hidden"
             >
