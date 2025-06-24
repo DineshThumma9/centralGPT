@@ -8,8 +8,64 @@ import type {Message} from "../entities/Message.ts";
 import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
 
+
+const chatAreaVstack = {
+    flex: "1",
+    gap: "0",
+    h: "100vh",
+    bg: "linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)",
+    overflow: "hidden",
+    position: "relative",
+
+}
+
+
+const caHeaaderBox = {
+    w: "full",
+    bg: "rgba(26, 11, 46, 0.9)",
+    backdropFilter: "blur(10px)",
+    borderColor: "purple.600",
+    zIndex: 100,
+    flexShrink: 0,
+
+}
+
+
+const bodyBox = {
+
+    flex: "1",
+    w: "full",
+    overflow: "hidden",
+    position: "relative",
+    bg: "transparent",
+}
+
+const footerBox = {
+
+    w: "full",
+    bg: "rgba(26, 11, 46, 0.9)",
+    backdropFilter: "blur(10px)",
+    borderColor: "purple.600",
+    flexShrink: 0,
+    zIndex: 100,
+}
+
+
+const Hstackprops = {
+    w :"full",
+    justifyContent: "space-between",
+    alignItems: "center",
+    p: 4,
+    minH: "70px",
+    maxW: "1200px",
+    mx: "auto",
+}
+
+
+
+
 const ChatArea = () => {
-    const [,setMessages] = useState<Message[]>([]);
+    const [, setMessages] = useState<Message[]>([]);
     const scrollRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -21,60 +77,32 @@ const ChatArea = () => {
         return unsubscribe;
     }, []);
 
+
     return (
         <VStack
-            flex="1"
-            gap="0"
-            h="100vh"
-            bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
-            // color="white"
-            overflow="hidden"
-            position="relative"
+            {...chatAreaVstack}
         >
-            {/* Fixed Header */}
+
             <Box
-                w="full"
-                bg="rgba(26, 11, 46, 0.9)"
-                backdropFilter="blur(10px)"
-                borderBottom="1px solid"
-                borderColor="purple.600"
-                zIndex={100}
-                flexShrink={0}
+                {...caHeaaderBox}
             >
                 <HStack
-                    w="full"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    p={4}
-                    minH="70px"
-                    maxW="1200px"
-                    mx="auto"
+                    {...Hstackprops}
                 >
                     <LLMModelChooser/>
                     <AvaterExpandable/>
                 </HStack>
             </Box>
 
-            {/* Messages Container */}
+
             <Box
-                flex="1"
-                w="full"
-                overflow="hidden"
-                position="relative"
-                bg="transparent"
+                {...bodyBox}
             >
                 <Response/>
             </Box>
 
-            {/* Fixed Input Area */}
             <Box
-                w="full"
-                bg="rgba(26, 11, 46, 0.9)"
-                backdropFilter="blur(10px)"
-                borderTop="1px solid"
-                borderColor="purple.600"
-                flexShrink={0}
-                zIndex={100}
+                {...footerBox}
             >
                 <SendRequest/>
             </Box>
@@ -86,4 +114,3 @@ const ChatArea = () => {
 
 export default ChatArea;
 
-// ===============================================

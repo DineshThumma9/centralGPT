@@ -10,7 +10,7 @@ const ChatPage = () => {
         <Box
             h="100vh"
             w="100vw"
-            color="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
+            bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
             overflow="hidden"
             position="relative"
         >
@@ -19,7 +19,7 @@ const ChatPage = () => {
                 templateColumns={isSidebarCollapsed ? "60px 1fr" : "280px 1fr"}
                 h="100vh"
                 w="100vw"
-                color="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
+                bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
                 transition="all 0.3s ease-in-out"
                 overflow="hidden"
             >
@@ -28,8 +28,6 @@ const ChatPage = () => {
                     area="aside"
                     overflow="hidden"
                     zIndex={10}
-                    // borderRight="1px solid"
-                    // borderColor="gray.200"
                 >
                     <Sidebar onCollapse={setIsSidebarCollapsed} />
                 </GridItem>
@@ -38,7 +36,7 @@ const ChatPage = () => {
                 <GridItem
                     area="main"
                     overflow="hidden"
-                    bg="#fafafa"
+                    bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
                     position="relative"
                 >
                     <ChatArea />

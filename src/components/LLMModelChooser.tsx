@@ -1,4 +1,3 @@
-
 // ===================================
 
 // Updated LLMModelChooser.tsx with Purple-Violet Theme
@@ -13,11 +12,27 @@ import {useEffect, useState} from "react";
 import StreamSwitch from "./Switch.tsx";
 import useSessionStore from "../store/sessionStore.ts";
 
+
+const hstack = {
+    gap: 3,
+    flexWrap: "wrap",
+    margin: "0px",
+    p: 4,
+    backdropFilter: "blur(10px)",
+    borderRadius: "xl",
+    // border:"1px solid"
+    borderColor: "rgba(139, 92, 246, 0.2)",
+    boxShadow: "0 0 30px rgba(139, 92, 246, 0.1)"
+}
+
+
+
+
 const LLMModelChooser = () => {
     const {providers_models, modelsProviders} = Constants();
     const {shouldStream} = useSessionStore();
 
-    const [model,setModel] = useState("");
+    const [model, setModel] = useState("");
 
     const {
         setCurrentLLMProvider,
@@ -68,17 +83,9 @@ const LLMModelChooser = () => {
 
     return (
         <HStack
-            gap={3}
-            flexWrap="wrap"
-            margin={"0px"}
-            p={4}
-            backdropFilter="blur(10px)"
-            borderRadius="xl"
-            border="1px solid"
-            borderColor="rgba(139, 92, 246, 0.2)"
-            boxShadow="0 0 30px rgba(139, 92, 246, 0.1)"
+            {...hstack}
         >
-            {/* API Provider Selector - Enhanced styling will be in MenuHelper */}
+
             <MenuHelper
                 title={"API Provider"}
                 options={modelsProviders}

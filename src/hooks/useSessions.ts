@@ -113,7 +113,7 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
 
         console.log('Starting stream with sessionId:', sessionId, 'message:', userMsg);
 
-        const response = await fetch('http://localhost:8000/sessions/simple-stream', {
+        const response = await fetch('http://localhost:8000/messages/simple-stream', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

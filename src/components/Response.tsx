@@ -7,9 +7,41 @@ import type {Message} from "../entities/Message.ts";
 import EmptyState from "./EmptyState.tsx";
 import UserRequest from "./UserRequest.tsx";
 import AIResponse from "./AIResponse.tsx";
-import Empty from "./Empty.tsx";
+// import Empty from "./Empty.tsx";
 
-const backgroundColor = "app.bg";
+const backgroundColor = "linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)";
+
+
+const box = {
+
+    h: "100%",
+    w: "full",
+    overflowY: "auto",
+    overflowX: "hidden",// Prevent horizontal scrolling
+    bg: {backgroundColor},
+    css: {
+        '&::-webkit-scrollbar': {width: '6px'},
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(147, 51, 234, 0.3)',
+            borderRadius: '3px',
+        },
+        '&::-webkit-scrollbar-track': {
+            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+        }
+    }
+}
+
+const vstack = {
+    gap: 6,
+    align: "stretch",
+    w: "full",
+    maxW: "4xl",
+    mx: "auto",
+    px: 4,
+
+}
+
+
 
 const Response = () => {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -36,34 +68,15 @@ const Response = () => {
     return (
         <Box
             ref={containerRef}
-            h="100%"
-            w="full"
-            overflowY="auto"
-            overflowX="hidden" // Prevent horizontal scrolling
-            bg={backgroundColor}
-            css={{
-                '&::-webkit-scrollbar': {width: '6px'},
-                '&::-webkit-scrollbar-thumb': {
-                    backgroundColor: 'rgba(147, 51, 234, 0.3)',
-                    borderRadius: '3px',
-                },
-                '&::-webkit-scrollbar-track': {
-                    backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                }
-            }}
+            {...box}
         >
-            <Empty />
+            <EmptyState/>
             {messages.length === 0 ? (
                 <EmptyState/>
             ) : (
                 <Box w="full" py={6}>
                     <VStack
-                        gap={6}
-                        align="stretch"
-                        w="full"
-                        maxW="4xl"
-                        mx="auto"
-                        px={4}
+                        {...vstack}
                     >
                         {messages.map((msg, idx) => (
                             <Box

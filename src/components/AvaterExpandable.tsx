@@ -4,6 +4,51 @@ import {useAuth} from "../hooks/useAuth.ts";
 import {useNavigate} from "react-router-dom";
 import useInitStore from "../store/initStore.ts";
 
+
+
+const menuButton = {
+         variant:"ghost",
+                        size:"sm",
+                        p:0,
+                        border:"0px",
+                        bg:"transparent",
+                        _hover:{
+                            borderRadius: "full",
+                            bg: "purple.50",
+                            transform: "scale(1.05)",
+                            transition: "all 0.2s ease"
+                        },
+                        _focus:{
+                            boxShadow: "0 0 0 2px rgba(147, 51, 234, 0.3)",
+                            outline: "none"
+                        },
+                        _active:{
+                            transform: "scale(0.95)"
+                        },
+                        transition:"all 0.2s ease",
+                        zIndex:2
+}
+
+
+const avatorRoot = {
+       size:"sm",
+                            border:"2px solid",
+                            borderColor:"purple.200",
+                            _hover:{
+                                borderColor: "purple.300",
+                                boxShadow: "0 4px 12px rgba(147, 51, 234, 0.3)"
+                            },
+                            transition:"all 0.2s ease"
+}
+
+
+const menuContent = {
+
+}
+
+const menuItem = {
+
+}
 const AvatarExpandable = () => {
     const {logout} = useAuth();
     const navigate = useNavigate()
@@ -14,36 +59,10 @@ const AvatarExpandable = () => {
             <Menu.Root>
                 <Menu.Trigger asChild>
                     <Button
-                        variant="ghost"
-                        size="sm"
-                        p={0}
-                        border="0px"
-                        bg="transparent"
-                        _hover={{
-                            borderRadius: "full",
-                            bg: "purple.50",
-                            transform: "scale(1.05)",
-                            transition: "all 0.2s ease"
-                        }}
-                        _focus={{
-                            boxShadow: "0 0 0 2px rgba(147, 51, 234, 0.3)",
-                            outline: "none"
-                        }}
-                        _active={{
-                            transform: "scale(0.95)"
-                        }}
-                        transition="all 0.2s ease"
-                        zIndex={2}
+                        {...menuButton}
                     >
                         <Avatar.Root
-                            size="sm"
-                            border="2px solid"
-                            borderColor="purple.200"
-                            _hover={{
-                                borderColor: "purple.300",
-                                boxShadow: "0 4px 12px rgba(147, 51, 234, 0.3)"
-                            }}
-                            transition="all 0.2s ease"
+                            {...avatorRoot}
                         >
                             <Avatar.Fallback
                                 name={username || "user"}

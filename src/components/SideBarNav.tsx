@@ -1,15 +1,64 @@
-import { HStack, IconButton, createToaster } from "@chakra-ui/react";
-import {Plus, Search } from "lucide-react";
+import {HStack, IconButton, createToaster} from "@chakra-ui/react";
+import {Plus, Search} from "lucide-react";
 import useSessions from "../hooks/useSessions.ts";
-import { useState } from "react";
+import {useState} from "react";
 
-// Create toaster instance
-const toaster = createToaster({
-    placement: "top",
-});
+
+const hstack = {
+    width: "100%",
+    bg: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)",
+    backdropFilter: "blur(20px)",
+    borderRadius: "20px",
+    justifyContent: "space-between",
+    height: "50px",
+    px: 3,
+    border: "1px solid rgba(139, 69, 197, 0.1)",
+    boxShadow: "0 4px 20px rgba(139, 69, 197, 0.1)",
+
+}
+
+
+const hstackplus = {
+    "arialabel": "Create new chat",
+    variant: "ghost",
+    size: "sm",
+    borderRadius: "full",
+    bg: "linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)",
+    color: "white",
+    _hover: {
+        bg: "linear-gradient(135deg, #9f4fd9 0%, #7c3aed 100%)",
+        transform: "scale(1.05)",
+        boxShadow: "0 6px 20px rgba(139, 69, 197, 0.3)"
+    },
+    _active: {
+        transform: "scale(0.95)"
+    },
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+}
+
+const hstackseach = {
+    "aria-label": "Search chats",
+    variant: "ghost",
+    size: "sm",
+    borderRadius: "full",
+    color: "rgba(139, 69, 197, 0.8)",
+    bg: "rgba(139, 69, 197, 0.1)",
+    _hover: {
+        bg: "rgba(139, 69, 197, 0.2)",
+        color: "#8b45c5",
+        transform: "scale(1.05)",
+        boxShadow: "0 4px 15px rgba(139, 69, 197, 0.2)"
+    },
+    _active: {
+        transform: "scale(0.95)"
+    },
+    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    p: 2,
+}
+
 
 const SideBarNav = () => {
-    const { createNewSession } = useSessions();
+    const {createNewSession} = useSessions();
     const [isCreating, setIsCreating] = useState(false);
 
     const handleCreateNewSession = async () => {
@@ -18,78 +67,33 @@ const SideBarNav = () => {
         setIsCreating(true);
         try {
             const sessionId = await createNewSession();
-            toaster.create({
-                title: "New chat created",
-                description: "Ready to start chatting!",
-                duration: 2000,
-            });
             console.log("New session created:", sessionId);
         } catch (error) {
             console.error("Failed to create new session:", error);
-            toaster.create({
-                title: "Error",
-                description: "Failed to create new chat session",
-                duration: 3000,
-            });
         } finally {
             setIsCreating(false);
         }
     };
 
-    const handleSearch = () => {
-        toaster.create({
-            title: "Coming Soon",
-            description: "Search functionality will be available soon",
-            duration: 2000,
-        });
-    };
 
     return (
-        <HStack width="100%"  bg = "white"  borderRadius = "40px"  justifyContent="space-between" height = "50px" px={2}>
+        <HStack
+            {...hstack}
+        >
             <IconButton
-                aria-label="Create new chat"
-                variant="ghost"
-                size="sm"
-                borderRadius={"full"}
-                bg={"white"}
-                color="blackAlpha.900"
-                css={{
-                    "&:hover": {
-                        bg: "var(--chakra-colors-app-accent)",
-                        color: "white",
-                        transform: "scale(1.05)"
-                    },
-                    "&:active": {
-                        transform: "scale(0.95)"
-                    },
-                    transition: "all 0.2s"
-                }}
+                {...hstackplus}
                 onClick={handleCreateNewSession}
                 loading={isCreating}
+                disabled={isCreating}
+                p={2}
             >
-                <Plus />
+                <Plus size={18}/>
             </IconButton>
 
             <IconButton
-                aria-label="Search chats"
-                variant="ghost"
-                size="sm"
-                borderRadius={"full"}
-                color="black"
-                css={{
-                    "&:hover": {
-                        bg: "var(--chakra-colors-surface-tertiary)",
-                        color: "var(--chakra-colors-app-accent)",
-                        transform: "scale(1.05)"
-                    },
-                    "&:active": {
-                        transform: "scale(0.95)"
-                    },
-                    transition: "all 0.2s"
-                }}
-                onClick={handleSearch}
+                {...hstackseach}
             >
-                <Search />
+                <Search size={18}/>
             </IconButton>
         </HStack>
     );

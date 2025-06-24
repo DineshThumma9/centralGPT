@@ -8,6 +8,96 @@ import {v4} from "uuid";
 import {z} from "zod/v4";
 import Message from "../entities/Message.ts";
 
+
+const box = {
+    w: "full",
+    bg: "transparent",
+    backdropFilter: "blur(20px)",
+    py: 4,
+    px: 4,
+    overflow: "auto",
+    css: {
+        "&::-webkit-scrollbar": {
+            width: "6px",
+        },
+        "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "rgba(139, 92, 246, 0.3)",
+            borderRadius: "3px",
+        },
+        "&::-webkit-scrollbar-track": {
+            backgroundColor: "transparent",
+        },
+    }
+}
+
+const hstack = {
+    bg: "rgba(30, 30, 40, 0.9)",
+    backdropFilter: "blur(10px)",
+    border: "2px solid",
+    borderColor: "rgba(139, 92, 246, 0.3)",
+    borderRadius: "2xl",
+    px: 4,
+    py: 3,
+    gap: 3,
+    alignItems: "flex-end",
+    boxShadow: "0 0 40px rgba(139, 92, 246, 0.2)",
+    _focusWithin: {
+        borderColor: "rgba(139, 92, 246, 0.6)",
+        boxShadow: "0 0 60px rgba(139, 92, 246, 0.3)",
+        transform: "translateY(-2px)"
+    },
+    transition: "all 0.3s ease",
+    position: "relative",
+    _before: {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        borderRadius: '2xl',
+        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1))',
+        zIndex: -1
+    }
+}
+
+const txtarea = {
+    resize: "none",
+    minH: "44px",
+    maxH: "120px",
+    color: "white",
+    border: "none",
+    px: 0,
+    py: 2,
+    overflow: "auto",
+    placeholder: "Type your message...",
+    fontSize: "md",
+    // lineHeight:,
+    bg: "transparent",
+    _placeholder: {color: "rgba(255, 255, 255, 0.5)"},
+    _focus: {
+        boxShadow: "none",
+        outline: "none"
+    },
+
+    css: {
+        "&::-webkit-scrollbar": {
+            width: "6px",
+        },
+        "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "rgba(139, 92, 246, 0.3)",
+            borderRadius: "3px",
+        },
+        "&::-webkit-scrollbar-track": {
+            backgroundColor: "transparent",
+        },
+    }
+}
+
+const send = {}
+
+
+
 const SendRequest = () => {
     const [input, setInput] = useState("");
     const {sending, setSending, shouldStream} = useSessionStore();
@@ -76,26 +166,7 @@ const SendRequest = () => {
 
     return (
         <Box
-            w="full"
-            bg="rgba(10, 10, 20, 0.95)"
-            backdropFilter="blur(20px)"
-            py={4}
-            px={4}
-            borderTop="1px solid"
-            borderColor="rgba(139, 92, 246, 0.2)"
-            overflow={"auto"}
-            css={{
-                "&::-webkit-scrollbar": {
-                    width: "6px",
-                },
-                "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: "rgba(139, 92, 246, 0.3)",
-                    borderRadius: "3px",
-                },
-                "&::-webkit-scrollbar-track": {
-                    backgroundColor: "transparent",
-                },
-            }}
+            {...box}
         >
             <Box
                 maxW="1000px"
@@ -103,70 +174,16 @@ const SendRequest = () => {
                 w="full"
             >
                 <HStack
-                    bg="rgba(30, 30, 40, 0.9)"
-                    backdropFilter="blur(10px)"
-                    border="2px solid"
-                    borderColor="rgba(139, 92, 246, 0.3)"
-                    borderRadius="2xl"
-                    px={4}
-                    py={3}
-                    gap={3}
-                    alignItems="flex-end"
-                    boxShadow="0 0 40px rgba(139, 92, 246, 0.2)"
-                    _focusWithin={{
-                        borderColor: "rgba(139, 92, 246, 0.6)",
-                        boxShadow: "0 0 60px rgba(139, 92, 246, 0.3)",
-                        transform: "translateY(-2px)"
-                    }}
-                    transition="all 0.3s ease"
-                    position="relative"
-                    _before={{
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        borderRadius: '2xl',
-                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1))',
-                        zIndex: -1
-                    }}
+                    {...hstack}
                 >
                     <Textarea
                         ref={textareaRef}
-                        resize="none"
-                        minH="44px"
-                        maxH="120px"
-                        color="white"
-                        border="none"
-                        px={0}
-                        py={2}
-                        overflow="auto"
                         value={input}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyPress}
-                        placeholder="Type your message..."
-                        fontSize="md"
-                        lineHeight="1.5"
-                        bg="transparent"
-                        _placeholder={{color: "rgba(255, 255, 255, 0.5)"}}
-                        _focus={{
-                            boxShadow: "none",
-                            outline: "none"
-                        }}
                         disabled={sending}
-                        css={{
-                            "&::-webkit-scrollbar": {
-                                width: "6px",
-                            },
-                            "&::-webkit-scrollbar-thumb": {
-                                backgroundColor: "rgba(139, 92, 246, 0.3)",
-                                borderRadius: "3px",
-                            },
-                            "&::-webkit-scrollbar-track": {
-                                backgroundColor: "transparent",
-                            },
-                        }}
+                        {...txtarea}
+
                     />
 
                     <IconButton

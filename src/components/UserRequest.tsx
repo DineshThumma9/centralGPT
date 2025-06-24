@@ -9,6 +9,58 @@ interface Props {
     msg: Message;
 }
 
+
+const box = {
+    bg: "linear-gradient(135deg, purple.500, violet.500)",
+    px: 4,
+    py: 3,
+    borderRadius: "xl",
+    fontSize: "md",
+    color: "white",
+    lineHeight: "1.6",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    boxShadow: "0 2px 12px rgba(147, 51, 234, 0.3)",
+    border: "1px solid",
+    borderColor: "purple.400"
+}
+
+
+const flexMain = {}
+
+const editableInput = {
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    whiteSpace: "pre-wrap",
+    bg: "purple.600",
+    border: "1px solid",
+    borderColor: "purple.400",
+    _focus: {
+        borderColor: "purple.300",
+        boxShadow: "0 0 0 1px rgba(147, 51, 234, 0.3)"
+    }
+}
+
+
+const editableIcon = {
+    variant: "outline",
+    size: "xs",
+    colorScheme: "purple",
+    bg: "white",
+    color: "purple.600",
+    _hover: {bg: "purple.50"}
+}
+
+
+const actionButton = {
+
+    size: "sm",
+    variant: "ghost",
+    _hover: {bg: "purple.50"}
+}
+
+
 const UserRequest = ({msg}: Props) => {
     const [copied, setCopied] = useState(false);
 
@@ -16,11 +68,6 @@ const UserRequest = ({msg}: Props) => {
         try {
             await navigator.clipboard.writeText(msg.content.trimEnd());
             setCopied(true);
-            toaster.create({
-                title: "Copied to clipboard",
-                type: "success",
-                duration: 2000,
-            });
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             toaster.create({
@@ -53,19 +100,7 @@ const UserRequest = ({msg}: Props) => {
                     minW={0} // Critical for text wrapping
                 >
                     <Box
-                        bg="linear-gradient(135deg, purple.500, violet.500)"
-                        px={4}
-                        py={3}
-                        borderRadius="xl"
-                        fontSize="md"
-                        color="white"
-                        lineHeight="1.6"
-                        whiteSpace="pre-wrap"
-                        wordBreak="break-word"
-                        overflowWrap="break-word"
-                        boxShadow="0 2px 12px rgba(147, 51, 234, 0.3)"
-                        border="1px solid"
-                        borderColor="purple.400"
+                        {...box}
                     >
                         <Editable.Root defaultValue={msg.content}>
                             <Editable.Preview
@@ -74,39 +109,20 @@ const UserRequest = ({msg}: Props) => {
                                 whiteSpace="pre-wrap"
                             />
                             <Editable.Input
-                                wordBreak="break-word"
-                                overflowWrap="break-word"
-                                whiteSpace="pre-wrap"
-                                bg="purple.600"
-                                border="1px solid"
-                                borderColor="purple.400"
-                                _focus={{
-                                    borderColor: "purple.300",
-                                    boxShadow: "0 0 0 1px rgba(147, 51, 234, 0.3)"
-                                }}
+                                {...editableInput}
                             />
 
                             <Editable.Control>
                                 <Editable.CancelTrigger asChild>
                                     <IconButton
-                                        variant="outline"
-                                        size="xs"
-                                        colorScheme="purple"
-                                        bg="white"
-                                        color="purple.600"
-                                        _hover={{ bg: "purple.50" }}
+                                        {...editableIcon}
                                     >
                                         <LuX/>
                                     </IconButton>
                                 </Editable.CancelTrigger>
                                 <Editable.SubmitTrigger asChild>
                                     <IconButton
-                                        variant="outline"
-                                        size="xs"
-                                        colorScheme="purple"
-                                        bg="white"
-                                        color="purple.600"
-                                        _hover={{ bg: "purple.50" }}
+                                        {...editableIcon}
                                     >
                                         <LuCheck/>
                                     </IconButton>
@@ -130,30 +146,17 @@ const UserRequest = ({msg}: Props) => {
             </Flex>
 
             {/* Action buttons */}
-            <HStack spacing={2} mr={12}>
+            <HStack gap={2} mr={12}>
                 <IconButton
-                    aria-label="Copy message"
-                    size="sm"
-                    variant="ghost"
+                    {...actionButton}
                     colorScheme={copied ? "purple" : "gray"}
                     onClick={handleCopy}
-                    _hover={{bg: "purple.50"}}
                 >
                     {copied ? <Check color="purple" size={16}/> : <Copy color="gray" size={16}/>}
                 </IconButton>
 
                 <IconButton
-                    aria-label="Edit message"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() =>
-                        toaster.create({
-                            title: "Edit feature coming soon",
-                            type: "info",
-                            duration: 1500,
-                        })
-                    }
-                    _hover={{bg: "purple.50"}}
+                    {...actionButton}
                 >
                     <LuPencilLine color="gray" size={16}/>
                 </IconButton>
