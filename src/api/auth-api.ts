@@ -2,12 +2,14 @@ import axios, { AxiosError } from "axios";
 
 
 
-const API_BASE_URL =import.meta.env.VITE_API_URI;
+const API_BASE_URL = import.meta.env.VITE_API_URI;
 
 export const API = axios.create({
      baseURL: `${API_BASE_URL}/auth`,
   withCredentials: true,
 });
+
+
 
 
 
@@ -18,6 +20,11 @@ export const login = (
                         password: string;
                       }) => {
 
+
+    const API_BASE_URL = import.meta.env.VITE_API_URI;
+if (!API_BASE_URL) {
+  throw new Error("❌ Missing VITE_API_URI. Check your .env or Vercel env settings.");
+}
 
   const form = new URLSearchParams();
   form.append("username", data.username);
@@ -33,7 +40,13 @@ export const login = (
 
 
 export const register = async (username: string, email: string, password: string) => {
-  const response = await API.post("/register",
+
+    const API_BASE_URL = import.meta.env.VITE_API_URI;
+if (!API_BASE_URL) {
+  throw new Error("❌ Missing VITE_API_URI. Check your .env or Vercel env settings.");
+}
+
+    const response = await API.post("/register",
     { username, email, password },
     { headers: { "Content-Type": "application/json" } }
   );
