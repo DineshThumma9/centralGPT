@@ -3,7 +3,7 @@ import {toaster} from "../components/ui/toaster.tsx";
 import React, {useState, useEffect} from "react";
 import {useAuth} from "../hooks/useAuth.ts";
 import {useNavigate} from "react-router-dom";
-import {useColorModeValue} from "../components/ui/color-mode.tsx";
+// Removed useColorModeValue import as it's not needed for Chakra v3
 import {Fade} from '@chakra-ui/transition';
 import {z} from "zod/v4";
 import useFieldForm from '../hooks/useFieldForm.ts';
@@ -35,7 +35,7 @@ const SignUpPage = () => {
 
     const {register} = useAuth();
     const navigate = useNavigate();
-    const cardBg = useColorModeValue("white", "gray.800");
+    // Removed cardBg variable as it's not needed
     const {setUsername,setEmail} = useInitStore();
 
     // Clear fields on component mount
@@ -112,10 +112,12 @@ const SignUpPage = () => {
     return (
         <Flex
             minH="100vh"
+            minW="100vw"
             align="center"
             justify="center"
             p={{base: 4, md: 8}}
-            background={"black"}
+            bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
+
         >
             <Fade in={!fadeOut} unmountOnExit transition={{exit: {duration: 0.3}}}>
                 <CrediantialCard

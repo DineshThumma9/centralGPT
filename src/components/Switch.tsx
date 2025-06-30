@@ -5,14 +5,7 @@ import useSessionStore from "../store/sessionStore.ts";
 
 
 
-const box = {
 
-}
-
-const txt  = {
-
-
-}
 const StreamSwitch = () => {
     const {shouldStream, setShouldStream} = useSessionStore();
 

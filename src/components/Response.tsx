@@ -1,15 +1,11 @@
 import {Box, Flex, VStack} from "@chakra-ui/react";
 import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
-import useSessionStore from "../store/sessionStore.ts";
 import "highlight.js/styles/github-dark.css";
 import type {Message} from "../entities/Message.ts";
 import EmptyState from "./EmptyState.tsx";
 import UserRequest from "./UserRequest.tsx";
 import AIResponse from "./AIResponse.tsx";
-// import Empty from "./Empty.tsx";
-
-const backgroundColor = "linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)";
 
 
 const box = {
@@ -18,17 +14,8 @@ const box = {
     w: "full",
     overflowY: "auto",
     overflowX: "hidden",// Prevent horizontal scrolling
-    bg: {backgroundColor},
-    css: {
-        '&::-webkit-scrollbar': {width: '6px'},
-        '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(147, 51, 234, 0.3)',
-            borderRadius: '3px',
-        },
-        '&::-webkit-scrollbar-track': {
-            backgroundColor: 'rgba(147, 51, 234, 0.1)',
-        }
-    }
+    // bg: {backgroundColor},
+
 }
 
 const vstack = {
@@ -40,7 +27,6 @@ const vstack = {
     px: 4,
 
 }
-
 
 
 const Response = () => {
@@ -70,7 +56,7 @@ const Response = () => {
             ref={containerRef}
             {...box}
         >
-            <EmptyState/>
+
             {messages.length === 0 ? (
                 <EmptyState/>
             ) : (

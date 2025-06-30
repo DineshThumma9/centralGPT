@@ -28,6 +28,7 @@ export type SessionState = {
   setShouldStream: (streaming: boolean) => void;
   clear: () => void;
   getSessions: () => Session[];
+    clearAllSessions(): void;
 };
 
 const useSessionStore = create<SessionState>()(
@@ -65,7 +66,12 @@ const useSessionStore = create<SessionState>()(
         );
         set({ sessions: sorted });
       },
-      addSession: (session) =>
+        clearAllSessions:() =>set({
+          messages:[],
+            sessions:[],
+            current_session:null
+        }),
+        addSession: (session) =>
         set((state) => ({
           sessions: [session, ...state.sessions],
         })),

@@ -17,15 +17,22 @@ import {v4, v4 as uuidv4} from 'uuid';
 import useAuthStore from "../store/authStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
 
+
+
+const API_BASE_URL =  process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+
 const useSessions = () => {
     const eventSourceRef = useRef<EventSource | null>(null);
 
-    // Get store functions and state
+
+
+
     const store = sessionStore.getState();
     const {
         addMessage, setSessions, removeSession, addSession, clear,
         setCurrentSessionId, current_session, setTitle,messages,
-        setMessages, setStreaming, updateMessage, isStreaming, setLoading,
+        setMessages, setStreaming, updateMessage,  setLoading,
     } = store;
 
     useEffect(() => {
@@ -75,7 +82,7 @@ const useSessions = () => {
         }
     };
 
-  // In useSessions.ts - replace your streamMessage function
+
 
 async function streamMessage(userMsg: string, sessionId: string): Promise<void> {
     const token = useAuthStore.getState().accessToken;
@@ -113,7 +120,7 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
 
         console.log('Starting stream with sessionId:', sessionId, 'message:', userMsg);
 
-        const response = await fetch('http://localhost:8000/messages/simple-stream', {
+        const response = await fetch(`${API_BASE_URL}/messages/simple-stream`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

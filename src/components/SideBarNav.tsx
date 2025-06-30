@@ -1,12 +1,14 @@
-import {HStack, IconButton, createToaster} from "@chakra-ui/react";
+import {HStack, IconButton, createToaster, useRecipe} from "@chakra-ui/react";
 import {Plus, Search} from "lucide-react";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
+import {undefined} from "zod";
+import { iconButton } from "../theme/iconButton.ts";
 
 
 const hstack = {
     width: "100%",
-    bg: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)",
+    // bg: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)",
     backdropFilter: "blur(20px)",
     borderRadius: "20px",
     justifyContent: "space-between",
@@ -61,6 +63,7 @@ const SideBarNav = () => {
     const {createNewSession} = useSessions();
     const [isCreating, setIsCreating] = useState(false);
 
+
     const handleCreateNewSession = async () => {
         if (isCreating) return;
 
@@ -81,7 +84,7 @@ const SideBarNav = () => {
             {...hstack}
         >
             <IconButton
-                {...hstackplus}
+                recipe={iconButton}
                 onClick={handleCreateNewSession}
                 loading={isCreating}
                 disabled={isCreating}
@@ -90,11 +93,7 @@ const SideBarNav = () => {
                 <Plus size={18}/>
             </IconButton>
 
-            <IconButton
-                {...hstackseach}
-            >
-                <Search size={18}/>
-            </IconButton>
+
         </HStack>
     );
 };

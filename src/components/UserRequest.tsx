@@ -1,4 +1,4 @@
-import {Box, HStack, IconButton, Editable, VStack, Flex} from "@chakra-ui/react";
+import {Box, Editable, Flex, HStack, IconButton, type ConditionalValue} from "@chakra-ui/react";
 import type {Message} from "../entities/Message.ts";
 import {Check, Copy, User} from "lucide-react";
 import {LuCheck, LuPencilLine, LuX} from "react-icons/lu";
@@ -27,7 +27,6 @@ const box = {
 }
 
 
-const flexMain = {}
 
 const editableInput = {
     wordBreak: "break-word",
@@ -45,7 +44,7 @@ const editableInput = {
 
 const editableIcon = {
     variant: "outline",
-    size: "xs",
+    size: "xs" ,
     colorScheme: "purple",
     bg: "white",
     color: "purple.600",

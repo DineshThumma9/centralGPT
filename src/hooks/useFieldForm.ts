@@ -18,7 +18,7 @@ const useFieldForm = (fieldName: string) => {
   };
 
   return {
-    // Ensure all return values are proper types
+
     value: String(field.value || ""),
     touched: Boolean(field.touched),
     error: String(field.error || ""),

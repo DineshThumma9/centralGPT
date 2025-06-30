@@ -2,6 +2,7 @@ import { login, register } from "../api/auth-api.ts";
 import useValidationStore from "../store/validationStore.ts";
 import useAuthStore from "../store/authStore.ts";
 import useInitStore from "../store/initStore.ts";
+import sessionStore from "../store/sessionStore.ts";
 
 export const useAuth = () => {
 
@@ -28,8 +29,7 @@ export const useAuth = () => {
       setRefreshToken(refresh)
 
 
-      // Update auth store
-      // setAuth(access, username);
+
 
       console.log("Login successful, tokens stored");
     } catch (error) {
@@ -51,14 +51,13 @@ export const useAuth = () => {
 
       const { access, refresh } = res;
 
-      // Store tokens in localStorage
+
 
             setAccessToken(access)
       setRefreshToken(refresh)
 
 
-      // Update auth store
-      // setAuth(access, username);
+
 
       console.log("Registration successful, tokens stored");
     } catch (error) {
@@ -70,6 +69,7 @@ export const useAuth = () => {
   const logoutUser=()=>{
         clearAllFields()
         clearInit()
+       sessionStore.getState().clearAllSessions();
         logout()
   }
 

@@ -2,10 +2,10 @@ import axios, { AxiosError } from "axios";
 
 
 
-
+const API_BASE_URL =  process.env.REACT_APP_API_URL || 'http://localhost:8000/auth';
 
 export const API = axios.create({
-  baseURL: "http://localhost:8000/auth",
+     baseURL: `${API_BASE_URL}`,
   withCredentials: true,
 });
 

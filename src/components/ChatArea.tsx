@@ -43,9 +43,8 @@ const bodyBox = {
 const footerBox = {
 
     w: "full",
-    bg: "rgba(26, 11, 46, 0.9)",
     backdropFilter: "blur(10px)",
-    borderColor: "purple.600",
+    // borderColor: "purple.600",
     flexShrink: 0,
     zIndex: 100,
 }

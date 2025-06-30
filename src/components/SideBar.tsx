@@ -1,13 +1,12 @@
 // src/components/SideBar.tsx
-import {Box, Button, HStack, Stack, Text, VStack} from "@chakra-ui/react";
+import {Box, Button,  Stack, Text, useSlotRecipe, VStack} from "@chakra-ui/react";
 import {FiChevronLeft, FiChevronRight} from "react-icons/fi";
 import {useEffect, useState} from "react";
 import SideBarNav from "./SideBarNav.tsx";
-import {SettingsIcon} from "lucide-react";
 import SessionComponent from "./SessionComponent.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
-import type Session from "../entities/Session.ts";
+import type {Session} from "../entities/Session.ts";
 
 interface SidebarProps {
     onCollapse?: (collapsed: boolean) => void;
@@ -26,18 +25,7 @@ const box = {
     borderColor: "purple.600",
     position: "relative",
     boxShadow: "4px 0 20px rgba(147, 51, 234, 0.1)",
-    css: {
-        "&::-webkit-scrollbar": {
-            width: "6px",
-        },
-        "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "rgba(147, 51, 234, 0.5)",
-            borderRadius: "3px",
-        },
-        "&::-webkit-scrollbar-track": {
-            backgroundColor: "transparent",
-        },
-    }
+
 }
 
 
@@ -69,21 +57,7 @@ const mpthstate = {
     overflowY: "auto",
     flex: "1",
     pr: 2,
-    css: {
-        "&::-webkit-scrollbar": {
-            width: "6px",
-        },
-        "&::-webkit-scrollbar-track": {
-            background: "transparent",
-        },
-        "&::-webkit-scrollbar-thumb": {
-            background: "rgba(147, 51, 234, 0.5)",
-            borderRadius: "3px",
-        },
-        "&::-webkit-scrollbar-thumb:hover": {
-            background: "rgba(147, 51, 234, 0.7)",
-        },
-    }
+
 }
 
 const sesssion = {
@@ -96,9 +70,11 @@ const sesssion = {
 
 export default function Sidebar({onCollapse}: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
-    const [sessions, setSessions] = useState<Session[]>([]);
+    const [sessions, setSessions] = useState<typeof Session[]>([]);
     const [currentSession, setCurrentSession] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const buttons = useSlotRecipe({key:"buttons"})
+    const styles = buttons()
 
     const {getSessions, selectSession} = useSessions();
 
@@ -143,6 +119,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                 height={collapsed ? "32px" : "52px"}
                 onClick={handleToggle}
                 {...collapsablebutton}
+
 
             >
                 {collapsed ? <FiChevronRight/> : <FiChevronLeft/>}
@@ -193,6 +170,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                                             bg={isActive ? "rgba(147, 51, 234, 0.2)" : "transparent"}
                                             border={isActive ? "1px solid" : "1px solid transparent"}
                                             borderColor={isActive ? "purple.400" : "transparent"}
+                                            borderRadius={"22px"}
                                         >
                                             <SessionComponent
                                                 bg={isActive ? "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)" : "rgba(45, 27, 105, 0.3)"}

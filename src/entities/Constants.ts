@@ -7,6 +7,7 @@ export const Constants = () => {
     "gemma/Gemma-3-27B",
     "togethercomputer/StripedHyena-Nous-7B",
     "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
+      "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
   ];
 
   const deepInfraModels: string[] = [
@@ -85,8 +86,11 @@ export const Constants = () => {
     "gemini",
     "vertex",
     "azure",
-    "groq",
+    "GROQ",
     "openrouter",
+      "mistral",
+      "deepinfra",
+      "together"
   ];
 
   const ollamaModels: string[] = [

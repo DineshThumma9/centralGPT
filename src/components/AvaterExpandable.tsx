@@ -1,168 +1,149 @@
-import {Avatar, Button, Menu, MenuPositioner, Portal, Separator, VStack} from "@chakra-ui/react";
-import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
-import {useAuth} from "../hooks/useAuth.ts";
-import {useNavigate} from "react-router-dom";
+import {
+    Avatar,
+    Button,
+    IconButton,
+    VStack,
+    Portal,
+    MenuPositioner,
+    Separator,
+    Text
+} from "@chakra-ui/react";
+import { BiCog, BiLogOut, BiUser } from "react-icons/bi";
+import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "./ui/menu.tsx";
+import { useAuth } from "../hooks/useAuth.ts";
+import { useNavigate } from "react-router-dom";
 import useInitStore from "../store/initStore.ts";
 
-
-
-const menuButton = {
-         variant:"ghost",
-                        size:"sm",
-                        p:0,
-                        border:"0px",
-                        bg:"transparent",
-                        _hover:{
-                            borderRadius: "full",
-                            bg: "purple.50",
-                            transform: "scale(1.05)",
-                            transition: "all 0.2s ease"
-                        },
-                        _focus:{
-                            boxShadow: "0 0 0 2px rgba(147, 51, 234, 0.3)",
-                            outline: "none"
-                        },
-                        _active:{
-                            transform: "scale(0.95)"
-                        },
-                        transition:"all 0.2s ease",
-                        zIndex:2
-}
-
-
-const avatorRoot = {
-       size:"sm",
-                            border:"2px solid",
-                            borderColor:"purple.200",
-                            _hover:{
-                                borderColor: "purple.300",
-                                boxShadow: "0 4px 12px rgba(147, 51, 234, 0.3)"
-                            },
-                            transition:"all 0.2s ease"
-}
-
+// Theme-consistent styles
+const avatarButton = {
+    bg: "linear-gradient(135deg, rgba(26, 10, 46, 0.6) 0%, rgba(45, 27, 61, 0.6) 100%)",
+    borderRadius: "50%",
+    border: "1px solid rgba(139, 69, 197, 0.15)",
+    boxShadow: "0 4px 15px rgba(26, 10, 46, 0.2)",
+    backdropFilter: "blur(10px)",
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    _hover: {
+        bg: "linear-gradient(135deg, rgba(139, 69, 197, 0.2) 0%, rgba(107, 70, 193, 0.2) 100%)",
+        transform: "translateY(-1px)",
+        boxShadow: "0 8px 25px rgba(139, 69, 197, 0.15)"
+    },
+    p: 0,
+    minW: "auto",
+    h: "40px",
+    w: "40px"
+};
 
 const menuContent = {
-
-}
+    bg: "linear-gradient(135deg, #1a0a2e 0%, #2d1b3d 100%)",
+    borderColor: "rgba(139, 69, 197, 0.3)",
+    shadow: "0 10px 40px rgba(26, 10, 46, 0.4)",
+    borderRadius: "12px",
+    border: "1px solid rgba(139, 69, 197, 0.2)",
+    backdropFilter: "blur(20px)",
+    minW: "200px"
+};
 
 const menuItem = {
+    color: "rgba(255, 255, 255, 0.9)",
+    borderRadius: "8px",
+    mx: 1,
+    my: 1,
+    _hover: {
+        bg: "rgba(139, 69, 197, 0.2)",
+        color: "white"
+    }
+};
 
-}
+const logoutMenuItem = {
+    ...menuItem,
+    _hover: {
+        bg: "rgba(239, 68, 68, 0.2)",
+        color: "white"
+    }
+};
+
+const separator = {
+    borderColor: "rgba(139, 69, 197, 0.2)",
+    my: 1
+};
+
+const iconButton = {
+    size: "sm" as const,
+    variant: "ghost" as const,
+    color: "rgba(255, 255, 255, 0.7)",
+    minW: "auto"
+};
+
 const AvatarExpandable = () => {
-    const {logout} = useAuth();
-    const navigate = useNavigate()
-    const {username, email} = useInitStore()
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    const { username, email } = useInitStore();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    };
 
     return (
-        <VStack>
-            <Menu.Root>
-                <Menu.Trigger asChild>
-                    <Button
-                        {...menuButton}
-                    >
-                        <Avatar.Root
-                            {...avatorRoot}
-                        >
+        <VStack gap={0}>
+            <MenuRoot>
+                <MenuTrigger asChild>
+                    <Button {...avatarButton}>
+                           <Avatar.Root
+                               bg="linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)"
+                            color="white">
                             <Avatar.Fallback
                                 name={username || "user"}
-                                bg="linear-gradient(135deg, purple.500, violet.500)"
-                                color="white"
-                                fontWeight="semibold"
+
                             />
-                            <Avatar.Image
-                                zIndex={2}
-                                borderRadius="full"
-                            />
+                            <Avatar.Image  />
                         </Avatar.Root>
+
                     </Button>
-                </Menu.Trigger>
+                </MenuTrigger>
 
                 <Portal>
                     <MenuPositioner>
-                        <Menu.Content
-                            bg="white"
-                            border="1px solid"
-                            borderColor="purple.200"
-                            borderRadius="xl"
-                            boxShadow="0 8px 32px rgba(147, 51, 234, 0.15)"
-                            p={2}
-                            minW="200px"
-                        >
-                            <Menu.Item
-                                value="profile"
-                                _hover={{
-                                    bg: "purple.50",
-                                    borderRadius: "lg"
-                                }}
-                                px={3}
-                                py={2}
-                                color="purple.700"
-                                fontWeight="medium"
-                            >
-                                <BiUser style={{marginRight: 8, color: "#8B5CF6"}}/>
-                                {username}
-                            </Menu.Item>
+                        <MenuContent {...menuContent}>
+                            <MenuItem value="username" {...menuItem}>
+                                <IconButton {...iconButton}>
+                                    <BiUser />
+                                </IconButton>
+                                <Text fontSize="sm" fontWeight="medium">
+                                    {username || "User"}
+                                </Text>
+                            </MenuItem>
 
-                            <Separator
-                                borderColor="purple.100"
-                                my={1}
-                            />
+                            <Separator {...separator} />
 
-                            <Menu.Item
-                                value="email"
-                                px={3}
-                                py={2}
-                                color="gray.600"
-                                fontSize="sm"
-                                cursor="default"
-                                _hover={{}}
-                            >
-                                {email}
-                            </Menu.Item>
+                            <MenuItem value="email" {...menuItem}>
+                                <Text fontSize="xs" color="rgba(255, 255, 255, 0.7)" pl={6}>
+                                    {email || "No email"}
+                                </Text>
+                            </MenuItem>
 
-                            <Menu.Item
-                                value="customize"
-                                _hover={{
-                                    bg: "purple.50",
-                                    borderRadius: "lg"
-                                }}
-                                px={3}
-                                py={2}
-                                color="purple.700"
-                                fontWeight="medium"
-                            >
-                                <BiCog style={{marginRight: 8, color: "#8B5CF6"}}/>
-                                Customize
-                            </Menu.Item>
+                            <Separator {...separator} />
 
-                            <Separator
-                                borderColor="purple.100"
-                                my={1}
-                            />
+                            <MenuItem value="customize" {...menuItem}>
+                                <IconButton {...iconButton}>
+                                    <BiCog />
+                                </IconButton>
+                                <Text fontSize="sm">Customize</Text>
+                            </MenuItem>
 
-                            <Menu.Item
-                                value="logout"
-                                onClick={() => {
-                                    logout()
-                                    navigate("/login")
-                                }}
-                                _hover={{
-                                    bg: "red.50",
-                                    borderRadius: "lg"
-                                }}
-                                px={3}
-                                py={2}
-                                color="red.600"
-                                fontWeight="medium"
-                            >
-                                <BiLogOut style={{marginRight: 8, color: "#DC2626"}}/>
-                                Logout
-                            </Menu.Item>
-                        </Menu.Content>
+                            <MenuItem value="logout" {...logoutMenuItem} onClick={handleLogout}>
+                                <IconButton
+                                    {...iconButton}
+                                    color="rgba(239, 68, 68, 0.8)"
+                                >
+                                    <BiLogOut />
+                                </IconButton>
+                                <Text fontSize="sm">Logout</Text>
+                            </MenuItem>
+                        </MenuContent>
                     </MenuPositioner>
                 </Portal>
-            </Menu.Root>
+            </MenuRoot>
         </VStack>
     );
 };

@@ -1,6 +1,6 @@
 import {Box, HStack, IconButton, Textarea,} from "@chakra-ui/react";
 import {Send} from "lucide-react";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
@@ -11,27 +11,15 @@ import Message from "../entities/Message.ts";
 
 const box = {
     w: "full",
-    bg: "transparent",
+    // bg: "transparent",
     backdropFilter: "blur(20px)",
     py: 4,
     px: 4,
     overflow: "auto",
-    css: {
-        "&::-webkit-scrollbar": {
-            width: "6px",
-        },
-        "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "rgba(139, 92, 246, 0.3)",
-            borderRadius: "3px",
-        },
-        "&::-webkit-scrollbar-track": {
-            backgroundColor: "transparent",
-        },
-    }
 }
 
 const hstack = {
-    bg: "rgba(30, 30, 40, 0.9)",
+
     backdropFilter: "blur(10px)",
     border: "2px solid",
     borderColor: "rgba(139, 92, 246, 0.3)",
@@ -57,7 +45,8 @@ const hstack = {
         bottom: 0,
         borderRadius: '2xl',
         background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1))',
-        zIndex: -1
+        zIndex: -1,
+
     }
 }
 
@@ -72,7 +61,6 @@ const txtarea = {
     overflow: "auto",
     placeholder: "Type your message...",
     fontSize: "md",
-    // lineHeight:,
     bg: "transparent",
     _placeholder: {color: "rgba(255, 255, 255, 0.5)"},
     _focus: {
@@ -80,18 +68,6 @@ const txtarea = {
         outline: "none"
     },
 
-    css: {
-        "&::-webkit-scrollbar": {
-            width: "6px",
-        },
-        "&::-webkit-scrollbar-thumb": {
-            backgroundColor: "rgba(139, 92, 246, 0.3)",
-            borderRadius: "3px",
-        },
-        "&::-webkit-scrollbar-track": {
-            backgroundColor: "transparent",
-        },
-    }
 }
 
 const send = {}
@@ -106,6 +82,11 @@ const SendRequest = () => {
     const {addMessage} = sessionStore();
 
     type MessageType = z.infer<typeof Message>;
+
+
+console.log(`Sending : ${sending}`)
+
+console.log(`Sending : ${sending}`)
 
     const handleSendMessage = async () => {
         if (!input.trim() || sending) return;

@@ -1,4 +1,13 @@
 import {createSystem, defineConfig, defaultConfig} from "@chakra-ui/react";
+import {badgeRecipe} from "./theme/BadgeTheme.ts";
+import { menuSlots} from "./theme/menuhelper.ts";
+import {iconButton} from "./theme/iconButton.ts";
+import {dialogcust} from "./theme/dialogcust.ts";
+import {buttonsReci} from "./theme/buttons.ts";
+import {messageRecipes} from "./theme/file.ts";
+import {buttonRecipes} from "./theme/buttonRecipes.ts";
+import {editableRecipes} from "./theme/editableRecipes.ts";
+import {codeBlockRecipes} from "./theme/codeBlockRecipes.ts";
 // 1. Design Tokens
 
 
@@ -10,7 +19,7 @@ const tokens = {
       500: { value: 'rgba(255, 255, 255, 0.72)' },
     },
     brand: {
-      primary: { value: '#171616' },
+      primary: { value: 'purple.200' },
     },
     whiteAlpha: {
       200: { value: 'rgba(255, 255, 255, 0.08)' },
@@ -38,9 +47,9 @@ const tokens = {
 // 2. Semantic Tokens
 const semanticTokens = {
   colors: {
-    "app.bg": { value: "{colors.brand.primary}" },
-    "app.text": { value: "{colors.white}" },
-    "app.text.secondary": { value: "{colors.gray.500}" },
+    "app.bg": { value: "linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)" },
+    "app.text": { value: "purple.100" },
+    "app.text.secondary": { value: "linear-gradient(135deg, purple.500, violet.500)" },
   },
 };
 
@@ -63,14 +72,18 @@ const globalCss = {
         height: "5px",
     },
 
-    "::webkit-scrollbar-thumb": {
-        color: "black",
-        "borderRadius": "4px",
-    },
 
-    '::-webkit-scrollbar-track': {
-        background: 'transparent',
-    },
+
+       '::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(147, 51, 234, 0.3)',
+            borderRadius: '3px',
+        },
+
+
+
+      '::-webkit-scrollbar-track': {
+            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+        },
     '*': {
         scrollbarColor: '#718096 transparent',
         scrollbarWidth: 'thin',
@@ -126,15 +139,32 @@ const globalCss = {
     },
 };
 
-// 4. Final Config and System
+
+
+
 const config = defineConfig({
-    theme: {
-        tokens,
-        semanticTokens,
+  theme: {
+    tokens,
+    semanticTokens,
+    recipes: {
+      badge: badgeRecipe,
     },
-    globalCss,
+    slotRecipes: {
+      menuHelper: menuSlots,
+      dialogHelper: dialogcust,
+      message: messageRecipes,
+      codeBlock: codeBlockRecipes,
+      editable: editableRecipes,
+    },
+  },
+  globalCss: {
+    ...globalCss,
+    '@keyframes blink': {
+      '0%, 50%': { opacity: 1 },
+      '51%, 100%': { opacity: 0 },
+    },
+  },
 });
 
 const system = createSystem(defaultConfig, config);
-
 export default system;

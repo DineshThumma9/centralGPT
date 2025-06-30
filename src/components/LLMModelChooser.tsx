@@ -67,6 +67,7 @@ const LLMModelChooser = () => {
 
         try {
             await llmSelection(provider);
+
         } catch (error) {
             console.error("Failed to set LLM provider:", error);
         }

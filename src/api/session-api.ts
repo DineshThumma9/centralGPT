@@ -1,23 +1,42 @@
 import axios from "axios";
-
 import useAuthStore from "../store/authStore.ts";
-import {z} from "zod/v4";
-import Session from "../entities/Session.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import useInitStore from "../store/initStore.ts";
+import useValidationStore from "../store/validationStore.ts";
+import Session from "../entities/Session.ts";
 import Message from "../entities/Message.ts";
 
+
+const API_BASE_URL =  process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+
 const API = axios.create({
-    baseURL: "http://localhost:8000/sessions",
+    baseURL: `${API_BASE_URL} + "/sessions`,
     withCredentials: true,
     validateStatus: (status) => status >= 200 && status < 300,
 });
 
 const apiSetUp = axios.create({
-    baseURL: "http://localhost:8000/setup",
+    baseURL: `${API_BASE_URL}` + "/setup" ,
     withCredentials: true,
     validateStatus: (status) => status >= 200 && status < 300
 });
+
+
+const handleAuthError = () => {
+    console.log("Authentication failed - clearing user data");
+
+
+    useAuthStore.getState().clearAuth();
+    useSessionStore.getState().clearAllSessions();
+    useInitStore.getState().clearInit();
+    useValidationStore.getState().clearAllFields();
+
+    window.location.href = '/login';
+};
+
+
+
 
 API.interceptors.request.use((config) => {
     const token = useAuthStore.getState().accessToken;
@@ -28,48 +47,97 @@ API.interceptors.request.use((config) => {
 });
 
 API.interceptors.response.use(
-  (response) => response,
-  (error) => {
-      if (error.response) {
-          console.error(`API Response Error : ${error.response.status}`, error.response.data);
-      } else if (error.request) {
-          // error.response might be undefined here, so don't access it
-          console.error(`API Request Error`, error.request, error.message);
-      } else {
-          console.error(`Some Error has occurred`, error.message);
-      }
-      return Promise.reject(error);
-  }
+    (response) => response,
+    (error) => {
+
+        if (error.response?.status === 401) {
+            console.error("Authentication error - token expired or invalid");
+            handleAuthError();
+            return Promise.reject(new Error("Authentication failed"));
+        }
+
+        if (error.response) {
+            console.error(`API Response Error: ${error.response.status}`, error.response.data);
+        } else if (error.request) {
+            console.error(`API Request Error:`, error.request, error.message);
+        } else {
+            console.error(`API Error:`, error.message);
+        }
+
+        return Promise.reject(error);
+    }
 );
 
-export const apiKeySelection = async (api_provider: string, api_key: string) => {
+
+apiSetUp.interceptors.request.use((config) => {
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+
+
+apiSetUp.interceptors.response.use(
+    (response) => response,
+    (error) => {
+
+
+        if (error.response?.status === 401) {
+            console.error("Authentication error - token expired or invalid");
+            handleAuthError();
+            return Promise.reject(new Error("Authentication failed"));
+        }
+
+
+        if (error.response) {
+            console.error(`Setup API Response Error: ${error.response.status}`, error.response.data);
+        } else if (error.request) {
+            console.error(`Setup API Request Error:`, error.request, error.message);
+        } else {
+            console.error(`Setup API Error:`, error.message);
+        }
+
+        return Promise.reject(error);
+    }
+);
+
+
+export const apiKeySelection = async (api_prov: string, api_key: string) => {
     const data = {
-        "api_prov": api_provider,
+        "api_prov": api_prov.toUpperCase(),
         "api_key": api_key
     };
 
-    await apiSetUp.post("/init", data, {
+    console.log("API Provider:", api_prov);
+    console.log("API KEY:", api_key);
+
+    const res = await apiSetUp.post("/init", data, {
         headers: {"Content-Type": "application/json"}
     });
 
-    useInitStore.getState().setCurrentAPIProvider(api_provider);
+    console.log(res.data);
+    useInitStore.getState().setCurrentAPIProvider(api_prov);
 };
 
 export const llmSelection = async (llm_class: string) => {
-    await apiSetUp.post(`/providers`, {llm_class}, {
+    console.log(`Provider llm_class ${llm_class}`);
+    await apiSetUp.post(`/providers`, {provider: llm_class}, {
         headers: {"Content-Type": "application/json"}
     });
 };
 
 export const modelSelection = async (model: string) => {
-    await apiSetUp.post(`/models`, {model}, {
+    console.log(`Model selection: ${model}`);
+    await apiSetUp.post(`/models`, {model: model}, {
         headers: {"Content-Type": "application/json"}
     });
 };
 
 export const newSession = async () => {
     const access = useAuthStore.getState().accessToken;
-    console.log("access token :", access);
+    console.log("access token:", access);
 
     const res = await API.post("/new", null, {
         headers: {"Authorization": `Bearer ${access}`}
@@ -86,12 +154,8 @@ export const newSession = async () => {
     });
 };
 
-
-
-
 export const getChatHistory = async (data: { session_id: string; limit?: number }) => {
     const res = await API.get(`/history/${data.session_id}`);
-
     if (!res?.data) throw new Error("Session History Empty");
     return res.data;
 };
@@ -100,12 +164,9 @@ export const deleteSession = async (session_id: string) => {
     await API.delete(`/${session_id}`);
 };
 
-// export type Message = z.infer<typeof Message>;
-
-export const testMsg = async (msg: string)=> {
+export const testMsg = async (msg: string) => {
     const session_id = useSessionStore.getState().current_session;
-
-    if (!session_id) throw new Error("Missing session ID in localStorage");
+    if (!session_id) throw new Error("Missing session ID");
 
     const payload = {session_id, msg};
     const res = await API.post("/simple/", payload, {
@@ -143,52 +204,22 @@ export const processPdf = async (files: File[] | FileList) => {
     return res.data;
 };
 
-// Request interceptor
-API.interceptors.request.use((config) => {
-    const token = useAuthStore.getState().accessToken;
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
-API.interceptors.response.use(
-  (response) => response,
-  (error) => {
-      if (error.response) {
-          console.error(`API Response Error : ${error.response.status}`, error.response.data);
-      } else if (error.request) {
-          // error.response might be undefined here, so don't access it
-          console.error(`API Request Error`, error.request, error.message);
-      } else {
-          console.error(`Some Error has occurred`, error.message);
-      }
-      return Promise.reject(error);
-  }
-);
 
 
-// Apply same interceptors to setup API
-apiSetUp.interceptors.request.use((config) => {
-    const token = useAuthStore.getState().accessToken;
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+function startHealthCheck() {
+    setInterval(async () => {
+        try {
+            const response = await fetch('http://localhost:8000/health');
+            if (!response.ok) {
+                handleServerDown();
+            }
+        } catch (error) {
+            handleServerDown();
+        }
+    }, 30000);
+}
+
+function handleServerDown() {
 
 
-apiSetUp.interceptors.response.use(
-    (response) => response,
-     (error) => {
-      if (error.response) {
-          console.error(`API Response Error : ${error.response.status}`, error.response.data);
-      } else if (error.request) {
-          // error.response might be undefined here, so don't access it
-          console.error(`API Request Error`, error.request, error.message);
-      } else {
-          console.error(`Some Error has occurred`, error.message);
-      }
-      return Promise.reject(error);
-  }
-);
+}
