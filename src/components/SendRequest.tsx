@@ -5,7 +5,7 @@ import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import {v4} from "uuid";
-import {z} from "zod/v4";
+import {z} from "zod";
 import Message from "../entities/Message.ts";
 
 
@@ -15,7 +15,7 @@ const box = {
     backdropFilter: "blur(20px)",
     py: 4,
     px: 4,
-    overflow: "auto",
+    overflow: "auto" as const,
 }
 
 const hstack = {
@@ -35,10 +35,10 @@ const hstack = {
         transform: "translateY(-2px)"
     },
     transition: "all 0.3s ease",
-    position: "relative",
+    position: "relative" as const,
     _before: {
         content: '""',
-        position: 'absolute',
+        position: 'absolute' as const,
         top: 0,
         left: 0,
         right: 0,
@@ -51,14 +51,14 @@ const hstack = {
 }
 
 const txtarea = {
-    resize: "none",
+    resize: "none" as const,
     minH: "44px",
     maxH: "120px",
     color: "white",
     border: "none",
     px: 0,
     py: 2,
-    overflow: "auto",
+    overflow: "auto" as const,
     placeholder: "Type your message...",
     fontSize: "md",
     bg: "transparent",
@@ -70,7 +70,6 @@ const txtarea = {
 
 }
 
-const send = {}
 
 
 
@@ -81,6 +80,8 @@ const SendRequest = () => {
     const {tstMsgFunc, streamMessage} = useSessions();
     const {addMessage} = sessionStore();
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     type MessageType = z.infer<typeof Message>;
 
 
@@ -117,6 +118,8 @@ console.log(`Sending : ${sending}`)
             }
 
             if (shouldStream) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 await streamMessage(messageContent);
             } else {
                 await tstMsgFunc(messageContent);

@@ -30,8 +30,8 @@ export const buttonRecipes = defineSlotRecipe({
       zIndex: 2,
     },
     action: {
-      size: "sm",
-      variant: "ghost",
+
+
       transition: "all 0.2s ease",
     },
   },

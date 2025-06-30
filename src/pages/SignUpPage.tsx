@@ -26,7 +26,7 @@ const SignUpPage = () => {
     const { clearAllFields } = useValidationStore();
     const [isLoading, setIsLoading] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
-    const [isError, setError] = useState("")
+    const [, setError] = useState("")
 
     const username = useFieldForm("username")
     const password = useFieldForm("password")

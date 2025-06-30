@@ -1,11 +1,8 @@
-import {createSystem, defineConfig, defaultConfig} from "@chakra-ui/react";
+import {createSystem, defaultConfig, defineConfig} from "@chakra-ui/react";
 import {badgeRecipe} from "./theme/BadgeTheme.ts";
-import { menuSlots} from "./theme/menuhelper.ts";
-import {iconButton} from "./theme/iconButton.ts";
+import {menuSlots} from "./theme/menuhelper.ts";
 import {dialogcust} from "./theme/dialogcust.ts";
-import {buttonsReci} from "./theme/buttons.ts";
 import {messageRecipes} from "./theme/file.ts";
-import {buttonRecipes} from "./theme/buttonRecipes.ts";
 import {editableRecipes} from "./theme/editableRecipes.ts";
 import {codeBlockRecipes} from "./theme/codeBlockRecipes.ts";
 // 1. Design Tokens
@@ -142,6 +139,7 @@ const globalCss = {
 
 
 
+
 const config = defineConfig({
   theme: {
     tokens,
@@ -159,10 +157,7 @@ const config = defineConfig({
   },
   globalCss: {
     ...globalCss,
-    '@keyframes blink': {
-      '0%, 50%': { opacity: 1 },
-      '51%, 100%': { opacity: 0 },
-    },
+
   },
 });
 

@@ -41,11 +41,11 @@ export const codeBlockRecipes = defineSlotRecipe({
       maxHeight: "400px",
     },
     copyButton: {
-      className: "copy-button",
+
       opacity: 0,
       transition: "opacity 0.2s",
-      size: "sm",
-      variant: "ghost",
+
+
       color: "white",
     },
     inline: {

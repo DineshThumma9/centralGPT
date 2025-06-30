@@ -1,9 +1,8 @@
-import {HStack, IconButton, createToaster, useRecipe} from "@chakra-ui/react";
-import {Plus, Search} from "lucide-react";
+import {HStack, IconButton} from "@chakra-ui/react";
+import {Plus} from "lucide-react";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
-import {undefined} from "zod";
-import { iconButton } from "../theme/iconButton.ts";
+import {iconButton} from "../theme/iconButton.ts";
 
 
 const hstack = {
@@ -20,43 +19,43 @@ const hstack = {
 }
 
 
-const hstackplus = {
-    "arialabel": "Create new chat",
-    variant: "ghost",
-    size: "sm",
-    borderRadius: "full",
-    bg: "linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)",
-    color: "white",
-    _hover: {
-        bg: "linear-gradient(135deg, #9f4fd9 0%, #7c3aed 100%)",
-        transform: "scale(1.05)",
-        boxShadow: "0 6px 20px rgba(139, 69, 197, 0.3)"
-    },
-    _active: {
-        transform: "scale(0.95)"
-    },
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-}
-
-const hstackseach = {
-    "aria-label": "Search chats",
-    variant: "ghost",
-    size: "sm",
-    borderRadius: "full",
-    color: "rgba(139, 69, 197, 0.8)",
-    bg: "rgba(139, 69, 197, 0.1)",
-    _hover: {
-        bg: "rgba(139, 69, 197, 0.2)",
-        color: "#8b45c5",
-        transform: "scale(1.05)",
-        boxShadow: "0 4px 15px rgba(139, 69, 197, 0.2)"
-    },
-    _active: {
-        transform: "scale(0.95)"
-    },
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-    p: 2,
-}
+// const hstackplus = {
+//     "arialabel": "Create new chat",
+//     variant: "ghost",
+//     size: "sm",
+//     borderRadius: "full",
+//     bg: "linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)",
+//     color: "white",
+//     _hover: {
+//         bg: "linear-gradient(135deg, #9f4fd9 0%, #7c3aed 100%)",
+//         transform: "scale(1.05)",
+//         boxShadow: "0 6px 20px rgba(139, 69, 197, 0.3)"
+//     },
+//     _active: {
+//         transform: "scale(0.95)"
+//     },
+//     transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+// }
+//
+// const hstackseach = {
+//     "aria-label": "Search chats",
+//     variant: "ghost",
+//     size: "sm",
+//     borderRadius: "full",
+//     color: "rgba(139, 69, 197, 0.8)",
+//     bg: "rgba(139, 69, 197, 0.1)",
+//     _hover: {
+//         bg: "rgba(139, 69, 197, 0.2)",
+//         color: "#8b45c5",
+//         transform: "scale(1.05)",
+//         boxShadow: "0 4px 15px rgba(139, 69, 197, 0.2)"
+//     },
+//     _active: {
+//         transform: "scale(0.95)"
+//     },
+//     transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+//     p: 2,
+// }
 
 
 const SideBarNav = () => {

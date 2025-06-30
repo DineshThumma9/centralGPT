@@ -1,4 +1,4 @@
-import {Box, Editable, Flex, HStack, IconButton, type ConditionalValue} from "@chakra-ui/react";
+import {Box, Editable, Flex, HStack, IconButton} from "@chakra-ui/react";
 import type {Message} from "../entities/Message.ts";
 import {Check, Copy, User} from "lucide-react";
 import {LuCheck, LuPencilLine, LuX} from "react-icons/lu";
@@ -18,9 +18,9 @@ const box = {
     fontSize: "md",
     color: "white",
     lineHeight: "1.6",
-    whiteSpace: "pre-wrap",
-    wordBreak: "break-word",
-    overflowWrap: "break-word",
+    whiteSpace: "pre-wrap" as const,
+    wordBreak: "break-word" as const,
+    overflowWrap: "break-word" as const,
     boxShadow: "0 2px 12px rgba(147, 51, 234, 0.3)",
     border: "1px solid",
     borderColor: "purple.400"
@@ -29,9 +29,9 @@ const box = {
 
 
 const editableInput = {
-    wordBreak: "break-word",
-    overflowWrap: "break-word",
-    whiteSpace: "pre-wrap",
+    wordBreak: "break-word" as const,
+    overflowWrap: "break-word" as const,
+    whiteSpace: "pre-wrap" as const,
     bg: "purple.600",
     border: "1px solid",
     borderColor: "purple.400",
@@ -43,8 +43,8 @@ const editableInput = {
 
 
 const editableIcon = {
-    variant: "outline",
-    size: "xs" ,
+    variant: "outline" as const,
+    size: "xs" as const,
     colorScheme: "purple",
     bg: "white",
     color: "purple.600",
@@ -53,9 +53,8 @@ const editableIcon = {
 
 
 const actionButton = {
-
-    size: "sm",
-    variant: "ghost",
+    size: "sm" as const,
+    variant: "ghost" as const,
     _hover: {bg: "purple.50"}
 }
 
@@ -71,7 +70,7 @@ const UserRequest = ({msg}: Props) => {
         } catch (err) {
             toaster.create({
                 title: "Failed to copy",
-                type: "error",
+                type: "error " + err,
                 duration: 2000,
             });
         }
@@ -115,6 +114,7 @@ const UserRequest = ({msg}: Props) => {
                                 <Editable.CancelTrigger asChild>
                                     <IconButton
                                         {...editableIcon}
+                                        aria-label="Cancel edit"
                                     >
                                         <LuX/>
                                     </IconButton>
@@ -122,6 +122,7 @@ const UserRequest = ({msg}: Props) => {
                                 <Editable.SubmitTrigger asChild>
                                     <IconButton
                                         {...editableIcon}
+                                        aria-label="Submit edit"
                                     >
                                         <LuCheck/>
                                     </IconButton>
@@ -150,12 +151,14 @@ const UserRequest = ({msg}: Props) => {
                     {...actionButton}
                     colorScheme={copied ? "purple" : "gray"}
                     onClick={handleCopy}
+                    aria-label="Copy message"
                 >
                     {copied ? <Check color="purple" size={16}/> : <Copy color="gray" size={16}/>}
                 </IconButton>
 
                 <IconButton
                     {...actionButton}
+                    aria-label="Edit message"
                 >
                     <LuPencilLine color="gray" size={16}/>
                 </IconButton>

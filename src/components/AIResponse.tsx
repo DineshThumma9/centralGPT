@@ -18,7 +18,7 @@ interface Props {
 
 
 export const streamCursor = {
-    as: "span",
+    as: "span" as const,
     display: "inline-block",
     w: "2px",
     h: "1em",
@@ -41,8 +41,8 @@ export const messageBox = {
     border: "2px solid",
     borderColor: "rgba(139, 92, 246, 0.3)",
     boxShadow: "0 4px 20px rgba(147, 51, 234, 0.2)",
-    wordBreak: "break-word",
-    overflowWrap: "break-word",
+    wordBreak: "break-word" as const,
+    overflowWrap: "break-word" as const,
     _hover: {
         borderColor: "rgba(139, 92, 246, 0.5)",
         boxShadow: "0 6px 25px rgba(147, 51, 234, 0.3)"
@@ -60,10 +60,10 @@ export const avatarBox = {
 }
 
 export const codeBlockContainer = {
-    position: "relative",
+    position: "relative" as const,
     bg: "rgba(15, 15, 25, 0.9)",
     borderRadius: "lg",
-    overflow: "hidden",
+    overflow: "hidden" as const,
     my: 3,
     border: "2px solid",
     borderColor: "rgba(139, 92, 246, 0.4)",
@@ -78,8 +78,8 @@ export const codeBlockContainer = {
     boxShadow: "0 2px 15px rgba(147, 51, 234, 0.2)"
 }
 export const codeBlockHeader = {
-    justify: "space-between",
-    align: "center",
+    justify: "space-between" as const,
+    align: "center" as const,
     px: 4,
     py: 2,
     bg: "linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(168, 85, 247, 0.8))",
@@ -87,16 +87,16 @@ export const codeBlockHeader = {
     borderColor: "rgba(139, 92, 246, 0.4)"
 }
 export const codeBlockContent = {
-    as: "pre",
+    as: "pre" as const,
     p: 4,
-    overflow: "auto",
+    overflow: "auto" as const,
     m: 0,
     bg: "rgba(15, 15, 25, 0.9)",
     maxH: "400px"
 }
 
 export const inlineCode = {
-    as: "code",
+    as: "code" as const,
     bg: "rgba(139, 92, 246, 0.2)",
     px: 2,
     py: 1,
@@ -109,18 +109,18 @@ export const inlineCode = {
 }
 
 export const streamingContent = {
-    as: "div",
-    whiteSpace: "pre-wrap",
+    as: "div" as const,
+    whiteSpace: "pre-wrap" as const,
     fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace",
     fontSize: "14px",
-    wordBreak: "break-word",
-    overflowWrap: "break-word",
+    wordBreak: "break-word" as const,
+    overflowWrap: "break-word" as const,
     color: "purple.100"
 }
 
 const actionButton = {
-    size: "sm",
-    variant: "ghost",
+    size: "sm" as const,
+    variant: "ghost" as const,
     color: "purple.200",
     _hover: {
         bg: "rgba(139, 92, 246, 0.2)",
@@ -147,8 +147,7 @@ const AIResponse = ({ msg, idx }: Props) => {
     const [retry, setRetry] = useState(false);
     const [copiedCodeBlocks, setCopiedCodeBlocks] = useState<Record<string, boolean>>({});
 
-    const buttons = useSlotRecipe({key:"buttons"})
-    const styles = buttons()
+
 
     const isLastMessage = useMemo(() => idx === messages.length - 1, [idx, messages.length]);
     const isCurrentlyStreaming = useMemo(() =>
@@ -202,6 +201,9 @@ const AIResponse = ({ msg, idx }: Props) => {
         handleCodeBlockCopy
     );
 
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
     return (
         <Flex
             align="flex-start"
@@ -238,6 +240,7 @@ const AIResponse = ({ msg, idx }: Props) => {
                                     <ReactMarkdown
                                         remarkPlugins={[remarkGfm, remarkBreaks]}
                                         rehypePlugins={[rehypeHighlight]}
+
                                         components={markdownComponents}
                                     >
                                         {displayed}
@@ -257,6 +260,7 @@ const AIResponse = ({ msg, idx }: Props) => {
                                         colorScheme={copied ? "purple" : "gray"}
                                         onClick={handleCopy}
                                         color={copied ? "purple.300" : "purple.200"}
+                                        aria-label="Copy message"
                                     >
                                         {copied ? <Check size={16}/> : <Copy size={16}/>}
                                     </IconButton>
@@ -264,6 +268,7 @@ const AIResponse = ({ msg, idx }: Props) => {
                                     <IconButton
                                         {...actionButton}
                                         onClick={handleRetry}
+                                        aria-label="Retry message"
                                     >
                                         <RepeatIcon size={16}/>
                                     </IconButton>

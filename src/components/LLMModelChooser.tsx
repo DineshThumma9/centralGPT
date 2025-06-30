@@ -32,7 +32,6 @@ const LLMModelChooser = () => {
     const {providers_models, modelsProviders} = Constants();
     const {shouldStream} = useSessionStore();
 
-    const [model, setModel] = useState("");
 
     const {
         setCurrentLLMProvider,
