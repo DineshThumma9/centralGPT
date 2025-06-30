@@ -22,6 +22,8 @@ export const login = (
 
 
     const API_BASE_URL = import.meta.env.VITE_API_URI;
+        console.log(import.meta.env.VITE_API_URI)
+    console.log(API_BASE_URL)
 if (!API_BASE_URL) {
   throw new Error("❌ Missing VITE_API_URI. Check your .env or Vercel env settings.");
 }
@@ -41,7 +43,11 @@ if (!API_BASE_URL) {
 
 export const register = async (username: string, email: string, password: string) => {
 
-    const API_BASE_URL = import.meta.env.VITE_API_URI;
+    const API_BASE_URL = import.meta.env.VITE_API_URI
+
+    console.log(import.meta.env.VITE_API_URI)
+    console.log(API_BASE_URL)
+
 if (!API_BASE_URL) {
   throw new Error("❌ Missing VITE_API_URI. Check your .env or Vercel env settings.");
 }
