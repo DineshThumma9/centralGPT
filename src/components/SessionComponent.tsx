@@ -64,7 +64,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
         setIsDeleting(true);
         try {
             await deleteSessionById(sessionId);
-        } catch(err) {
+        } catch (err) {
             console.log("Error has occurred", err)
         } finally {
             setIsDeleting(false);
@@ -140,7 +140,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                                     }}
                                     transition="all 0.2s"
                                 >
-                                    {title.slice(0,30) + "..."}
+                                    {title.slice(0, 30) + "..."}
                                 </Text>
                             </Editable.Preview>
                             <Editable.Input

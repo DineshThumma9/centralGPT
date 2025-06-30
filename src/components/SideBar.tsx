@@ -1,12 +1,12 @@
 // src/components/SideBar.tsx
-import { Box, Button, Stack, Text, useSlotRecipe, VStack } from "@chakra-ui/react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import {Box, Button, Stack, Text, VStack} from "@chakra-ui/react";
+import {FiChevronLeft, FiChevronRight} from "react-icons/fi";
+import {useEffect, useState} from "react";
 import SideBarNav from "./SideBarNav";
 import SessionComponent from "./SessionComponent";
 import useSessions from "../hooks/useSessions";
 import sessionStore from "../store/sessionStore";
-import type { Session } from "../entities/Session";
+import type {Session} from "../entities/Session";
 
 interface SidebarProps {
     onCollapse?: (collapsed: boolean) => void;
@@ -59,14 +59,14 @@ const sessionStackStyles = {
     transition: "all 0.2s ease-in-out"
 };
 
-export default function Sidebar({ onCollapse }: SidebarProps) {
+export default function Sidebar({onCollapse}: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
     const [sessions, setSessions] = useState<Session[]>([]);
     const [currentSession, setCurrentSession] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
 
-    const { getSessions, selectSession } = useSessions();
+    const {getSessions, selectSession} = useSessions();
 
     const handleToggle = () => {
         const newCollapsed = !collapsed;
@@ -144,13 +144,13 @@ export default function Sidebar({ onCollapse }: SidebarProps) {
                 aria-label="Toggle sidebar"
                 {...collapsibleButtonStyles}
             >
-                {collapsed ? <FiChevronRight /> : <FiChevronLeft />}
+                {collapsed ? <FiChevronRight/> : <FiChevronLeft/>}
             </Button>
 
             <VStack align="stretch" gap={4} height="calc(100% - 80px)">
                 {!collapsed && (
                     <>
-                        <SideBarNav />
+                        <SideBarNav/>
 
                         <VStack {...stackStyles}>
                             {isLoading && sessions.length === 0 && (
@@ -165,7 +165,7 @@ export default function Sidebar({ onCollapse }: SidebarProps) {
                                 <Box p={4}>
                                     <Text fontSize="sm" color="purple.300" textAlign="center" lineHeight="1.6">
                                         No chat sessions yet.
-                                        <br />
+                                        <br/>
                                         Create your first chat!
                                     </Text>
                                 </Box>

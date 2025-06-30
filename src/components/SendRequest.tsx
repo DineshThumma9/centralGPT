@@ -1,6 +1,6 @@
 import {Box, HStack, IconButton, Textarea,} from "@chakra-ui/react";
 import {Send} from "lucide-react";
-import {useEffect, useRef, useState} from "react";
+import { useRef, useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
 import useSessionStore from "../store/sessionStore.ts";

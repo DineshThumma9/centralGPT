@@ -8,7 +8,7 @@ import MenuHelper from "./MenuHelper.tsx";
 import useInitStore from "../store/initStore.ts";
 import BadgeCompo from "./BadgeCompo.tsx";
 import APIKey from "./API-Key.tsx";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import StreamSwitch from "./Switch.tsx";
 import useSessionStore from "../store/sessionStore.ts";
 
