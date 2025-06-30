@@ -1,5 +1,5 @@
 // src/components/AIResponse.tsx
-import {Box, Flex, HStack, IconButton, Spinner, Text, useSlotRecipe} from "@chakra-ui/react";
+import {Box, Flex, HStack, IconButton, Spinner, Text} from "@chakra-ui/react";
 import { Bot, Check, Copy, RepeatIcon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
@@ -16,9 +16,7 @@ interface Props {
     idx: number;
 }
 
-
 export const streamCursor = {
-    as: "span" as const,
     display: "inline-block",
     w: "2px",
     h: "1em",
@@ -26,7 +24,6 @@ export const streamCursor = {
     animation: "blink 1s infinite",
     ml: 1
 }
-
 
 export const messageBox = {
     fontSize: "15px",
@@ -77,6 +74,7 @@ export const codeBlockContainer = {
     transition: "border-color 0.2s",
     boxShadow: "0 2px 15px rgba(147, 51, 234, 0.2)"
 }
+
 export const codeBlockHeader = {
     justify: "space-between" as const,
     align: "center" as const,
@@ -86,8 +84,8 @@ export const codeBlockHeader = {
     borderBottom: "1px solid",
     borderColor: "rgba(139, 92, 246, 0.4)"
 }
+
 export const codeBlockContent = {
-    as: "pre" as const,
     p: 4,
     overflow: "auto" as const,
     m: 0,
@@ -96,7 +94,6 @@ export const codeBlockContent = {
 }
 
 export const inlineCode = {
-    as: "code" as const,
     bg: "rgba(139, 92, 246, 0.2)",
     px: 2,
     py: 1,
@@ -109,7 +106,6 @@ export const inlineCode = {
 }
 
 export const streamingContent = {
-    as: "div" as const,
     whiteSpace: "pre-wrap" as const,
     fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace",
     fontSize: "14px",
@@ -146,8 +142,6 @@ const AIResponse = ({ msg, idx }: Props) => {
     const [copied, setCopied] = useState(false);
     const [retry, setRetry] = useState(false);
     const [copiedCodeBlocks, setCopiedCodeBlocks] = useState<Record<string, boolean>>({});
-
-
 
     const isLastMessage = useMemo(() => idx === messages.length - 1, [idx, messages.length]);
     const isCurrentlyStreaming = useMemo(() =>
@@ -201,9 +195,6 @@ const AIResponse = ({ msg, idx }: Props) => {
         handleCodeBlockCopy
     );
 
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
     return (
         <Flex
             align="flex-start"
@@ -228,19 +219,17 @@ const AIResponse = ({ msg, idx }: Props) => {
                 {!retry ? (
                     <Box {...messageBox}>
                         {/* Show streaming content with monospace font during streaming */}
-                        {(isCurrentlyStreaming && !isCurrentlyStreaming) ? (
+                        {isCurrentlyStreaming ? (
                             <Box {...streamingContent}>
                                 {displayed}
                                 <StreamingCursor />
                             </Box>
                         ) : (
-
                             <Box>
                                 {displayed ? (
                                     <ReactMarkdown
                                         remarkPlugins={[remarkGfm, remarkBreaks]}
                                         rehypePlugins={[rehypeHighlight]}
-
                                         components={markdownComponents}
                                     >
                                         {displayed}

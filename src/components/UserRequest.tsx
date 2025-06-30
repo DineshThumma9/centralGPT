@@ -9,7 +9,6 @@ interface Props {
     msg: Message;
 }
 
-
 const box = {
     bg: "linear-gradient(135deg, purple.500, violet.500)",
     px: 4,
@@ -26,8 +25,6 @@ const box = {
     borderColor: "purple.400"
 }
 
-
-
 const editableInput = {
     wordBreak: "break-word" as const,
     overflowWrap: "break-word" as const,
@@ -41,7 +38,6 @@ const editableInput = {
     }
 }
 
-
 const editableIcon = {
     variant: "outline" as const,
     size: "xs" as const,
@@ -51,13 +47,11 @@ const editableIcon = {
     _hover: {bg: "purple.50"}
 }
 
-
 const actionButton = {
     size: "sm" as const,
     variant: "ghost" as const,
     _hover: {bg: "purple.50"}
 }
-
 
 const UserRequest = ({msg}: Props) => {
     const [copied, setCopied] = useState(false);
@@ -70,7 +64,8 @@ const UserRequest = ({msg}: Props) => {
         } catch (err) {
             toaster.create({
                 title: "Failed to copy",
-                type: "error " + err,
+                type: "error",
+                description: String(err),
                 duration: 2000,
             });
         }
@@ -97,18 +92,14 @@ const UserRequest = ({msg}: Props) => {
                     maxW="80%"
                     minW={0} // Critical for text wrapping
                 >
-                    <Box
-                        {...box}
-                    >
+                    <Box {...box}>
                         <Editable.Root defaultValue={msg.content}>
                             <Editable.Preview
                                 wordBreak="break-word"
                                 overflowWrap="break-word"
                                 whiteSpace="pre-wrap"
                             />
-                            <Editable.Input
-                                {...editableInput}
-                            />
+                            <Editable.Input {...editableInput} />
 
                             <Editable.Control>
                                 <Editable.CancelTrigger asChild>

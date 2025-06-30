@@ -1,30 +1,19 @@
 // src/components/MarkdownComponents.tsx
 import { Box, Text, Flex, IconButton } from "@chakra-ui/react";
 import { Check, Copy } from "lucide-react";
-import React, { type ElementType } from "react";
+import React from "react";
+import type { Components } from "react-markdown";
 import { codeBlockContainer, codeBlockContent, codeBlockHeader, inlineCode } from "./AIResponse";
 
-interface ReactMarkdownNode {
-    type?: string;
-    props?: {
-        children?: React.ReactNode;
-        [key: string]: unknown;
-    };
-    children?: React.ReactNode;
-}
-
 interface CodeComponentProps {
-    node?: ReactMarkdownNode;
+    node?: unknown;
     inline?: boolean;
     className?: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
+    style?: React.CSSProperties;
     idx: number;
     copiedCodeBlocks: Record<string, boolean>;
     onCodeBlockCopy: (code: string, blockId: string) => void;
-}
-
-interface MarkdownComponentProps {
-    children: React.ReactNode;
 }
 
 const CodeComponent = ({
@@ -34,22 +23,20 @@ const CodeComponent = ({
     idx,
     copiedCodeBlocks,
     onCodeBlockCopy,
-    ...props
+   
 }: CodeComponentProps) => {
     const match = /language-(\w+)/.exec(className || '');
 
-    const getTextContent = (node: React.ReactNode | ReactMarkdownNode): string => {
+    const getTextContent = (node: React.ReactNode): string => {
         if (typeof node === 'string') return node;
-        if (typeof node === 'number') return node.toString();
+        if (typeof node === 'number') return String(node);
         if (Array.isArray(node)) return node.map(getTextContent).join('');
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        if (node && typeof node === 'object' && 'props' in node && node.props && 'children' in node.props) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            return getTextContent(node.props.children);
+        if (React.isValidElement(node) && node.props && 'children' in node.props) {
+            return getTextContent(node.props.children as React.ReactNode);
         }
-        return '';
+        return String(node || '');
     };
 
     const codeString = getTextContent(children).replace(/\n$/, '');
@@ -57,7 +44,7 @@ const CodeComponent = ({
 
     if (inline) {
         return (
-            <Box {...inlineCode} {...props}>
+            <Box as="code" {...inlineCode}>
                 {children}
             </Box>
         );
@@ -99,15 +86,14 @@ const CodeComponent = ({
                 </IconButton>
             </Flex>
 
-            <Box {...codeBlockContent}>
+            <Box as="pre" {...codeBlockContent}>
                 <Box
-                    as={"code" as ElementType}
+                    as="code"
                     className={className}
                     fontFamily="ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace"
                     fontSize="13px"
                     lineHeight="1.5"
                     color="purple.100"
-                    {...props}
                 >
                     {children}
                 </Box>
@@ -116,15 +102,12 @@ const CodeComponent = ({
     );
 };
 
-// Omit the problematic props from CodeComponentProps for the component function
-type CodeComponentFunctionProps = Omit<CodeComponentProps, 'idx' | 'copiedCodeBlocks' | 'onCodeBlockCopy'>;
-
 export const createMarkdownComponents = (
     idx: number,
     copiedCodeBlocks: Record<string, boolean>,
     onCodeBlockCopy: (code: string, blockId: string) => void
-) => ({
-    code: (props: CodeComponentFunctionProps) => (
+): Components => ({
+    code: (props: { node?: unknown; inline?: boolean; className?: string; children?: React.ReactNode; style?: React.CSSProperties }) => (
         <CodeComponent
             {...props}
             idx={idx}
@@ -132,42 +115,42 @@ export const createMarkdownComponents = (
             onCodeBlockCopy={onCodeBlockCopy}
         />
     ),
-    p: ({ children }: MarkdownComponentProps) => (
+    p: ({ children }) => (
         <Text mb={3} lineHeight="1.7" wordBreak="break-word" color="purple.50">
             {children}
         </Text>
     ),
-    h1: ({ children }: MarkdownComponentProps) => (
+    h1: ({ children }) => (
         <Text as="h1" fontSize="xl" fontWeight="bold" mb={3} mt={4} color="purple.200">
             {children}
         </Text>
     ),
-    h2: ({ children }: MarkdownComponentProps) => (
+    h2: ({ children }) => (
         <Text as="h2" fontSize="lg" fontWeight="bold" mb={2} mt={3} color="purple.200">
             {children}
         </Text>
     ),
-    h3: ({ children }: MarkdownComponentProps) => (
+    h3: ({ children }) => (
         <Text as="h3" fontSize="md" fontWeight="bold" mb={2} mt={2} color="purple.200">
             {children}
         </Text>
     ),
-    ul: ({ children }: MarkdownComponentProps) => (
+    ul: ({ children }) => (
         <Box as="ul" ml={4} mb={3} color="purple.50">
             {children}
         </Box>
     ),
-    ol: ({ children }: MarkdownComponentProps) => (
+    ol: ({ children }) => (
         <Box as="ol" ml={4} mb={3} color="purple.50">
             {children}
         </Box>
     ),
-    li: ({ children }: MarkdownComponentProps) => (
+    li: ({ children }) => (
         <Box as="li" mb={1} color="purple.50">
             {children}
         </Box>
     ),
-    blockquote: ({ children }: MarkdownComponentProps) => (
+    blockquote: ({ children }) => (
         <Box
             as="blockquote"
             borderLeft="4px solid"
@@ -182,12 +165,12 @@ export const createMarkdownComponents = (
             {children}
         </Box>
     ),
-    strong: ({ children }: MarkdownComponentProps) => (
+    strong: ({ children }) => (
         <Text as="strong" color="purple.200" fontWeight="bold">
             {children}
         </Text>
     ),
-    em: ({ children }: MarkdownComponentProps) => (
+    em: ({ children }) => (
         <Text as="em" color="purple.200" fontStyle="italic">
             {children}
         </Text>
