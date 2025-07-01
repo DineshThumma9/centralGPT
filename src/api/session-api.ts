@@ -9,7 +9,7 @@ import Message from "../entities/Message.ts";
 
 
 
-const API_BASE_URL =import.meta.env.VITE_API_URI;
+const API_BASE_URL = import.meta.env.VITE_API_URI || "https://centralgpt-backend-production.up.railway.app";
 
 const API = axios.create({
     baseURL: `${API_BASE_URL}/sessions`,
@@ -114,7 +114,7 @@ export const apiKeySelection = async (api_prov: string, api_key: string) => {
     console.log("API Provider:", api_prov);
     console.log("API KEY:", api_key);
 
-    const res = await apiSetUp.post("/init", data, {
+    const res = await apiSetUp.post("/init/", data, {
         headers: {"Content-Type": "application/json"}
     });
 
