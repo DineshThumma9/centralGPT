@@ -61,10 +61,11 @@ const sessionStackStyles = {
 
 export default function Sidebar({onCollapse}: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
-    const [sessions, setSessions] = useState<Session[]>([]);
-    const [currentSession, setCurrentSession] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
 
+    // ✅ Directly use Zustand selectors
+    const sessions = sessionStore((s) => s.sessions);
+    const currentSession = sessionStore((s) => s.current_session);
+    const isLoading = sessionStore((s) => s.isLoading);
 
     const {getSessions, selectSession} = useSessions();
 
@@ -75,21 +76,11 @@ export default function Sidebar({onCollapse}: SidebarProps) {
     };
 
     useEffect(() => {
-        const unsubscribe = sessionStore.subscribe((state) => {
-            setSessions(state.sessions);
-            setCurrentSession(state.current_session);
-            setIsLoading(state.isLoading);
-        });
+        getSessions(); // ✅ Only run once on mount
+    }, []);
 
-        const initialState = sessionStore.getState();
-        setSessions(initialState.sessions);
-        setCurrentSession(initialState.current_session);
-        setIsLoading(initialState.isLoading);
 
-        getSessions();
 
-        return unsubscribe;
-    }, [getSessions]);
 
     const handleSessionSelect = async (sessionId: string) => {
         try {
