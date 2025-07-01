@@ -87,11 +87,13 @@ const SendRequest = () => {
 
 console.log(`Sending : ${sending}`)
 
-console.log(`Sending : ${sending}`)
+
 
     const handleSendMessage = async () => {
         if (!input.trim() || sending) return;
 
+
+        console.log("Entered message",input.trim())
         const currentSession = sessionStore.getState().current_session;
         if (!currentSession) {
             console.error("No session selected.");
@@ -134,7 +136,9 @@ console.log(`Sending : ${sending}`)
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
+
             e.preventDefault();
+            console.log("Enter has been pressed")
             handleSendMessage();
         }
     };

@@ -12,13 +12,13 @@ import Message from "../entities/Message.ts";
 const API_BASE_URL =import.meta.env.VITE_API_URI;
 
 const API = axios.create({
-    baseURL: `${API_BASE_URL} + "/sessions`,
+    baseURL: `${API_BASE_URL}/sessions`,
     withCredentials: true,
     validateStatus: (status) => status >= 200 && status < 300,
 });
 
 const apiSetUp = axios.create({
-    baseURL: `${API_BASE_URL}` + "/setup" ,
+    baseURL: `${API_BASE_URL}/setup` ,
     withCredentials: true,
     validateStatus: (status) => status >= 200 && status < 300
 });
