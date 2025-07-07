@@ -219,12 +219,7 @@ const AIResponse = ({ msg, idx }: Props) => {
                 {!retry ? (
                     <Box {...messageBox}>
                         {/* Show streaming content with monospace font during streaming */}
-                        {isCurrentlyStreaming ? (
-                            <Box {...streamingContent}>
-                                {displayed}
-                                <StreamingCursor />
-                            </Box>
-                        ) : (
+                        { (
                             <Box>
                                 {displayed ? (
                                     <ReactMarkdown

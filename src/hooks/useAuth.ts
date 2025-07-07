@@ -3,6 +3,8 @@ import useValidationStore from "../store/validationStore.ts";
 import useAuthStore from "../store/authStore.ts";
 import useInitStore from "../store/initStore.ts";
 import sessionStore from "../store/sessionStore.ts";
+import useSessions from "./useSessions.ts";
+
 
 export const useAuth = () => {
 
@@ -10,6 +12,8 @@ export const useAuth = () => {
 
   const logout = useAuthStore.getState().clearAuth
   const {clearAllFields} = useValidationStore();
+
+  const {createNewSession} = useSessions()
 
   const {setAccessToken,setRefreshToken} = useAuthStore()
   const {clearInit} = useInitStore()
@@ -27,8 +31,7 @@ export const useAuth = () => {
 
       setAccessToken(access)
       setRefreshToken(refresh)
-
-
+      await createNewSession()
 
 
       console.log("Login successful, tokens stored");
@@ -51,14 +54,9 @@ export const useAuth = () => {
 
       const { access, refresh } = res;
 
-
-
-            setAccessToken(access)
+      setAccessToken(access)
       setRefreshToken(refresh)
-
-
-
-
+      await createNewSession()
       console.log("Registration successful, tokens stored");
     } catch (error) {
       console.error("Registration failed:", error);
@@ -75,3 +73,4 @@ export const useAuth = () => {
 
   return { login: loginUser, register: registerUser, logout:logoutUser };
 };
+

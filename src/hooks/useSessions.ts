@@ -7,7 +7,6 @@ import {
     getAllSessions,
     getChatHistory,
     newSession,
-    testMsg,
     updateSessionTitle
 } from "../api/session-api.ts";
 import {z} from "zod/v4";
@@ -20,7 +19,7 @@ import useSessionStore from "../store/sessionStore.ts";
 
 
 
-const API_BASE_URL = import.meta.env.VITE_API_URI;
+const API_BASE_URL = "http://localhost:8000";
 
 
 const useSessions = () => {
@@ -34,6 +33,7 @@ const useSessions = () => {
         addMessage, setSessions, removeSession, addSession, clear,
         setCurrentSessionId, current_session, setTitle,messages,
         setMessages, setStreaming, updateMessage,  setLoading,
+        context,context_id
     } = store;
 
     useEffect(() => {
@@ -45,23 +45,6 @@ const useSessions = () => {
         };
     }, []);
 
-    const tstMsgFunc = async (msg: string) => {
-        try {
-            const result = await testMsg(msg)
-            const aiMessage: Message = {
-                session_id: v4(),
-                message_id: v4(),
-                content: result.content,
-                sender: "assistant",
-                timestamp: new Date().toISOString()
-            };
-
-            addMessage(aiMessage);
-
-        } catch (error) {
-            console.error("Error in tstMsgFunc:", error);
-        }
-    };
 
     const createNewSession = async () => {
         try {
@@ -112,6 +95,15 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
     let accumulatedContent = '';
     let isStreamComplete = false;
 
+    // BEFORE streaming
+
+const context_id = useSessionStore.getState().context_id
+
+// Log them
+console.log("Starting stream with:", session_id, context_id)
+
+
+
 
     try {
         // Close any existing connection
@@ -130,9 +122,20 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
             body: JSON.stringify({
                 session_id: session_id,
                 msg: userMsg,
-                isFirst:isFirst
+                isFirst:isFirst,
+                context_type:context,
+                context_id:context_id
             }),
         });
+
+        console.log(`key Sending : ${session_id}_${context_id}_${context}`)
+        console.log(JSON.stringify({
+                session_id: session_id,
+                msg: userMsg,
+                isFirst:isFirst,
+                context_type:context,
+                context_id:context_id
+            }))
 
         console.log('Response status:', response.status);
 
@@ -367,7 +370,6 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
         getSessions,
         fetchAllSessions,
         streamMessage,
-        tstMsgFunc,
         selectSession
     };
 };

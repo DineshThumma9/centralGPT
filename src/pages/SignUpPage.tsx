@@ -19,7 +19,7 @@ const signUp = z.object({
     confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords must match",
-    path: ["confirmPassword"], // Fixed: changed from confirm_password
+    path: ["confirmPassword"],
 });
 
 const SignUpPage = () => {
@@ -35,17 +35,16 @@ const SignUpPage = () => {
 
     const {register} = useAuth();
     const navigate = useNavigate();
-    // Removed cardBg variable as it's not needed
     const {setUsername,setEmail} = useInitStore();
 
-    // Clear fields on component mount
+
     useEffect(() => {
         clearAllFields();
     }, [clearAllFields]);
 
     const onSubmit = async () => {
 
-        // Fixed: Pass values instead of field objects
+
         const values = {
             username: String(username.value || ""),
             email: String(email.value || ""),
@@ -58,7 +57,7 @@ const SignUpPage = () => {
         if (!result.success) {
             const {fieldErrors} = z.flattenError(result.error);
 
-            // Use setTimeout to ensure state updates don't conflict
+
             setTimeout(() => {
                 if (fieldErrors.username) {
                     username.setError(fieldErrors.username[0]);

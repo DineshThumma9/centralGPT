@@ -12,6 +12,8 @@ export type SessionState = {
   isStreaming: boolean;
   sending:boolean;
   shouldStream:boolean;
+  context:"code" | "notes" | "vanilla";
+  context_id:string | null
 
   setCurrentSessionId: (session: string | null) => void;
   setMessages: (messages: Message[]) => void;
@@ -27,6 +29,8 @@ export type SessionState = {
   setStreaming: (streaming: boolean) => void;
   setShouldStream: (streaming: boolean) => void;
   clear: () => void;
+  setContext:(context:"code" | "notes" | "vanilla") => void;
+  setContextID:(context_id:string)=> void;
   getSessions: () => Session[];
     clearAllSessions(): void;
 };
@@ -42,6 +46,8 @@ const useSessionStore = create<SessionState>()(
       isStreaming: false,
         shouldStream:false,
         sending:false,
+        context:"vanilla",
+        context_id:null,
 
       setCurrentSessionId: (session) => set({ current_session: session }),
       setMessages: (messages) => set({ messages }),
@@ -57,6 +63,8 @@ const useSessionStore = create<SessionState>()(
               : message
           ),
         })),
+        setContext:(context:"code"|"notes"|"vanilla")=>set({context:context}),
+        setContextID:(context_id:string) => set({context_id:context_id}),
       setSessions: (sessions) => {
         const sorted = [...sessions].sort((a, b) =>
           a.created_at && b.created_at

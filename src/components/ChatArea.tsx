@@ -89,6 +89,7 @@ const ChatArea = () => {
                     {...Hstackprops}
                 >
                     <LLMModelChooser/>
+
                     <AvaterExpandable/>
                 </HStack>
             </Box>

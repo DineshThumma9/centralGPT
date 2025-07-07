@@ -8,11 +8,15 @@ import {
     Separator,
     Text
 } from "@chakra-ui/react";
-import { BiCog, BiLogOut, BiUser } from "react-icons/bi";
-import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "./ui/menu.tsx";
-import { useAuth } from "../hooks/useAuth.ts";
-import { useNavigate } from "react-router-dom";
+import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
+import {MenuContent, MenuItem, MenuRoot, MenuTrigger} from "./ui/menu.tsx";
+import {useAuth} from "../hooks/useAuth.ts";
+import {useNavigate} from "react-router-dom";
 import useInitStore from "../store/initStore.ts";
+import {LuPencilLine} from "react-icons/lu";
+import {GithubIcon} from "lucide-react";
+import {useState} from "react";
+import GitDialog from "./GitDialog.tsx";
 
 // Theme-consistent styles
 const avatarButton = {
@@ -75,28 +79,53 @@ const iconButton = {
 };
 
 const AvatarExpandable = () => {
-    const { logout } = useAuth();
+    const {logout} = useAuth();
     const navigate = useNavigate();
-    const { username, email } = useInitStore();
+    const {username, email} = useInitStore();
 
     const handleLogout = () => {
         logout();
         navigate("/login");
     };
 
+
+    const [dialog, setDialog] = useState(false);
+
+
+    const handleGitDialog = () => {
+    }
+
+
     return (
         <VStack gap={0}>
+               <IconButton
+                        aria-label="Git Creditionals"
+                        onClick={() => setDialog(true)}
+                        size="sm"
+                        variant="ghost"
+                        color="rgba(255, 255, 255, 0.7)"
+                        _hover={{
+                            bg: "rgba(139, 69, 197, 0.2)",
+                            color: "white"
+                        }}
+
+                    >
+                        <GithubIcon size={16}/>
+                    </IconButton>
+
             <MenuRoot>
                 <MenuTrigger asChild>
+
+
                     <Button {...avatarButton}>
-                           <Avatar.Root
-                               bg="linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)"
+                        <Avatar.Root
+                            bg="linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)"
                             color="white">
                             <Avatar.Fallback
                                 name={username || "user"}
 
                             />
-                            <Avatar.Image  />
+                            <Avatar.Image/>
                         </Avatar.Root>
 
                     </Button>
@@ -107,7 +136,7 @@ const AvatarExpandable = () => {
                         <MenuContent {...menuContent}>
                             <MenuItem value="username" {...menuItem}>
                                 <IconButton {...iconButton}>
-                                    <BiUser />
+                                    <BiUser/>
                                 </IconButton>
                                 <Text fontSize="sm" fontWeight="medium">
                                     {username || "User"}
@@ -126,7 +155,7 @@ const AvatarExpandable = () => {
 
                             <MenuItem value="customize" {...menuItem}>
                                 <IconButton {...iconButton}>
-                                    <BiCog />
+                                    <BiCog/>
                                 </IconButton>
                                 <Text fontSize="sm">Customize</Text>
                             </MenuItem>
@@ -136,7 +165,7 @@ const AvatarExpandable = () => {
                                     {...iconButton}
                                     color="rgba(239, 68, 68, 0.8)"
                                 >
-                                    <BiLogOut />
+                                    <BiLogOut/>
                                 </IconButton>
                                 <Text fontSize="sm">Logout</Text>
                             </MenuItem>
@@ -144,7 +173,17 @@ const AvatarExpandable = () => {
                     </MenuPositioner>
                 </Portal>
             </MenuRoot>
+
+            {
+                dialog &&
+
+                <GitDialog
+                    onCancel={() => setDialog(false)}
+                    onConfirm={handleGitDialog}
+                />
+            }
         </VStack>
+
     );
 };
 

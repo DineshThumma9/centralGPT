@@ -7,6 +7,7 @@ import useSessionStore from "../store/sessionStore.ts";
 import {v4} from "uuid";
 import {z} from "zod";
 import Message from "../entities/Message.ts";
+import MediaPDF from "./FileUpload.tsx";
 
 
 const box = {
@@ -75,9 +76,9 @@ const txtarea = {
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
-    const {sending, setSending, shouldStream} = useSessionStore();
+    const {sending, setSending} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const {tstMsgFunc, streamMessage} = useSessions();
+    const {streamMessage} = useSessions();
     const {addMessage} = sessionStore();
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -119,13 +120,10 @@ console.log(`Sending : ${sending}`)
                 textareaRef.current.style.height = 'auto';
             }
 
-            if (shouldStream) {
+
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
                 await streamMessage(messageContent);
-            } else {
-                await tstMsgFunc(messageContent);
-            }
 
         } catch (error) {
             console.error("Failed to send message:", error);
@@ -164,6 +162,7 @@ console.log(`Sending : ${sending}`)
                 <HStack
                     {...hstack}
                 >
+                    <MediaPDF/>
                     <Textarea
                         ref={textareaRef}
                         value={input}

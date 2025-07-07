@@ -9,7 +9,7 @@ import useInitStore from "../store/initStore.ts";
 import BadgeCompo from "./BadgeCompo.tsx";
 import APIKey from "./API-Key.tsx";
 import {useEffect} from "react";
-import StreamSwitch from "./Switch.tsx";
+
 import useSessionStore from "../store/sessionStore.ts";
 
 
@@ -115,11 +115,9 @@ const LLMModelChooser = () => {
                 </HStack>
             )}
 
-            <HStack>
-                <BadgeCompo label={shouldStream ? "streaming" : "not streaming"} key={"stream"}/>
-            </HStack>
 
-            <StreamSwitch/>
+
+
             <APIKey provider={currentAPIProvider} title={"API KEY"}/>
         </HStack>
     );
