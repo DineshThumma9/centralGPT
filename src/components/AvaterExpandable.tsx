@@ -6,7 +6,7 @@ import {
     Portal,
     MenuPositioner,
     Separator,
-    Text
+    Text, HStack
 } from "@chakra-ui/react";
 import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
 import {MenuContent, MenuItem, MenuRoot, MenuTrigger} from "./ui/menu.tsx";
@@ -97,11 +97,12 @@ const AvatarExpandable = () => {
 
 
     return (
-        <VStack gap={0}>
-               <IconButton
+
+        <HStack>
+                    <IconButton
                         aria-label="Git Creditionals"
                         onClick={() => setDialog(true)}
-                        size="sm"
+                        size="md"
                         variant="ghost"
                         color="rgba(255, 255, 255, 0.7)"
                         _hover={{
@@ -112,6 +113,9 @@ const AvatarExpandable = () => {
                     >
                         <GithubIcon size={16}/>
                     </IconButton>
+
+        <VStack gap={0}>
+
 
             <MenuRoot>
                 <MenuTrigger asChild>
@@ -183,7 +187,7 @@ const AvatarExpandable = () => {
                 />
             }
         </VStack>
-
+        </HStack>
     );
 };
 

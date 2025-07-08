@@ -4,6 +4,7 @@ import useAuthStore from "../store/authStore.ts";
 import useInitStore from "../store/initStore.ts";
 import sessionStore from "../store/sessionStore.ts";
 import useSessions from "./useSessions.ts";
+import useSessionStore from "../store/sessionStore.ts";
 
 
 export const useAuth = () => {
@@ -68,6 +69,8 @@ export const useAuth = () => {
         clearAllFields()
         clearInit()
        sessionStore.getState().clearAllSessions();
+        useSessionStore.getState().setContextID("")
+        useSessionStore.getState().setContext("vanilla")
         logout()
   }
 

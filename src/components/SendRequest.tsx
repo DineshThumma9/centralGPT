@@ -1,4 +1,4 @@
-import {Box, HStack, IconButton, Textarea,} from "@chakra-ui/react";
+import {Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
 import {Send} from "lucide-react";
 import { useRef, useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
@@ -27,7 +27,7 @@ const hstack = {
     borderRadius: "2xl",
     px: 4,
     py: 3,
-    gap: 3,
+    gap: 1,
     alignItems: "flex-end",
     boxShadow: "0 0 40px rgba(139, 92, 246, 0.2)",
     _focusWithin: {
@@ -159,10 +159,13 @@ console.log(`Sending : ${sending}`)
                 mx="auto"
                 w="full"
             >
-                <HStack
+                <VStack
                     {...hstack}
                 >
+
                     <MediaPDF/>
+
+
                     <Textarea
                         ref={textareaRef}
                         value={input}
@@ -205,7 +208,7 @@ console.log(`Sending : ${sending}`)
                     >
                         <Send size={18}/>
                     </IconButton>
-                </HStack>
+                </VStack>
             </Box>
         </Box>
     );

@@ -95,8 +95,7 @@ async function streamMessage(userMsg: string, sessionId: string): Promise<void> 
     let accumulatedContent = '';
     let isStreamComplete = false;
 
-    // BEFORE streaming
-
+    // BEFORE streamin
 const context_id = useSessionStore.getState().context_id
 
 // Log them
@@ -132,9 +131,7 @@ console.log("Starting stream with:", session_id, context_id)
         console.log(JSON.stringify({
                 session_id: session_id,
                 msg: userMsg,
-                isFirst:isFirst,
-                context_type:context,
-                context_id:context_id
+                isFirst:isFirst
             }))
 
         console.log('Response status:', response.status);

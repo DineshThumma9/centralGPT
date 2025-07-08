@@ -3,20 +3,26 @@
 import { Portal, Select, createListCollection } from "@chakra-ui/react"
 import { useState } from "react"
 
-const SelectOptions = () => {
-  const [value, setValue] = useState<string[]>([])
+
+interface Props {
+  value : string[]
+  setValue: (value: string[]) => void
+}
+const SelectOptions = ({value,setValue}:Props) => {
+
   return (
     <Select.Root
       collection={include_exclude}
       width="320px"
+
       value={value}
       onValueChange={(e) => setValue(e.value)}
     >
       <Select.HiddenSelect />
-      <Select.Label>Select framework</Select.Label>
+      <Select.Label>Include/Exclude</Select.Label>
       <Select.Control>
         <Select.Trigger>
-          <Select.ValueText placeholder="Select framework" />
+          <Select.ValueText placeholder="Include/Exclude" />
         </Select.Trigger>
         <Select.IndicatorGroup>
           <Select.Indicator />

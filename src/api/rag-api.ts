@@ -3,6 +3,7 @@
 import { ragAPI } from "./apiInstance.ts";
 import useSessions from "../hooks/useSessions.ts";
 import useSessionStore from "../store/sessionStore.ts";
+import {v4} from "uuid";
 
 export const uploadDocument = async (files: File[] | FileList) => {
     const formData = new FormData();
@@ -71,6 +72,9 @@ const res = await ragAPI.post(`/git?session_id=${session_id}&context_id=${contex
          console.log("Request was succesful")
         useSessionStore.getState().setContext("code")
     }
+
+
+    return res.data;
 
 }
 
