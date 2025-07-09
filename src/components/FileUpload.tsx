@@ -7,16 +7,17 @@ import {IoAttach} from "react-icons/io5";
 
 const MediaPDF = () => {
   return (
-    <FileUpload.Root maxFiles={5} >
+    <FileUpload.Root maxFiles={5}  >
       <FileUpload.HiddenInput />
+
+            <FileUploadList/>
+
       <FileUpload.Trigger asChild>
-        <Button size="md" bg={"transparent"}  color={"white"} border={"0px"}>
+        <Button size="md" bg={"transparent"}   color={"white"} border={"0px"}>
           <IoAttach/>
         </Button>
       </FileUpload.Trigger>
 
-
-            <FileUploadList/>
 
     </FileUpload.Root>
   )

@@ -1,21 +1,20 @@
 import {Alert, Button, Dialog, Field, HStack, Input, InputGroup, Portal, useSlotRecipe, VStack} from "@chakra-ui/react"
-import GitCard from "./GitCard.tsx";
 import {useState} from "react";
-import {v4, v4 as uuidv4} from "uuid";
+import {v4} from "uuid";
 import useSessionStore from "../store/sessionStore.ts";
-import {v3} from "uuid";
+import {z} from "zod";
+import {gitFilesUpload} from "../api/rag-api.ts";
+import SelectOptions from "./Select.tsx";
 
 interface Props {
     onCancel: () => void;
     onConfirm: () => void;
 }
 
-
 const dialogHeader = {
     p: 6,
     pb: 4
 };
-
 
 const dialogBody = {
     p: 6,
@@ -28,10 +27,6 @@ const dialogFooter = {
     pt: 4,
     gap: 3
 };
-
-import {z} from "zod";
-import {gitFilesUpload} from "../api/rag-api.ts";
-import SelectOptions from "./Select.tsx";
 
 export const GitRequestSchema = z.object({
     owner: z.string(),
@@ -46,206 +41,283 @@ export const GitRequestSchema = z.object({
 
 export type GitRequestSchema = z.infer<typeof GitRequestSchema>
 
-
 const GitDialog = ({onConfirm, onCancel}: Props) => {
-
-
     const [owner, setOwner] = useState("")
     const [repo, setRepo] = useState("")
-    const [branch, setBranch] = useState("")
+    const [branch, setBranch] = useState("main")
     const [commit, setCommit] = useState("")
-    const [alret,showAlert] = useState(false)
-    const [inc_ex_dir,setIncExDir] = useState("")
-    const  [inc_ex_file_ex,setIncExFileEx] = useState("")
-    const [value_dir,setValueDir] = useState<string[]>([])
-    const [value_ext,setValueExt] = useState<string[]>([])
+    const [alert, showAlert] = useState(false)
+    const [dirInput, setDirInput] = useState("")
+    const [fileExtInput, setFileExtInput] = useState("")
+    const [dirOption, setDirOption] = useState<string[]>([])
+    const [fileExtOption, setFileExtOption] = useState<string[]>([])
+    const [loading, setLoading] = useState(false)
 
     const {current_session} = useSessionStore()
-
     const recipe = useSlotRecipe({key: "dialogHelper"})
     const styles = recipe()
 
+    const inputStyles = {
+        borderRadius: "xl",
+        border: "2px solid",
+        borderColor: "rgba(139, 92, 246, 0.3)",
+        bg: "rgba(139, 92, 246, 0.05)",
+        color: "white",
+        _placeholder: { color: "rgba(255, 255, 255, 0.6)" },
+        _hover: {
+            borderColor: "rgba(139, 92, 246, 0.5)",
+            bg: "rgba(139, 92, 246, 0.1)"
+        },
+        _focus: {
+            borderColor: "rgba(139, 92, 246, 0.6)",
+            boxShadow: "0 0 0 3px rgba(139, 92, 246, 0.2)",
+            bg: "rgba(139, 92, 246, 0.1)"
+        },
+        transition: "all 0.2s ease"
+    }
+
     const handleGitSelected = async () => {
-        const res_body = GitRequestSchema.parse({
-            owner,
-            repo,
-            commit,
-            branch,
-            dir_include: inc_ex_dir.split(",") ? value_dir[0] === "Include" : [],
-            dir_exclude: inc_ex_dir.split(",") ? value_dir[0] === "Exclude" : [],
-            file_extension_include: inc_ex_file_ex.split(",") ? value_ext[0] === "Include" : [],
-            file_extension_exclude: inc_ex_file_ex.split(",") ? value_ext[0]  === "Exclude" : []
-        })
+        if (!owner.trim() || !repo.trim()) {
+            showAlert(true)
+            return
+        }
 
-        const new_context_id = `${v4()}`
+        setLoading(true)
+        try {
+            const parsedDirs = dirInput.split(",").map(d => d.trim()).filter(d => d)
+            const parsedExts = fileExtInput.split(",").map(e => e.trim()).filter(e => e)
 
-        // Set state if you want to reflect it elsewhere
-        useSessionStore.getState().setContextID(new_context_id)
-        useSessionStore.getState().setContext("code")
+            const res_body = GitRequestSchema.parse({
+                owner: owner.trim(),
+                repo: repo.trim(),
+                commit: commit.trim() || undefined,
+                branch: branch.trim() || "main",
+                dir_include: dirOption[0] === "Include" ? parsedDirs : [],
+                dir_exclude: dirOption[0] === "Exclude" ? parsedDirs : [],
+                file_extension_include: fileExtOption[0] === "Include" ? parsedExts : undefined,
+                file_extension_exclude: fileExtOption[0] === "Exclude" ? parsedExts : undefined
+            })
 
-        // ❗️CRUCIAL: pass the new_context_id into upload
-        const res = await gitFilesUpload(res_body, current_session, new_context_id)
+            const new_context_id = v4()
+            useSessionStore.getState().setContextID(new_context_id)
+            useSessionStore.getState().setContext("code")
 
-        if (res != null){
-           showAlert(true)
+            const res = await gitFilesUpload(res_body, current_session, new_context_id)
+
+            if (res) {
+                showAlert(true)
+                setTimeout(() => {
+                    onConfirm()
+                }, 2000)
+            }
+        } catch (error) {
+            console.error("Git upload error:", error)
+            showAlert(true)
+        } finally {
+            setLoading(false)
         }
     }
 
-
     return (
-  <>
-        {
-            alret &&
-             <Alert.Root status="success" variant="solid">
-             <Alert.Indicator />
-           <Alert.Title>Data uploaded to the server. Fire on!</Alert.Title>
-            </Alert.Root>
-           }
-        <Dialog.Root role="alertdialog" open={true}>
-            <Portal>
-                <Dialog.Backdrop css={styles.backdrop}/>
-                <Dialog.Positioner>
-                    <Dialog.Content css={styles.content}>
-                        <Dialog.Header {...dialogHeader}>
-                            <Dialog.Title css={styles.title}>
-                                Enter Git Repo Details
-                            </Dialog.Title>
-                        </Dialog.Header>
-                        <Dialog.Body {...dialogBody}>
-                            <VStack color={"transparent"} pt={"2px"} pb={"2px"}>
-                                <InputGroup startAddon="https://" endAddon=".git" color={"transparent"}>
-                                    <Input
-                                        color={"transparent"}
-                                        placeholder="username/repo-name"
-                                         border="1px solid rgba(139, 69, 197, 0.15)"
+        <>
+            {alert && (
+                <Alert.Root
+                    status="success"
+                    variant="solid"
+                    position="fixed"
+                    top={4}
+                    right={4}
+                    width="auto"
+                    zIndex={9999}
+                >
+                    <Alert.Indicator />
+                    <Alert.Title>
+                        {owner && repo ? "Data uploaded successfully!" : "Please fill required fields"}
+                    </Alert.Title>
+                </Alert.Root>
+            )}
 
-                                    />
-                                </InputGroup>
-                                <HStack gap="4" w="full" pt={"2px"} pb={"2px"}>
-                                    <Field.Root color={"white"}>
-                                        <Field.Label>Owner</Field.Label>
-                                        <Input
-                                            placeholder={"username"}
-                                            value={owner}
-                                            color={"white"}
-                                            onChange={(e) => setOwner(e.target.value)}
-                                            borderRadius="xl"
-                                            border="2px solid"
-                                            borderColor="rgba(139, 92, 246, 0.3)"
-
-                                        />
-                                    </Field.Root>
-                                    <Field.Root color={"white"}>
-                                        <Field.Label>Repoistory</Field.Label>
-                                        <Input placeholder={"repo-name"}
-                                               value={repo}
-                                               color={"white"}
-                                               onChange={(e) => setRepo(e.target.value)}
-                                               borderRadius="xl"
-                                               border="2px solid"
-                                               borderColor="rgba(139, 92, 246, 0.3)"
-                                        />
-                                    </Field.Root>
-                                </HStack>
-                                <HStack gap="4" w="full" pt={"2px"} pb={"2px"}>
-                                    <Field.Root color={"white"}>
-                                        <Field.Label>Commit</Field.Label>
-                                        <Input
-                                            value={commit}
-                                            placeholder={"commit"}
-                                            color={"white"}
-                                            onChange={(e) => setCommit(e.target.value)}
-                                            borderRadius="xl"
-                                            border="2px solid"
-                                            borderColor="rgba(139, 92, 246, 0.3)"
-                                        />
-                                    </Field.Root>
-                                    <Field.Root>
-                                        <Field.Label color={"white"}>Branch</Field.Label>
-                                        <Input
-                                            placeholder={"main"}
-                                            value={branch}
-                                            color={"white"}
-                                            onChange={(e) => setBranch(e.target.value)}
-                                            borderRadius="xl"
-                                            border="2px solid"
-                                            borderColor="rgba(139, 92, 246, 0.3)"
-                                        />
-                                    </Field.Root>
-                                </HStack>
-
-                                     <VStack gap="4" w="full" pt={"2px"} pb={"2px"} justifyContent={"space-around"}>
-
-                                         <HStack>
-                                             <Field.Root color={"white"}>
-                                        <Field.Label>Include\Exclude dirs (Seperated by commas)</Field.Label>
-                                         <Input
-                                            value={inc_ex_file_ex}
-                                            placeholder={"Include or Exclude file Extension"}
-                                            color={"white"}
-                                            onChange={(e) => setIncExFileEx(e.target.value)}
-                                            borderRadius="xl"
-                                            border="2px solid"
-                                            borderColor="rgba(139, 92, 246, 0.3)"
-                                           />
-                                           </Field.Root>
-
-                                             <SelectOptions value={value_dir} setValue={setValueDir}/>
-
-                                         </HStack>
-
-                                     </VStack>
-
-                               <VStack gap="4" w="full" pt={"2px"} pb={"2px"} justifyContent={"space-around"}>
-
-                                         <HStack>
-                                             <Field.Root color={"white"}>
-                                        <Field.Label>Include\Exclude file Extensions (Seperated By commas)</Field.Label>
-                                         <Input
-                                            value={inc_ex_dir}
-                                            placeholder={"Include or Exclude Dirs"}
-                                            color={"white"}
-                                            onChange={(e) => setIncExDir(e.target.value)}
-                                            borderRadius="xl"
-                                            border="2px solid"
-                                            borderColor="rgba(139, 92, 246, 0.3)"
-                                           />
-
-                                           </Field.Root>
-
-                                             <SelectOptions  value={value_ext} setValue={setValueExt}/>
-
-                                         </HStack>
-
-                                     </VStack>
-                            </VStack>
-                        </Dialog.Body>
-                        <Dialog.Footer {...dialogFooter}>
-                            <Dialog.ActionTrigger asChild>
-                                <Button
-                                    css={styles.cancel}
-                                    onClick={onCancel}
-                                >
-                                    Cancel
-                                </Button>
-                            </Dialog.ActionTrigger>
-                            <Button
-                                css={{
-                                    bg: "red.500",
+            <Dialog.Root role="alertdialog" open={true}>
+                <Portal>
+                    <Dialog.Backdrop
+                        css={{
+                            ...styles.backdrop,
+                            backdropFilter: "blur(8px)",
+                            bg: "rgba(0, 0, 0, 0.6)"
+                        }}
+                    />
+                    <Dialog.Positioner>
+                        <Dialog.Content
+                            css={{
+                                ...styles.content,
+                                bg: "rgba(20, 20, 30, 0.95)",
+                                backdropFilter: "blur(20px)",
+                                border: "2px solid rgba(139, 92, 246, 0.3)",
+                                borderRadius: "2xl",
+                                boxShadow: "0 25px 50px rgba(0, 0, 0, 0.5)"
+                            }}
+                        >
+                            <Dialog.Header {...dialogHeader}>
+                                <Dialog.Title css={{
+                                    ...styles.title,
                                     color: "white",
-                                    borderRadius: "10px"
-                                }}
-                                onClick={handleGitSelected}
-                            >
-                                Save
-                            </Button>
-                        </Dialog.Footer>
-                    </Dialog.Content>
-                </Dialog.Positioner>
-            </Portal>
-        </Dialog.Root>
+                                    fontSize: "2xl",
+                                    fontWeight: "bold"
+                                }}>
+                                    Connect Git Repository
+                                </Dialog.Title>
+                            </Dialog.Header>
 
-      </>
+                            <Dialog.Body {...dialogBody}>
+                                <VStack gap={6} align="stretch">
+                                    {/* Repository URL Preview */}
+                                    <InputGroup
+                                        startAddon="https://github.com/"
+                                        endAddon=".git"
+                                        css={{
+                                            "& > div": {
+                                                bg: "rgba(139, 92, 246, 0.1)",
+                                                border: "2px solid rgba(139, 92, 246, 0.3)",
+                                                borderRadius: "xl",
+                                                color: "rgba(255, 255, 255, 0.7)"
+                                            }
+                                        }}
+                                    >
+                                        <Input
+                                            placeholder="owner/repository"
+                                            value={`${owner}/${repo}`}
+                                            readOnly
+                                            {...inputStyles}
+                                        />
+                                    </InputGroup>
+
+                                    {/* Owner and Repository */}
+                                    <HStack gap={4}>
+                                        <Field.Root flex={1}>
+                                            <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                Owner *
+                                            </Field.Label>
+                                            <Input
+                                                placeholder="github-username"
+                                                value={owner}
+                                                onChange={(e) => setOwner(e.target.value)}
+                                                {...inputStyles}
+                                            />
+                                        </Field.Root>
+                                        <Field.Root flex={1}>
+                                            <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                Repository *
+                                            </Field.Label>
+                                            <Input
+                                                placeholder="repo-name"
+                                                value={repo}
+                                                onChange={(e) => setRepo(e.target.value)}
+                                                {...inputStyles}
+                                            />
+                                        </Field.Root>
+                                    </HStack>
+
+                                    {/* Branch and Commit */}
+                                    <HStack gap={4}>
+                                        <Field.Root flex={1}>
+                                            <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                Branch
+                                            </Field.Label>
+                                            <Input
+                                                placeholder="main"
+                                                value={branch}
+                                                onChange={(e) => setBranch(e.target.value)}
+                                                {...inputStyles}
+                                            />
+                                        </Field.Root>
+                                        <Field.Root flex={1}>
+                                            <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                Commit (optional)
+                                            </Field.Label>
+                                            <Input
+                                                placeholder="commit-hash"
+                                                value={commit}
+                                                onChange={(e) => setCommit(e.target.value)}
+                                                {...inputStyles}
+                                            />
+                                        </Field.Root>
+                                    </HStack>
+
+                                    {/* Directory Filters */}
+                                    <VStack gap={4} align="stretch">
+                                        <HStack gap={4} align="flex-end">
+                                            <Field.Root flex={1}>
+                                                <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                    Directory Filters (comma-separated)
+                                                </Field.Label>
+                                                <Input
+                                                    placeholder="src/, docs/, tests/"
+                                                    value={dirInput}
+                                                    onChange={(e) => setDirInput(e.target.value)}
+                                                    {...inputStyles}
+                                                />
+                                            </Field.Root>
+                                            <SelectOptions value={dirOption} setValue={setDirOption} />
+                                        </HStack>
+
+                                        <HStack gap={4} align="flex-end">
+                                            <Field.Root flex={1}>
+                                                <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                    File Extension Filters (comma-separated)
+                                                </Field.Label>
+                                                <Input
+                                                    placeholder=".ts, .tsx, .js, .jsx"
+                                                    value={fileExtInput}
+                                                    onChange={(e) => setFileExtInput(e.target.value)}
+                                                    {...inputStyles}
+                                                />
+                                            </Field.Root>
+                                            <SelectOptions value={fileExtOption} setValue={setFileExtOption} />
+                                        </HStack>
+                                    </VStack>
+                                </VStack>
+                            </Dialog.Body>
+
+                            <Dialog.Footer {...dialogFooter}>
+                                <Dialog.ActionTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        color="white"
+                                        borderRadius="xl"
+                                        _hover={{
+                                            bg: "rgba(255, 255, 255, 0.1)"
+                                        }}
+                                        onClick={onCancel}
+                                        disabled={loading}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </Dialog.ActionTrigger>
+                                <Button
+                                    bg="linear-gradient(135deg, #8B5CF6, #A855F7)"
+                                    color="white"
+                                    borderRadius="xl"
+                                    _hover={{
+                                        transform: "translateY(-2px)",
+                                        boxShadow: "0 10px 30px rgba(139, 92, 246, 0.4)"
+                                    }}
+                                    _active={{
+                                        transform: "translateY(0)"
+                                    }}
+                                    onClick={handleGitSelected}
+                                    disabled={loading || !owner.trim() || !repo.trim()}
+                                    loading={loading}
+                                    loadingText="Connecting..."
+                                    transition="all 0.2s ease"
+                                >
+                                    Connect Repository
+                                </Button>
+                            </Dialog.Footer>
+                        </Dialog.Content>
+                    </Dialog.Positioner>
+                </Portal>
+            </Dialog.Root>
+        </>
     );
 };
 

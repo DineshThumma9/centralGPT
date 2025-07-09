@@ -1,6 +1,6 @@
-import {Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
+import {Box, Button, FileUpload, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
 import {Send} from "lucide-react";
-import { useRef, useState} from "react";
+import {useRef, useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
@@ -8,6 +8,8 @@ import {v4} from "uuid";
 import {z} from "zod";
 import Message from "../entities/Message.ts";
 import MediaPDF from "./FileUpload.tsx";
+import FileUploadList from "./FileItem.tsx";
+import {IoAttach} from "react-icons/io5";
 
 
 const box = {
@@ -25,8 +27,8 @@ const hstack = {
     border: "2px solid",
     borderColor: "rgba(139, 92, 246, 0.3)",
     borderRadius: "2xl",
-    px: 4,
-    py: 3,
+    px: 2,
+    py: 2,
     gap: 1,
     alignItems: "flex-end",
     boxShadow: "0 0 40px rgba(139, 92, 246, 0.2)",
@@ -72,8 +74,6 @@ const txtarea = {
 }
 
 
-
-
 const SendRequest = () => {
     const [input, setInput] = useState("");
     const {sending, setSending} = useSessionStore();
@@ -86,15 +86,14 @@ const SendRequest = () => {
     type MessageType = z.infer<typeof Message>;
 
 
-console.log(`Sending : ${sending}`)
-
+    console.log(`Sending : ${sending}`)
 
 
     const handleSendMessage = async () => {
         if (!input.trim() || sending) return;
 
 
-        console.log("Entered message",input.trim())
+        console.log("Entered message", input.trim())
         const currentSession = sessionStore.getState().current_session;
         if (!currentSession) {
             console.error("No session selected.");
@@ -121,9 +120,9 @@ console.log(`Sending : ${sending}`)
             }
 
 
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                await streamMessage(messageContent);
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            await streamMessage(messageContent);
 
         } catch (error) {
             console.error("Failed to send message:", error);
@@ -153,17 +152,17 @@ console.log(`Sending : ${sending}`)
     return (
         <Box
             {...box}
+
         >
             <Box
                 maxW="1000px"
                 mx="auto"
-                w="full"
+
             >
                 <VStack
                     {...hstack}
-                >
 
-                    <MediaPDF/>
+                >
 
 
                     <Textarea
@@ -174,7 +173,17 @@ console.log(`Sending : ${sending}`)
                         disabled={sending}
                         {...txtarea}
 
+
                     />
+
+
+
+                </VStack>
+
+                    <HStack>
+
+
+                  <MediaPDF/>
 
                     <IconButton
                         aria-label="Send message"
@@ -208,7 +217,7 @@ console.log(`Sending : ${sending}`)
                     >
                         <Send size={18}/>
                     </IconButton>
-                </VStack>
+                    </HStack>
             </Box>
         </Box>
     );
