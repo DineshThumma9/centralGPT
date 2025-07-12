@@ -1,5 +1,5 @@
 import {Box, Editable, FileUpload, Flex, HStack, IconButton, VStack} from "@chakra-ui/react";
-import type {Message} from "../entities/Message.ts";
+import message, {type Message} from "../entities/Message.ts";
 import {Check, Copy, User} from "lucide-react";
 import {LuCheck, LuPencilLine, LuX} from "react-icons/lu";
 import {toaster} from "./ui/toaster.tsx";
@@ -89,6 +89,20 @@ const UserRequest = ({msg}: Props) => {
                 w="100%"
                 justify="flex-end"
             >
+                {files?.length > 0 && (
+  <VStack gap={2}>
+    {files.map((file, idx) => (
+      <Box
+        key={idx}
+        border="1px solid rgba(139, 92, 246, 0.3)"
+        borderRadius="md"
+        p={2}
+        bg="rgba(139, 92, 246, 0.1)"
+      >
+        {file.name}
+      </Box>
+    ))}
+  </VStack>)}
 
                 {/* Content container - Flexible width with proper constraints */}
                 <Box

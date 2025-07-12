@@ -16,10 +16,12 @@ const MediaPDF = ({ children }: Props) => {
 
   return (
     <FileUpload.Root
+
       maxFiles={5}
        onFileChange={({ acceptedFiles }) => {
     acceptedFiles.forEach(addFiles);
   }}
+      justifyContent={"flex-start"}
     >
       <FileUploadList />
       <FileUpload.HiddenInput />

@@ -1,4 +1,4 @@
-import {Box, Button, FileUpload, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
+import {Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
 import {Send} from "lucide-react";
 import {useRef, useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
@@ -7,9 +7,7 @@ import useSessionStore from "../store/sessionStore.ts";
 import {v4} from "uuid";
 import {z} from "zod";
 import Message from "../entities/Message.ts";
-import MediaPDF from "./FileUpload.tsx";
-import FileUploadList from "./FileItem.tsx";
-import {IoAttach} from "react-icons/io5";
+import MediaPDF from "./MediaPDF.tsx";
 import {uploadDocument} from "../api/rag-api.ts";
 
 
@@ -78,7 +76,7 @@ const txtarea = {
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
-    const {sending, setSending,current_session} = useSessionStore();
+    const {sending, setSending} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const {streamMessage} = useSessions();
     const {addMessage,files,clearFiles} = sessionStore();
@@ -105,13 +103,6 @@ const SendRequest = () => {
 
         }
 
-         if (files.length != 0) {
-                const new_context_id = v4()
-            useSessionStore.getState().setContextID(new_context_id)
-            useSessionStore.getState().setContext("notes")
-                const res =await uploadDocument(files,currentSession,new_context_id)
-               clearFiles()
-            }
 
         const message: MessageType = {
             session_id: v4(),
@@ -124,7 +115,16 @@ const SendRequest = () => {
         addMessage(message);
 
         try {
+
             setSending(true);
+            if (files.length != 0) {
+                const new_context_id = v4()
+            useSessionStore.getState().setContextID(new_context_id)
+            useSessionStore.getState().setContext("notes")
+                const res =await uploadDocument(files,currentSession,new_context_id)
+               clearFiles()
+            }
+
             const messageContent = input.trim();
             setInput("");
 
@@ -180,7 +180,7 @@ const SendRequest = () => {
 
                 >
 
-                       <HStack  w="full" justifyContent="space-between" alignItems="center">
+                       <HStack  w="full" justifyContent="space-between" >
 
 
                        <MediaPDF children={<Textarea
@@ -194,6 +194,8 @@ const SendRequest = () => {
 
 
                     />}
+
+
 
                        />
 

@@ -7,9 +7,9 @@ const FileUploadList = () => {
   const { files, removeFile } = useSessionStore();
 
   return (
-    <Box position="relative" mb={2} maxW="1000px" mx="auto">
-      <FileUpload.ItemGroup>
-        <HStack overflowX="auto" gap={2} pb={2}>
+
+      <FileUpload.ItemGroup color={"white"}>
+        <HStack overflowX="auto" gap={2} pb={2} justifyContent={"flex-start"} color={"white"}>
           <FileUpload.Context>
             {({ acceptedFiles }) =>
               acceptedFiles.map((file,index) => (
@@ -27,14 +27,13 @@ const FileUploadList = () => {
                   alignItems="center"
                   justifyContent="space-between"
                   position="relative"
+
                 >
                   <HStack gap={3} flex={1} overflow="hidden">
-                    <FileUpload.ItemPreview fontSize="24px" />
-                    <Box flex={1} overflow="hidden">
-                      <FileUpload.ItemName fontSize="sm" fontWeight="500" mb={1} />
-                      <FileUpload.ItemSizeText fontSize="xs" />
-                    </Box>
-                  </HStack>
+                    <FileUpload.ItemPreview fontSize="24px" color={"white"} />
+                      <FileUpload.ItemName fontSize="sm" fontWeight="500" mb={1} color={"white"} />
+                      <FileUpload.ItemSizeText fontSize="xs" color={"white"}/>
+                  </HStack >
                   <FileUpload.ItemDeleteTrigger
                     onClick={() => removeFile(index)}
                     ml={2}
@@ -45,7 +44,8 @@ const FileUploadList = () => {
           </FileUpload.Context>
         </HStack>
       </FileUpload.ItemGroup>
-    </Box>
+
+
   );
 };
 

@@ -2,36 +2,43 @@
 import {ragAPI} from "./apiInstance.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import type {GitRequestSchema} from "../components/GitDialog.tsx";
+import axios, {type AxiosError} from "axios";
+
+
 
 export const uploadDocument = async (
-  files: File[] | FileList,
-  session_id: string,
-  context_id: string,
-  context_type:string="notes"
+  files: File[],
+  sessionId: string,
+  contextId: string
 ) => {
   const formData = new FormData();
-
-  for (const file of files) {
-    formData.append("files", file); // "files" must match the key in Notes model
+files.forEach((file, index) => {
+  console.log(`File ${index}`, file, typeof file, file instanceof File);
+  if (file instanceof File) {
+    formData.append("files", file);
+  } else {
+    console.warn(`Skipping invalid file at index ${index}`, file);
   }
-
-  formData.append("session_id", session_id);
-  formData.append("context_id", context_id);
-  formData.append("context_type", context_type); // assuming "notes" is the type
-
-    console.log(`formData : ${formData}`)
+});
 
 
-  const res = await ragAPI.post("/upload", formData);
+  formData.append("session_id", sessionId);
+  formData.append("context_id", contextId);
+  formData.append("context_type", "notes");
 
-  if (res.status === 200) {
-    console.log("Upload successful");
-    useSessionStore.getState().setContext("notes");
+  try {
+    const response = await ragAPI.post("/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data", // 🛠️ REQUIRED FOR FASTAPI
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("RAG API Response Error:", error.response?.data || error);
+    throw error;
   }
-
-  return res.data;
 };
-
 
 export const searchDocuments = async (query: string, limit: number = 10) => {
     const res = await ragAPI.post("/search",
