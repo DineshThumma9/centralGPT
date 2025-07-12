@@ -11,6 +11,7 @@ export type SessionState = {
   isLoading: boolean;
   isStreaming: boolean;
   sending:boolean;
+  files:File[];
   shouldStream:boolean;
   context:"code" | "notes" | "vanilla";
   context_id:string | null
@@ -21,6 +22,8 @@ export type SessionState = {
   setTitle: (title: string) => void;
   updateMessage: (messageId: string, updates: Partial<Message>) => void;
   setSessions: (sessions: Session[]) => void;
+  addFiles:(file:File)=>void;
+  removeFile: (index:number) => void;
   addSession: (session: Session) => void;
   updateSession: (sessionId: string, updates: Partial<Session>) => void;
   removeSession: (sessionId: string) => void;
@@ -29,6 +32,7 @@ export type SessionState = {
   setStreaming: (streaming: boolean) => void;
   setShouldStream: (streaming: boolean) => void;
   clear: () => void;
+  clearFiles:() => void;
   setContext:(context:"code" | "notes" | "vanilla") => void;
   setContextID:(context_id:string)=> void;
   getSessions: () => Session[];
@@ -42,6 +46,7 @@ const useSessionStore = create<SessionState>()(
       sessions: [],
       title: "",
       messages: [],
+        files:[],
       isLoading: false,
       isStreaming: false,
         shouldStream:false,
@@ -63,6 +68,11 @@ const useSessionStore = create<SessionState>()(
               : message
           ),
         })),
+        addFiles:(file:File) => set((state) =>({files:[...state.files,file]}) ),
+        removeFile:(index:number) =>
+            set((state) => ({
+            files:state.files.filter((_,i) => i !== index)
+        })),
         setContext:(context:"code"|"notes"|"vanilla")=>set({context:context}),
         setContextID:(context_id:string) => set({context_id:context_id}),
       setSessions: (sessions) => {
@@ -74,6 +84,7 @@ const useSessionStore = create<SessionState>()(
         );
         set({ sessions: sorted });
       },
+
         clearAllSessions:() =>set({
           messages:[],
             sessions:[],
@@ -99,6 +110,7 @@ const useSessionStore = create<SessionState>()(
         })),
       setLoading: (loading) => set({ isLoading: loading }),
       setStreaming: (streaming) => set({ isStreaming: streaming }),
+        clearFiles: () => set({ files: [] }),
         setShouldStream:(shouldStream) => set({shouldStream:shouldStream}),
       clear: () => set({ messages: [] }),
       getSessions: () => get().sessions,

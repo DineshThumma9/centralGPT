@@ -230,9 +230,7 @@ const AIResponse = ({ msg, idx }: Props) => {
                                         {displayed}
                                     </ReactMarkdown>
                                 ) : (
-                                    <Text color="purple.300" fontStyle="italic">
-                                        Waiting for response...
-                                    </Text>
+                                    StreamingCursor()
                                 )}
                             </Box>
                         )}

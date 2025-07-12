@@ -10,6 +10,7 @@ import Message from "../entities/Message.ts";
 import MediaPDF from "./FileUpload.tsx";
 import FileUploadList from "./FileItem.tsx";
 import {IoAttach} from "react-icons/io5";
+import {uploadDocument} from "../api/rag-api.ts";
 
 
 const box = {
@@ -25,12 +26,13 @@ const hstack = {
 
     backdropFilter: "blur(10px)",
     border: "2px solid",
+    alignItems:"flex-start",
     borderColor: "rgba(139, 92, 246, 0.3)",
     borderRadius: "2xl",
+    marginLeft:"3px",
     px: 2,
     py: 2,
     gap: 1,
-    alignItems: "flex-end",
     boxShadow: "0 0 40px rgba(139, 92, 246, 0.2)",
     _focusWithin: {
         borderColor: "rgba(139, 92, 246, 0.6)",
@@ -76,11 +78,10 @@ const txtarea = {
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
-    const {sending, setSending} = useSessionStore();
+    const {sending, setSending,current_session} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const {streamMessage} = useSessions();
-    const {addMessage} = sessionStore();
-
+    const {addMessage,files,clearFiles} = sessionStore();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     type MessageType = z.infer<typeof Message>;
@@ -93,12 +94,24 @@ const SendRequest = () => {
         if (!input.trim() || sending) return;
 
 
+
+
+
         console.log("Entered message", input.trim())
         const currentSession = sessionStore.getState().current_session;
         if (!currentSession) {
             console.error("No session selected.");
             return;
+
         }
+
+         if (files.length != 0) {
+                const new_context_id = v4()
+            useSessionStore.getState().setContextID(new_context_id)
+            useSessionStore.getState().setContext("notes")
+                const res =await uploadDocument(files,currentSession,new_context_id)
+               clearFiles()
+            }
 
         const message: MessageType = {
             session_id: v4(),
@@ -131,12 +144,14 @@ const SendRequest = () => {
         }
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
+    const handleKeyPress = async (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
 
             e.preventDefault();
+
             console.log("Enter has been pressed")
-            handleSendMessage();
+
+            await handleSendMessage();
         }
     };
 
@@ -162,28 +177,26 @@ const SendRequest = () => {
                 <VStack
                     {...hstack}
 
+
                 >
 
+                       <HStack  w="full" justifyContent="space-between" alignItems="center">
 
-                    <Textarea
+
+                       <MediaPDF children={<Textarea
                         ref={textareaRef}
                         value={input}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyPress}
                         disabled={sending}
                         {...txtarea}
+                             maxH={"80px"}
 
 
-                    />
+                    />}
 
+                       />
 
-
-                </VStack>
-
-                    <HStack>
-
-
-                  <MediaPDF/>
 
                     <IconButton
                         aria-label="Send message"
@@ -218,6 +231,16 @@ const SendRequest = () => {
                         <Send size={18}/>
                     </IconButton>
                     </HStack>
+
+
+
+
+
+                </VStack>
+
+
+
+
             </Box>
         </Box>
     );

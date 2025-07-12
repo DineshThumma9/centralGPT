@@ -1,9 +1,10 @@
-import {Box, Editable, Flex, HStack, IconButton} from "@chakra-ui/react";
+import {Box, Editable, FileUpload, Flex, HStack, IconButton, VStack} from "@chakra-ui/react";
 import type {Message} from "../entities/Message.ts";
 import {Check, Copy, User} from "lucide-react";
 import {LuCheck, LuPencilLine, LuX} from "react-icons/lu";
 import {toaster} from "./ui/toaster.tsx";
 import {useState} from "react";
+import useSessionStore from "../store/sessionStore.ts";
 
 interface Props {
     msg: Message;
@@ -55,6 +56,8 @@ const actionButton = {
 
 const UserRequest = ({msg}: Props) => {
     const [copied, setCopied] = useState(false);
+    const {files} = useSessionStore();
+
 
     const handleCopy = async () => {
         try {
@@ -86,6 +89,7 @@ const UserRequest = ({msg}: Props) => {
                 w="100%"
                 justify="flex-end"
             >
+
                 {/* Content container - Flexible width with proper constraints */}
                 <Box
                     flex="1"

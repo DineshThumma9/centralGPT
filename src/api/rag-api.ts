@@ -1,22 +1,37 @@
-
 // src/api/rag-api.ts (Future RAG endpoints)
-import { ragAPI } from "./apiInstance.ts";
-import useSessions from "../hooks/useSessions.ts";
+import {ragAPI} from "./apiInstance.ts";
 import useSessionStore from "../store/sessionStore.ts";
-import {v4} from "uuid";
+import type {GitRequestSchema} from "../components/GitDialog.tsx";
 
-export const uploadDocument = async (files: File[] | FileList) => {
-    const formData = new FormData();
-    for (const file of files) {
-        formData.append("file", file);
-    }
+export const uploadDocument = async (
+  files: File[] | FileList,
+  session_id: string,
+  context_id: string,
+  context_type:string="notes"
+) => {
+  const formData = new FormData();
 
-    const res = await ragAPI.post("/upload", formData, {
-        headers: {"Content-Type": "multipart/form-data"}
-    });
+  for (const file of files) {
+    formData.append("files", file); // "files" must match the key in Notes model
+  }
 
-    return res.data;
+  formData.append("session_id", session_id);
+  formData.append("context_id", context_id);
+  formData.append("context_type", context_type); // assuming "notes" is the type
+
+    console.log(`formData : ${formData}`)
+
+
+  const res = await ragAPI.post("/upload", formData);
+
+  if (res.status === 200) {
+    console.log("Upload successful");
+    useSessionStore.getState().setContext("notes");
+  }
+
+  return res.data;
 };
+
 
 export const searchDocuments = async (query: string, limit: number = 10) => {
     const res = await ragAPI.post("/search",
@@ -45,8 +60,6 @@ function startHealthCheck() {
     }, 30000);
 }
 
-
-import type {GitRequestSchema} from "../components/GitDialog.tsx";
 
 export const gitFilesUpload = async (body: GitRequestSchema,session_id:string|null,context_id:string|null)=>{
 

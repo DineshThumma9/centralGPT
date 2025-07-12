@@ -103,7 +103,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
             useSessionStore.getState().setContext("code")
 
             const res = await gitFilesUpload(res_body, current_session, new_context_id)
-
+            setLoading(false)
             if (res) {
                 showAlert(true)
                 setTimeout(() => {
@@ -288,7 +288,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                             bg: "rgba(255, 255, 255, 0.1)"
                                         }}
                                         onClick={onCancel}
-                                        disabled={loading}
+
                                     >
                                         Cancel
                                     </Button>

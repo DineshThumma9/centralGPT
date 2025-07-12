@@ -1,7 +1,7 @@
 // ===================================
 
 // Updated LLMModelChooser.tsx with Purple-Violet Theme
-import {HStack} from "@chakra-ui/react";
+import {createListCollection, HStack} from "@chakra-ui/react";
 import {Constants} from "../entities/Constants.ts";
 import {llmSelection, modelSelection} from "../api/session-api.ts";
 import MenuHelper from "./MenuHelper.tsx";
@@ -11,6 +11,7 @@ import APIKey from "./API-Key.tsx";
 import {useEffect} from "react";
 
 import useSessionStore from "../store/sessionStore.ts";
+import SelectExp from "./SelectExp.tsx";
 
 
 const hstack = {
@@ -45,6 +46,16 @@ const LLMModelChooser = () => {
         providerModels,
         currentModel
     } = useInitStore();
+
+    const frameworks = createListCollection({
+  items: [
+    { label: "React.js", value: "react" },
+    { label: "Vue.js", value: "vue" },
+    { label: "Angular", value: "angular" },
+    { label: "Svelte", value: "svelte" },
+  ],
+})
+
 
     useEffect(() => {
         if (!currentLLMProvider) return;
@@ -107,6 +118,8 @@ const LLMModelChooser = () => {
                 onSelect={handleModelSelection}
                 disabled={!currentLLMProvider || modelMap.length === 0}
             />
+
+
 
             {(currentLLMProvider || currentModel || shouldStream) && (
                 <HStack gap={2}>
