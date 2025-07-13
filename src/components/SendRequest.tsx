@@ -9,6 +9,7 @@ import {z} from "zod";
 import Message from "../entities/Message.ts";
 import MediaPDF from "./MediaPDF.tsx";
 import {uploadDocument} from "../api/rag-api.ts";
+import useMessage from "../hooks/useMessage.ts";
 
 
 const box = {
@@ -78,7 +79,7 @@ const SendRequest = () => {
     const [input, setInput] = useState("");
     const {sending, setSending} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const {streamMessage} = useSessions();
+    const {streamMessage} = useMessage();
     const {addMessage,files,clearFiles} = sessionStore();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
@@ -109,7 +110,8 @@ const SendRequest = () => {
             message_id: v4(),
             content: input.trim(),
             sender: "user",
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            files:files.length > 0 ? [...files] : []
         };
 
         addMessage(message);
@@ -120,13 +122,13 @@ const SendRequest = () => {
             if (files.length != 0) {
                 const new_context_id = v4()
             useSessionStore.getState().setContextID(new_context_id)
-            useSessionStore.getState().setContext("notes")
                 const res =await uploadDocument(files,currentSession,new_context_id)
-               clearFiles()
+
             }
 
             const messageContent = input.trim();
             setInput("");
+            clearFiles()
 
             if (textareaRef.current) {
                 textareaRef.current.style.height = 'auto';

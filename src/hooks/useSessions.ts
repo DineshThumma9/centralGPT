@@ -11,29 +11,21 @@ import {
 } from "../api/session-api.ts";
 import {z} from "zod/v4";
 
-import type {Message} from "../entities/Message.ts";
-import {v4, v4 as uuidv4} from 'uuid';
-import useAuthStore from "../store/authStore.ts";
-import useSessionStore from "../store/sessionStore.ts";
 
 
 
-
-const API_BASE_URL = "http://localhost:8000";
 
 
 const useSessions = () => {
     const eventSourceRef = useRef<EventSource | null>(null);
 
 
-
-
     const store = sessionStore.getState();
     const {
-        addMessage, setSessions, removeSession, addSession, clear,
-        setCurrentSessionId, current_session, setTitle,messages,
-        setMessages, setStreaming, updateMessage,  setLoading,
-        context,context_id
+         setSessions, removeSession, addSession, clear,
+        setCurrentSessionId, current_session, setTitle,
+        setMessages, setStreaming,setLoading,
+
     } = store;
 
     useEffect(() => {
@@ -68,171 +60,7 @@ const useSessions = () => {
 
 
 
-async function streamMessage(userMsg: string, sessionId: string): Promise<void> {
-    const token = useAuthStore.getState().accessToken;
-    const assistantMsgId = uuidv4();
-    const session_id = sessionId || useSessionStore.getState().current_session;
 
-    const isFirst  =  messages.length == 0
-    if (!session_id) {
-        throw new Error('No session ID provided');
-    }
-
-    console.log('Using session_id:', session_id);
-
-    // Add empty assistant message to start streaming
-    addMessage({
-        message_id: assistantMsgId,
-        session_id: session_id,
-        content: '',
-        sender: 'assistant',
-        timestamp: new Date().toISOString(),
-    });
-
-    setStreaming(true);
-
-    // Keep accumulated content in local variable
-    let accumulatedContent = '';
-    let isStreamComplete = false;
-
-    // BEFORE streamin
-const context_id = useSessionStore.getState().context_id
-
-// Log them
-console.log("Starting stream with:", session_id, context_id)
-
-
-
-
-    try {
-        // Close any existing connection
-        if (eventSourceRef.current) {
-            eventSourceRef.current.close();
-        }
-
-        console.log('Starting stream with sessionId:', sessionId, 'message:', userMsg);
-
-        const response = await fetch(`${API_BASE_URL}/messages/simple-stream`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(token && { Authorization: `Bearer ${token}` }),
-            },
-            body: JSON.stringify({
-                session_id: session_id,
-                msg: userMsg,
-                isFirst:isFirst,
-                context_type:context,
-                context_id:context_id
-            }),
-        });
-
-        console.log(`key Sending : ${session_id}_${context_id}_${context}`)
-        console.log(JSON.stringify({
-                session_id: session_id,
-                msg: userMsg,
-                isFirst:isFirst
-            }))
-
-        console.log('Response status:', response.status);
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error response:', errorText);
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-        }
-
-        if (!response.body) {
-            throw new Error('No response body for streaming');
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-
-        try {
-            while (true) {
-                const { done, value } = await reader.read();
-
-                if (done) break;
-
-                const chunk = decoder.decode(value, { stream: true });
-                buffer += chunk;
-
-                // Process complete lines
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || ''; // Keep incomplete line in buffer
-
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        try {
-                            const data = JSON.parse(line.slice(6));
-
-                            switch (data.type) {
-                                case 'start':
-                                    console.log('Stream started');
-                                    break;
-
-                                case 'token':
-                                    if (data.content && !isStreamComplete) {
-                                        accumulatedContent += data.content;
-                                        // Update message with streaming content
-                                        updateMessage(assistantMsgId, {
-                                            content: accumulatedContent,
-                                            isStreaming: true
-                                        });
-                                    }
-                                    break;
-
-                                case 'done':
-                                    console.log('Stream completed');
-                                    isStreamComplete = true;
-                                    // Final update with complete content
-                                    updateMessage(assistantMsgId, {
-                                        content: data.content,
-                                        isStreaming: false
-                                    });
-                                    break;
-
-
-                                case 'title':
-                                    {
-
-                                        console.log(`Session Title has been generated ${data.content}`);
-                                    setTitle(data.content);
-                                    await changeTitle(current_session || v4(),data.content)
-                                    break;
-                                    }
-
-                                case 'error':
-                                    console.error('Stream error:', data.content);
-                                    updateMessage(assistantMsgId, {
-                                        content: `[Error: ${data.content}]`,
-                                        isStreaming: false
-                                    });
-                                    isStreamComplete = true;
-                                    break;
-                            }
-                        } catch (parseError) {
-                            console.error('Parse error:', parseError, 'Line:', line);
-                        }
-                    }
-                }
-            }
-        } finally {
-            reader.releaseLock();
-        }
-
-    } catch (err) {
-        console.error('StreamMessage error:', err);
-        updateMessage(assistantMsgId, {
-            content: '[Error streaming response]',
-            isStreaming: false
-        });
-    } finally {
-        setStreaming(false);
-    }
-}
     const changeTitle = async (sessionId: string, title: string) => {
         try {
             setLoading(true);
@@ -366,7 +194,6 @@ console.log("Starting stream with:", session_id, context_id)
         deleteSessionById,
         getSessions,
         fetchAllSessions,
-        streamMessage,
         selectSession
     };
 };

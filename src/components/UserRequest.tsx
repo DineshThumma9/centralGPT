@@ -74,6 +74,7 @@ const UserRequest = ({msg}: Props) => {
         }
     };
 
+    // @ts-ignore
     return (
         <Flex
             direction="column"
@@ -89,9 +90,9 @@ const UserRequest = ({msg}: Props) => {
                 w="100%"
                 justify="flex-end"
             >
-                {files?.length > 0 && (
+                {msg.files?.length > 0 && (
   <VStack gap={2}>
-    {files.map((file, idx) => (
+    {msg.files.map((file, idx) => (
       <Box
         key={idx}
         border="1px solid rgba(139, 92, 246, 0.3)"

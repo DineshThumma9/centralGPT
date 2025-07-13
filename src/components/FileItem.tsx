@@ -32,7 +32,7 @@ const FileUploadList = () => {
                   <HStack gap={3} flex={1} overflow="hidden">
                     <FileUpload.ItemPreview fontSize="24px" color={"white"} />
                       <FileUpload.ItemName fontSize="sm" fontWeight="500" mb={1} color={"white"} />
-                      <FileUpload.ItemSizeText fontSize="xs" color={"white"}/>
+
                   </HStack >
                   <FileUpload.ItemDeleteTrigger
                     onClick={() => removeFile(index)}

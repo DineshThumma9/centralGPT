@@ -33,39 +33,21 @@ files.forEach((file, index) => {
       },
     });
 
+    if(response.status  === 200){
+         console.log(`key:${sessionId}_${contextId}_notes`)
+         console.log("Request was succesful")
+        useSessionStore.getState().setContext("notes")
+    }
+
+
     return response.data;
   } catch (error) {
-    console.error("RAG API Response Error:", error.response?.data || error);
+    console.error("RAG API Response Error:",  error.response?.data);
     throw error;
   }
 };
 
-export const searchDocuments = async (query: string, limit: number = 10) => {
-    const res = await ragAPI.post("/search",
-        { query, limit },
-        { headers: {"Content-Type": "application/json"} }
-    );
 
-    return res.data;
-};
-
-export const deleteDocument = async (documentId: string) => {
-    await ragAPI.delete(`/document/${documentId}`);
-};
-
-// Health check function (can be moved to a separate utility file)
-function startHealthCheck() {
-    setInterval(async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URI}/health`);
-            if (!response.ok) {
-                handleServerDown();
-            }
-        } catch (error) {
-            handleServerDown();
-        }
-    }, 30000);
-}
 
 
 export const gitFilesUpload = async (body: GitRequestSchema,session_id:string|null,context_id:string|null)=>{
@@ -103,3 +85,30 @@ function handleServerDown() {
 
 }
 
+
+export const searchDocuments = async (query: string, limit: number = 10) => {
+    const res = await ragAPI.post("/search",
+        { query, limit },
+        { headers: {"Content-Type": "application/json"} }
+    );
+
+    return res.data;
+};
+
+export const deleteDocument = async (documentId: string) => {
+    await ragAPI.delete(`/document/${documentId}`);
+};
+
+// Health check function (can be moved to a separate utility file)
+function startHealthCheck() {
+    setInterval(async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URI}/health`);
+            if (!response.ok) {
+                handleServerDown();
+            }
+        } catch (error) {
+            handleServerDown();
+        }
+    }, 30000);
+}
