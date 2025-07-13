@@ -1,10 +1,24 @@
-import {Alert, Button, Dialog, Field, HStack, Input, InputGroup, Portal, useSlotRecipe, VStack} from "@chakra-ui/react"
+import {
+    Alert,
+    Button,
+    Dialog,
+    Field,
+    HStack,
+    Input,
+    InputGroup,
+    Portal,
+    Spinner,
+    useSlotRecipe,
+    VStack
+} from "@chakra-ui/react"
 import {useState} from "react";
 import {v4} from "uuid";
 import useSessionStore from "../store/sessionStore.ts";
 import {z} from "zod";
 import {gitFilesUpload} from "../api/rag-api.ts";
 import SelectOptions from "./Select.tsx";
+import { toaster } from "./ui/toaster.tsx"
+
 
 interface Props {
     onCancel: () => void;
@@ -52,7 +66,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
     const [dirOption, setDirOption] = useState<string[]>([])
     const [fileExtOption, setFileExtOption] = useState<string[]>([])
     const [loading, setLoading] = useState(false)
-
+    const [error, setError] = useState(false)
     const {current_session} = useSessionStore()
     const recipe = useSlotRecipe({key: "dialogHelper"})
     const styles = recipe()
@@ -63,7 +77,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
         borderColor: "rgba(139, 92, 246, 0.3)",
         bg: "rgba(139, 92, 246, 0.05)",
         color: "white",
-        _placeholder: { color: "rgba(255, 255, 255, 0.6)" },
+        _placeholder: {color: "rgba(255, 255, 255, 0.6)"},
         _hover: {
             borderColor: "rgba(139, 92, 246, 0.5)",
             bg: "rgba(139, 92, 246, 0.1)"
@@ -76,50 +90,74 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
         transition: "all 0.2s ease"
     }
 
-    const handleGitSelected = async () => {
-        if (!owner.trim() || !repo.trim()) {
-            showAlert(true)
-            return
-        }
 
-        setLoading(true)
-        try {
-            const parsedDirs = dirInput.split(",").map(d => d.trim()).filter(d => d)
-            const parsedExts = fileExtInput.split(",").map(e => e.trim()).filter(e => e)
 
-            const res_body = GitRequestSchema.parse({
-                owner: owner.trim(),
-                repo: repo.trim(),
-                commit: commit.trim() || undefined,
-                branch: branch.trim() || "main",
-                dir_include: dirOption[0] === "Include" ? parsedDirs : [],
-                dir_exclude: dirOption[0] === "Exclude" ? parsedDirs : [],
-                file_extension_include: fileExtOption[0] === "Include" ? parsedExts : undefined,
-                file_extension_exclude: fileExtOption[0] === "Exclude" ? parsedExts : undefined
-            })
+const handleGitSelected = async () => {
+  if (!owner.trim() || !repo.trim()) {
+    toaster.create({
+      title: "Missing fields",
+      description: "Please provide both owner and repository name.",
+      type: "error",
+      duration: 3000,
+    });
+    return;
+  }
 
-            const new_context_id = v4()
-            useSessionStore.getState().setContextID(new_context_id)
-            useSessionStore.getState().setContext("code")
+  onConfirm(); // close dialog immediately
 
-            const res = await gitFilesUpload(res_body, current_session, new_context_id)
-            setLoading(false)
-            if (res) {
-                showAlert(true)
-                setTimeout(() => {
-                    onConfirm()
-                }, 2000)
-            }
-        } catch (error) {
-            console.error("Git upload error:", error)
-            showAlert(true)
-        } finally {
-            setLoading(false)
-        }
-    }
+  setLoading(true);
+  try {
+    const parsedDirs = dirInput.split(",").map(d => d.trim()).filter(Boolean);
+    const parsedExts = fileExtInput.split(",").map(e => e.trim()).filter(Boolean);
+
+    const res_body = GitRequestSchema.parse({
+      owner: owner.trim(),
+      repo: repo.trim(),
+      commit: commit.trim() || undefined,
+      branch: branch.trim() || "main",
+      dir_include: dirOption[0] === "Include" ? parsedDirs : [],
+      dir_exclude: dirOption[0] === "Exclude" ? parsedDirs : [],
+      file_extension_include: fileExtOption[0] === "Include" ? parsedExts : undefined,
+      file_extension_exclude: fileExtOption[0] === "Exclude" ? parsedExts : undefined
+    });
+
+    const new_context_id = v4();
+    useSessionStore.getState().setContextID(new_context_id);
+    useSessionStore.getState().setContext("code");
+
+    const res = await gitFilesUpload(res_body, current_session, new_context_id);
+
+    toaster.create({
+      title: res ? "Upload Complete" : "Upload Failed",
+      description: res ? "Git repository connected and data indexed." : "Something went wrong with the upload.",
+      type: res ? "success" : "error",
+      duration: 3000,
+    });
+  } catch (error) {
+    console.error("Git upload error:", error);
+    toaster.create({
+      title: "Unexpected Error",
+      description: "Something went wrong while connecting.",
+      type: "error",
+      duration: 3000,
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
     return (
         <>
+
+            {
+                loading &&
+                    toaster.create({
+          description: "File saved successfully",
+          type: "loading",
+        })
+            }
+
+
             {alert && (
                 <Alert.Root
                     status="success"
@@ -130,12 +168,21 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                     width="auto"
                     zIndex={9999}
                 >
-                    <Alert.Indicator />
+                    <Alert.Indicator/>
                     <Alert.Title>
                         {owner && repo ? "Data uploaded successfully!" : "Please fill required fields"}
                     </Alert.Title>
                 </Alert.Root>
             )}
+
+            {
+                error &&
+                <Alert.Root status="error">
+                    <Alert.Indicator/>
+                    <Alert.Title>There was an error processing your request</Alert.Title>
+                </Alert.Root>
+            }
+
 
             <Dialog.Root role="alertdialog" open={true}>
                 <Portal>
@@ -257,7 +304,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                                     {...inputStyles}
                                                 />
                                             </Field.Root>
-                                            <SelectOptions value={dirOption} setValue={setDirOption} />
+                                            <SelectOptions value={dirOption} setValue={setDirOption}/>
                                         </HStack>
 
                                         <HStack gap={4} align="flex-end">
@@ -272,7 +319,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                                     {...inputStyles}
                                                 />
                                             </Field.Root>
-                                            <SelectOptions value={fileExtOption} setValue={setFileExtOption} />
+                                            <SelectOptions value={fileExtOption} setValue={setFileExtOption}/>
                                         </HStack>
                                     </VStack>
                                 </VStack>
@@ -309,6 +356,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                     loading={loading}
                                     loadingText="Connecting..."
                                     transition="all 0.2s ease"
+
                                 >
                                     Connect Repository
                                 </Button>

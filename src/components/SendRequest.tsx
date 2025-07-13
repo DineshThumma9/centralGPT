@@ -1,4 +1,4 @@
-import {Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
+import {Alert, Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
 import {Send} from "lucide-react";
 import {useRef, useState} from "react";
 import useSessions from "../hooks/useSessions.ts";
@@ -11,10 +11,8 @@ import MediaPDF from "./MediaPDF.tsx";
 import {uploadDocument} from "../api/rag-api.ts";
 import useMessage from "../hooks/useMessage.ts";
 
-
 const box = {
     w: "full",
-    // bg: "transparent",
     backdropFilter: "blur(20px)",
     py: 4,
     px: 4,
@@ -22,13 +20,12 @@ const box = {
 }
 
 const hstack = {
-
     backdropFilter: "blur(10px)",
     border: "2px solid",
-    alignItems:"flex-start",
+    alignItems: "flex-start",
     borderColor: "rgba(139, 92, 246, 0.3)",
     borderRadius: "2xl",
-    marginLeft:"3px",
+    marginLeft: "3px",
     px: 2,
     py: 2,
     gap: 1,
@@ -50,7 +47,6 @@ const hstack = {
         borderRadius: '2xl',
         background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1))',
         zIndex: -1,
-
     }
 }
 
@@ -71,72 +67,71 @@ const txtarea = {
         boxShadow: "none",
         outline: "none"
     },
-
 }
-
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
     const {sending, setSending} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const {streamMessage} = useMessage();
-    const {addMessage,files,clearFiles} = sessionStore();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    type MessageType = z.infer<typeof Message>;
-
+    const {addMessage, files, clearFiles} = sessionStore();
+    const [alert, setAlert] = useState(false)
 
     console.log(`Sending : ${sending}`)
 
-
     const handleSendMessage = async () => {
         if (!input.trim() || sending) return;
-
-
-
-
 
         console.log("Entered message", input.trim())
         const currentSession = sessionStore.getState().current_session;
         if (!currentSession) {
             console.error("No session selected.");
             return;
-
         }
 
+        // Create a copy of current files before clearing
+        const currentFiles = [...files];
 
-        const message: MessageType = {
+        const message: Message = {
             session_id: v4(),
             message_id: v4(),
             content: input.trim(),
             sender: "user",
             timestamp: new Date().toISOString(),
-            files:files.length > 0 ? [...files] : []
+            files: currentFiles.length > 0 ? currentFiles : []
         };
 
+        // Add message first
         addMessage(message);
 
         try {
-
             setSending(true);
-            if (files.length != 0) {
-                const new_context_id = v4()
-            useSessionStore.getState().setContextID(new_context_id)
-                const res =await uploadDocument(files,currentSession,new_context_id)
 
-            }
-
-            const messageContent = input.trim();
+            // Clear input and files IMMEDIATELY after creating message
             setInput("");
-            clearFiles()
+            clearFiles();
+
+            // Clear the file input element
+            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+            if (fileInput) {
+                fileInput.value = '';
+            }
 
             if (textareaRef.current) {
                 textareaRef.current.style.height = 'auto';
             }
 
+            // Handle file upload if files exist
+            if (currentFiles.length > 0) {
+                const new_context_id = v4();
+                useSessionStore.getState().setContextID(new_context_id);
+                const res = await uploadDocument(currentFiles, currentSession, new_context_id);
+                if (res) {
+                    setAlert(true)
+                }
+            }
 
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
+            const messageContent = input.trim();
             await streamMessage(messageContent);
 
         } catch (error) {
@@ -148,11 +143,8 @@ const SendRequest = () => {
 
     const handleKeyPress = async (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
-
             e.preventDefault();
-
             console.log("Enter has been pressed")
-
             await handleSendMessage();
         }
     };
@@ -167,86 +159,62 @@ const SendRequest = () => {
     };
 
     return (
-        <Box
-            {...box}
-
-        >
-            <Box
-                maxW="1000px"
-                mx="auto"
-
-            >
-                <VStack
-                    {...hstack}
+        <>
 
 
-                >
+            <Box {...box}>
+                <Box maxW="1000px" mx="auto">
+                    <VStack {...hstack}>
+                        <HStack w="full" justifyContent="space-between">
+                            <MediaPDF children={
+                                <Textarea
+                                    ref={textareaRef}
+                                    value={input}
+                                    onChange={handleInputChange}
+                                    onKeyDown={handleKeyPress}
+                                    disabled={sending}
+                                    {...txtarea}
+                                    maxH={"80px"}
+                                />
+                            }/>
 
-                       <HStack  w="full" justifyContent="space-between" >
-
-
-                       <MediaPDF children={<Textarea
-                        ref={textareaRef}
-                        value={input}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyPress}
-                        disabled={sending}
-                        {...txtarea}
-                             maxH={"80px"}
-
-
-                    />}
-
-
-
-                       />
-
-
-                    <IconButton
-                        aria-label="Send message"
-                        onClick={handleSendMessage}
-                        disabled={!input.trim() || sending}
-                        size="md"
-                        bg={input.trim() && !sending
-                            ? "linear-gradient(135deg, #8B5CF6, #A855F7)"
-                            : "rgba(100, 100, 120, 0.3)"
-                        }
-                        color="white"
-                        borderRadius="xl"
-                        transition="all 0.3s ease"
-                        boxShadow={input.trim() && !sending
-                            ? "0 0 20px rgba(139, 92, 246, 0.4)"
-                            : "none"
-                        }
-                        _hover={{
-                            transform: input.trim() && !sending ? "scale(1.1)" : "none",
-                            boxShadow: input.trim() && !sending
-                                ? "0 0 30px rgba(139, 92, 246, 0.6)"
-                                : "none"
-                        }}
-                        _active={{
-                            transform: input.trim() && !sending ? "scale(0.95)" : "none"
-                        }}
-                        _disabled={{
-                            cursor: "not-allowed",
-                            opacity: 0.4
-                        }}
-                    >
-                        <Send size={18}/>
-                    </IconButton>
-                    </HStack>
-
-
-
-
-
-                </VStack>
-
-
-
-
+                            <IconButton
+                                aria-label="Send message"
+                                onClick={handleSendMessage}
+                                disabled={!input.trim() || sending}
+                                size="md"
+                                bg={input.trim() && !sending
+                                    ? "linear-gradient(135deg, #8B5CF6, #A855F7)"
+                                    : "rgba(100, 100, 120, 0.3)"
+                                }
+                                color="white"
+                                borderRadius="xl"
+                                transition="all 0.3s ease"
+                                boxShadow={input.trim() && !sending
+                                    ? "0 0 20px rgba(139, 92, 246, 0.4)"
+                                    : "none"
+                                }
+                                _hover={{
+                                    transform: input.trim() && !sending ? "scale(1.1)" : "none",
+                                    boxShadow: input.trim() && !sending
+                                        ? "0 0 30px rgba(139, 92, 246, 0.6)"
+                                        : "none"
+                                }}
+                                _active={{
+                                    transform: input.trim() && !sending ? "scale(0.95)" : "none"
+                                }}
+                                _disabled={{
+                                    cursor: "not-allowed",
+                                    opacity: 0.4
+                                }}
+                            >
+                                <Send size={18}/>
+                            </IconButton>
+                        </HStack>
+                    </VStack>
+                </Box>
             </Box>
-        </Box>
+        </>
     );
 };
 

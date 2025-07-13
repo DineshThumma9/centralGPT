@@ -1,19 +1,21 @@
-"use client"
+"use client";
 
-import { Portal, Select, createListCollection } from "@chakra-ui/react"
+import { Portal, Select, createListCollection } from "@chakra-ui/react";
 
 interface Props {
-  value: string[]
-  setValue: (value: string[]) => void
+  value: string[];
+  setValue: (value: string[]) => void;
 }
 
 const SelectOptions = ({ value, setValue }: Props) => {
   return (
     <Select.Root
       collection={include_exclude}
-      width="200px"
       value={value}
-      onValueChange={(details) => setValue(details.value)}
+      onValueChange={(details) => {
+        setValue(details.value); // 👈 use item.value
+      }}
+      width="200px"
     >
       <Select.HiddenSelect />
       <Select.Label
@@ -25,7 +27,6 @@ const SelectOptions = ({ value, setValue }: Props) => {
       </Select.Label>
       <Select.Control>
         <Select.Trigger
-
           bg="rgba(139, 92, 246, 0.1)"
           border="2px solid"
           borderColor="rgba(139, 92, 246, 0.3)"
@@ -51,7 +52,6 @@ const SelectOptions = ({ value, setValue }: Props) => {
           <Select.Indicator color="white" />
         </Select.IndicatorGroup>
       </Select.Control>
-      <Portal>
         <Select.Positioner>
           <Select.Content
             bg="rgba(30, 30, 40, 0.95)"
@@ -61,35 +61,31 @@ const SelectOptions = ({ value, setValue }: Props) => {
             borderRadius="xl"
             boxShadow="0 10px 40px rgba(0, 0, 0, 0.3)"
           >
-            {include_exclude.items.map((options) => (
+            {include_exclude.items.map((option) => (
               <Select.Item
-                item={options}
-                key={options.value}
+                key={option.value}
+                item={option}
                 color="white"
-                _hover={{
-                  bg: "rgba(139, 92, 246, 0.2)"
-                }}
-                _selected={{
-                  bg: "rgba(139, 92, 246, 0.3)"
-                }}
+                _hover={{ bg: "rgba(139, 92, 246, 0.2)" }}
+                _selected={{ bg: "rgba(139, 92, 246, 0.3)" }}
                 transition="all 0.2s ease"
               >
-                {options.label}
+                {option.label}
                 <Select.ItemIndicator color="rgba(139, 92, 246, 0.8)" />
               </Select.Item>
             ))}
           </Select.Content>
         </Select.Positioner>
-      </Portal>
+
     </Select.Root>
-  )
-}
+  );
+};
 
 const include_exclude = createListCollection({
   items: [
     { label: "Include", value: "Include" },
     { label: "Exclude", value: "Exclude" }
   ],
-})
+});
 
 export default SelectOptions;

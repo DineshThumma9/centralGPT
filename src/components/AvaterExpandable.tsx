@@ -93,6 +93,7 @@ const AvatarExpandable = () => {
 
 
     const handleGitDialog = () => {
+        setDialog(false)
     }
 
 

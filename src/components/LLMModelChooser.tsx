@@ -1,7 +1,5 @@
-// ===================================
 
-// Updated LLMModelChooser.tsx with Purple-Violet Theme
-import {createListCollection, HStack} from "@chakra-ui/react";
+import {HStack} from "@chakra-ui/react";
 import {Constants} from "../entities/Constants.ts";
 import {llmSelection, modelSelection} from "../api/session-api.ts";
 import MenuHelper from "./MenuHelper.tsx";
@@ -11,8 +9,6 @@ import APIKey from "./API-Key.tsx";
 import {useEffect} from "react";
 
 import useSessionStore from "../store/sessionStore.ts";
-import SelectExp from "./SelectExp.tsx";
-
 
 const hstack = {
     gap: 3,
@@ -47,14 +43,7 @@ const LLMModelChooser = () => {
         currentModel
     } = useInitStore();
 
-    const frameworks = createListCollection({
-  items: [
-    { label: "React.js", value: "react" },
-    { label: "Vue.js", value: "vue" },
-    { label: "Angular", value: "angular" },
-    { label: "Svelte", value: "svelte" },
-  ],
-})
+
 
 
     useEffect(() => {
