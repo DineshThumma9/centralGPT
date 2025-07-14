@@ -82,7 +82,7 @@ const UserRequest = ({msg}: Props) => {
             gap={2}
         >
             <Flex
-                align="flex-start"
+                align="flex-end"
                 direction="row"
                 gap={3}
                 w="100%"

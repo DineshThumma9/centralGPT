@@ -56,10 +56,10 @@ const useMessage = () => {
     } = store;
 
 
-    async function streamMessage(userMsg: string, sessionId: string): Promise<void> {
+    async function streamMessage(userMsg: string): Promise<void> {
         const token = useAuthStore.getState().accessToken;
         const assistantMsgId = uuidv4();
-        const session_id = sessionId || useSessionStore.getState().current_session;
+        const session_id = useSessionStore.getState().current_session;
 
         const isFirst = messages.length == 0
         if (!session_id) {
@@ -81,6 +81,7 @@ const useMessage = () => {
 
         // Keep accumulated content in local variable
         let accumulatedContent = '';
+        let sources: Doc[] = [];
         let isStreamComplete = false;
 
         // BEFORE streamin
@@ -96,7 +97,7 @@ const useMessage = () => {
                 eventSourceRef.current.close();
             }
 
-            console.log('Starting stream with sessionId:', sessionId, 'message:', userMsg);
+            console.log('Starting stream with sessionId:', session_id, 'message:', userMsg);
 
             const response = await fetch(`${API_BASE_URL}/messages/simple-stream`, {
                 method: 'POST',
@@ -172,22 +173,19 @@ const useMessage = () => {
 
 
                                     case 'sources': {
-                                        const sources = data.content;
-                                        const parsed = sources
+                                        const sourcesData = data.content;
+                                        const parsed = sourcesData
                                             .map((source: unknown) => docSchema.safeParse(source))
-                                            .filter((res): res is z.ZodSafeParseSuccess<Doc> => res.success);
+                                            .filter((res: { success: boolean; }): res is z.ZodSafeParseSuccess<Doc> => res.success)
+                                            .map((res: { data: never; }) => res.data);
 
                                         if (parsed.length > 0) {
-                                            const first = parsed[0].data;
-                                            const page_no = first.metadata.page_label ?? "N/A";
-                                            const file_name = first.metadata.file_name ?? "N/A";
-                                            const score = first.score ?? 0;
+                                            // Sort by score (highest first)
+                                            sources = parsed.sort((a: { score: number; }, b: { score: number; }) => b.score - a.score);
+                                            console.log('Sources received:', sources);
 
-                                            console.log(`page_no: ${page_no}\nfile_name: ${file_name}\nscore: ${score}`);
-                                            updateMessage(assistantMsgId, {
-                                                content: `page_no: ${page_no}\nfile_name: ${file_name}\nscore: ${score}`,
-                                                isStreaming: true,
-                                            });
+                                            // Don't update the message content here, just store sources
+                                            // The sources will be displayed separately in the UI
                                         } else {
                                             console.warn("No valid source documents found in 'sources' payload.");
                                         }
@@ -199,10 +197,12 @@ const useMessage = () => {
                                     case 'done':
                                         console.log('Stream completed');
                                         isStreamComplete = true;
-                                        // Final update with complete content
+
+                                        // Final update with complete content and sources
                                         updateMessage(assistantMsgId, {
                                             content: data.content,
-                                            isStreaming: false
+                                            isStreaming: false,
+                                            sources: sources.length > 0 ? sources : undefined
                                         });
                                         break;
 

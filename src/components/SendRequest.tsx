@@ -1,12 +1,10 @@
-import {Alert, Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
+import {Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
 import {Send} from "lucide-react";
 import {useRef, useState} from "react";
-import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import {v4} from "uuid";
-import {z} from "zod";
-import Message from "../entities/Message.ts";
+import type { Message} from "../entities/Message.ts";
 import MediaPDF from "./MediaPDF.tsx";
 import {uploadDocument} from "../api/rag-api.ts";
 import useMessage from "../hooks/useMessage.ts";
@@ -74,8 +72,8 @@ const SendRequest = () => {
     const {sending, setSending} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const {streamMessage} = useMessage();
-    const {addMessage, files, clearFiles} = sessionStore();
-    const [alert, setAlert] = useState(false)
+    const {addMessage, files, setFiles} = sessionStore();
+
 
     console.log(`Sending : ${sending}`)
 
@@ -90,48 +88,50 @@ const SendRequest = () => {
         }
 
         // Create a copy of current files before clearing
-        const currentFiles = [...files];
+        const displayCurrentFiles = []
+        for(const file of files){
+            displayCurrentFiles.push(file.name)
+        }
+        const currentFiles = [...files]
+        const messageContent = input.trim();
+
+        // Clear input and files IMMEDIATELY
+        setInput("");
+        setFiles([]);
+
+        // Clear the file input element
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+        if (fileInput) {
+            fileInput.value = '';
+        }
+
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+        }
 
         const message: Message = {
             session_id: v4(),
             message_id: v4(),
-            content: input.trim(),
+            content: messageContent,
             sender: "user",
             timestamp: new Date().toISOString(),
-            files: currentFiles.length > 0 ? currentFiles : []
+            files: displayCurrentFiles.length > 0 ? displayCurrentFiles : []
         };
 
-        // Add message first
+        // Add message to store
         addMessage(message);
 
         try {
             setSending(true);
 
-            // Clear input and files IMMEDIATELY after creating message
-            setInput("");
-            clearFiles();
-
-            // Clear the file input element
-            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-            if (fileInput) {
-                fileInput.value = '';
-            }
-
-            if (textareaRef.current) {
-                textareaRef.current.style.height = 'auto';
-            }
-
             // Handle file upload if files exist
             if (currentFiles.length > 0) {
                 const new_context_id = v4();
                 useSessionStore.getState().setContextID(new_context_id);
-                const res = await uploadDocument(currentFiles, currentSession, new_context_id);
-                if (res) {
-                    setAlert(true)
-                }
+                 await uploadDocument(currentFiles, currentSession, new_context_id);
+
             }
 
-            const messageContent = input.trim();
             await streamMessage(messageContent);
 
         } catch (error) {
@@ -159,62 +159,58 @@ const SendRequest = () => {
     };
 
     return (
-        <>
+        <Box {...box}>
+            <Box maxW="1000px" mx="auto">
+                <VStack {...hstack}>
+                    <HStack w="full" justifyContent="space-between">
+                        <MediaPDF>
+                            <Textarea
+                                ref={textareaRef}
+                                value={input}
+                                onChange={handleInputChange}
+                                onKeyDown={handleKeyPress}
+                                disabled={sending}
+                                {...txtarea}
+                                maxH={"80px"}
+                            />
+                        </MediaPDF>
 
-
-            <Box {...box}>
-                <Box maxW="1000px" mx="auto">
-                    <VStack {...hstack}>
-                        <HStack w="full" justifyContent="space-between">
-                            <MediaPDF children={
-                                <Textarea
-                                    ref={textareaRef}
-                                    value={input}
-                                    onChange={handleInputChange}
-                                    onKeyDown={handleKeyPress}
-                                    disabled={sending}
-                                    {...txtarea}
-                                    maxH={"80px"}
-                                />
-                            }/>
-
-                            <IconButton
-                                aria-label="Send message"
-                                onClick={handleSendMessage}
-                                disabled={!input.trim() || sending}
-                                size="md"
-                                bg={input.trim() && !sending
-                                    ? "linear-gradient(135deg, #8B5CF6, #A855F7)"
-                                    : "rgba(100, 100, 120, 0.3)"
-                                }
-                                color="white"
-                                borderRadius="xl"
-                                transition="all 0.3s ease"
-                                boxShadow={input.trim() && !sending
-                                    ? "0 0 20px rgba(139, 92, 246, 0.4)"
+                        <IconButton
+                            aria-label="Send message"
+                            onClick={handleSendMessage}
+                            disabled={!input.trim() || sending}
+                            size="md"
+                            bg={input.trim() && !sending
+                                ? "linear-gradient(135deg, #8B5CF6, #A855F7)"
+                                : "rgba(100, 100, 120, 0.3)"
+                            }
+                            color="white"
+                            borderRadius="xl"
+                            transition="all 0.3s ease"
+                            boxShadow={input.trim() && !sending
+                                ? "0 0 20px rgba(139, 92, 246, 0.4)"
+                                : "none"
+                            }
+                            _hover={{
+                                transform: input.trim() && !sending ? "scale(1.1)" : "none",
+                                boxShadow: input.trim() && !sending
+                                    ? "0 0 30px rgba(139, 92, 246, 0.6)"
                                     : "none"
-                                }
-                                _hover={{
-                                    transform: input.trim() && !sending ? "scale(1.1)" : "none",
-                                    boxShadow: input.trim() && !sending
-                                        ? "0 0 30px rgba(139, 92, 246, 0.6)"
-                                        : "none"
-                                }}
-                                _active={{
-                                    transform: input.trim() && !sending ? "scale(0.95)" : "none"
-                                }}
-                                _disabled={{
-                                    cursor: "not-allowed",
-                                    opacity: 0.4
-                                }}
-                            >
-                                <Send size={18}/>
-                            </IconButton>
-                        </HStack>
-                    </VStack>
-                </Box>
+                            }}
+                            _active={{
+                                transform: input.trim() && !sending ? "scale(0.95)" : "none"
+                            }}
+                            _disabled={{
+                                cursor: "not-allowed",
+                                opacity: 0.4
+                            }}
+                        >
+                            <Send size={18}/>
+                        </IconButton>
+                    </HStack>
+                </VStack>
             </Box>
-        </>
+        </Box>
     );
 };
 
