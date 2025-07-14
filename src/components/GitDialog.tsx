@@ -1,5 +1,5 @@
 import {
-    Alert,
+
     Button,
     Dialog,
     Field,
@@ -7,7 +7,7 @@ import {
     Input,
     InputGroup,
     Portal,
-    Spinner,
+
     useSlotRecipe,
     VStack
 } from "@chakra-ui/react"
@@ -60,13 +60,13 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
     const [repo, setRepo] = useState("")
     const [branch, setBranch] = useState("main")
     const [commit, setCommit] = useState("")
-    const [alert, showAlert] = useState(false)
+
     const [dirInput, setDirInput] = useState("")
     const [fileExtInput, setFileExtInput] = useState("")
     const [dirOption, setDirOption] = useState<string[]>([])
     const [fileExtOption, setFileExtOption] = useState<string[]>([])
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(false)
+
     const {current_session} = useSessionStore()
     const recipe = useSlotRecipe({key: "dialogHelper"})
     const styles = recipe()
@@ -158,30 +158,8 @@ const handleGitSelected = async () => {
             }
 
 
-            {alert && (
-                <Alert.Root
-                    status="success"
-                    variant="solid"
-                    position="fixed"
-                    top={4}
-                    right={4}
-                    width="auto"
-                    zIndex={9999}
-                >
-                    <Alert.Indicator/>
-                    <Alert.Title>
-                        {owner && repo ? "Data uploaded successfully!" : "Please fill required fields"}
-                    </Alert.Title>
-                </Alert.Root>
-            )}
 
-            {
-                error &&
-                <Alert.Root status="error">
-                    <Alert.Indicator/>
-                    <Alert.Title>There was an error processing your request</Alert.Title>
-                </Alert.Root>
-            }
+
 
 
             <Dialog.Root role="alertdialog" open={true}>

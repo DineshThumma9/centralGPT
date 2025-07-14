@@ -6,7 +6,6 @@ import {toaster} from "./ui/toaster.tsx";
 import {useState} from "react";
 import FileDisplayForUserMessage from "./FileDisplayForUserMessage.tsx";
 
-
 interface Props {
     msg: Message;
 }
@@ -14,7 +13,7 @@ interface Props {
 const box = {
     bg: "linear-gradient(135deg, purple.500, violet.500)",
     px: 4,
-    py: 3,
+    py: 1,
     borderRadius: "xl",
     fontSize: "md",
     color: "white",
@@ -58,6 +57,12 @@ const actionButton = {
 const UserRequest = ({msg}: Props) => {
     const [copied, setCopied] = useState(false);
 
+    // Debug logging
+    console.log('UserRequest received message:', msg);
+    console.log('Message files:', msg.files);
+    console.log('Files exists:', !!msg.files);
+    console.log('Files length:', msg.files?.length);
+
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(msg.content.trimEnd());
@@ -79,8 +84,10 @@ const UserRequest = ({msg}: Props) => {
             align="flex-end"
             w="100%"
             maxW="100%"
-            gap={2}
+
+            px={2} // Optional small padding
         >
+
             <Flex
                 align="flex-end"
                 direction="row"
@@ -89,15 +96,13 @@ const UserRequest = ({msg}: Props) => {
                 justify="flex-end"
             >
                 {/* Files Section */}
-                <VStack align="flex-end" gap={2} flex="1" maxW="80%">
+                <VStack align="flex-end" gap={1} maxW="80%">
                     {msg.files && msg.files.length > 0 && (
-                        <Box w="100%">
-                            <FileDisplayForUserMessage files={msg.files} />
+                        <Box maxW="full">
+                            <FileDisplayForUserMessage files={msg.files}/>
                         </Box>
                     )}
-
-                    {/* Message Content */}
-                    <Box w="100%">
+                    <Box maxW="full" display="inline-block">
                         <Box {...box}>
                             <Editable.Root defaultValue={msg.content}>
                                 <Editable.Preview
@@ -106,7 +111,6 @@ const UserRequest = ({msg}: Props) => {
                                     whiteSpace="pre-wrap"
                                 />
                                 <Editable.Input {...editableInput} />
-
                                 <Editable.Control>
                                     <Editable.CancelTrigger asChild>
                                         <IconButton

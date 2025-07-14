@@ -58,6 +58,8 @@ export const newSession = async () => {
 export const getChatHistory = async (data: { session_id: string; limit?: number }) => {
     const res = await sessionAPI.get(`/history/${data.session_id}`);
     if (!res?.data) throw new Error("Session History Empty");
+    console.log(res.data)
+
     return res.data;
 };
 

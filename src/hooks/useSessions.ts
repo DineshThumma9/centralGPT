@@ -91,6 +91,8 @@ const useSessions = () => {
         try {
             setLoading(true);
             const history = await getChatHistory({session_id});
+            console.log(history)
+            console.log(history[0])
             setCurrentSessionId(session_id);
             setMessages(history);
 

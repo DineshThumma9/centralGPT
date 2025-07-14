@@ -52,7 +52,7 @@ const useMessage = () => {
     const {
         addMessage,
         current_session, setTitle, messages, setStreaming, updateMessage,
-        context,
+        context,files
     } = store;
 
 
@@ -89,8 +89,10 @@ const useMessage = () => {
 
 // Log them
         console.log("Starting stream with:", session_id, context_id)
-
-
+        const displayCurrentFiles = []
+        for(const file of files){
+            displayCurrentFiles.push(file.name)
+        }
         try {
             // Close any existing connection
             if (eventSourceRef.current) {
@@ -110,7 +112,8 @@ const useMessage = () => {
                     msg: userMsg,
                     isFirst: isFirst,
                     context_type: context,
-                    context_id: context_id
+                    context_id: context_id,
+                    files:displayCurrentFiles
                 }),
             });
 

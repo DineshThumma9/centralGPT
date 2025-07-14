@@ -2,7 +2,6 @@
 import {ragAPI} from "./apiInstance.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import type {GitRequestSchema} from "../components/GitDialog.tsx";
-import axios, {type AxiosError} from "axios";
 
 
 
@@ -41,9 +40,10 @@ files.forEach((file, index) => {
 
 
     return response.data;
-  } catch (error) {
-    console.error("RAG API Response Error:",  error.response?.data);
-    throw error;
+  } 
+       
+  catch (error) {
+      console.log(`error has occured : ${error}`)
   }
 };
 
@@ -80,35 +80,5 @@ const res = await ragAPI.post(`/git?session_id=${session_id}&context_id=${contex
 
 }
 
-function handleServerDown() {
-    // Handle server down logic
-
-}
 
 
-export const searchDocuments = async (query: string, limit: number = 10) => {
-    const res = await ragAPI.post("/search",
-        { query, limit },
-        { headers: {"Content-Type": "application/json"} }
-    );
-
-    return res.data;
-};
-
-export const deleteDocument = async (documentId: string) => {
-    await ragAPI.delete(`/document/${documentId}`);
-};
-
-// Health check function (can be moved to a separate utility file)
-function startHealthCheck() {
-    setInterval(async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URI}/health`);
-            if (!response.ok) {
-                handleServerDown();
-            }
-        } catch (error) {
-            handleServerDown();
-        }
-    }, 30000);
-}

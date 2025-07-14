@@ -39,7 +39,7 @@ export type SessionState = {
   getSessions: () => Session[];
   clearAllSessions(): void;
   setFiles: (files: File[]) => void;
-  addUniqueFiles: (newFiles: File[]) => void; // New method for safe file addition
+  addUniqueFiles: (newFiles: File[]) => void;
 };
 
 // Helper function to check if two files are identical
@@ -191,11 +191,15 @@ const useSessionStore = create<SessionState>()(
     }),
     {
       name: "session-persist",
-      // Don't persist files as they can't be serialized properly
-      partialize: (state) => ({
-        ...state,
-        files: [] // Always start with empty files array
-      })
+      // Only exclude the files (File objects) from persistence
+      // Keep messages with their file names intact
+      partialize: (state) => {
+        const { files, ...persistedState } = state;
+        return {
+          ...persistedState,
+          files: [] // Only clear the File objects, not the message files
+        };
+      }
     }
   )
 );
