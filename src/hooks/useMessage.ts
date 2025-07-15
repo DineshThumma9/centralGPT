@@ -29,7 +29,7 @@ const docSchema = z.object({
 type Doc = z.infer<typeof docSchema>;
 
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URI;
 
 
 const useMessage = () => {

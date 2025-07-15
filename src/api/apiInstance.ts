@@ -5,7 +5,7 @@ import useSessionStore from "../store/sessionStore";
 import useInitStore from "../store/initStore";
 import useValidationStore from "../store/validationStore";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URI;
 
 // Centralized auth error handler
 const handleAuthError = () => {
