@@ -1,54 +1,66 @@
-# React + TypeScript + Vite
+# 🧠 CentralGPT
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**One Nexus Point to access and chat with multiple LLM providers — Mistral, Ollama, Groq, TogetherAI.**  
+Supports memory, chat history, and persistent messages.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠 Tech Stack
 
-## Expanding the ESLint configuration
+| Layer         | Tech                                 |
+|---------------|--------------------------------------|
+| **Framework** | React                                |
+| **Language**  | TypeScript                           |
+| **State**     | Zustand                              |
+| **Validation**| Zod                                  |
+| **Networking**| Axios                                |
+| **UI**        | Chakra UI                            |
+| **Markdown**  | rehype plugins + React Markdown      |
+| **Deployment**| Vercel                               |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🚀 Features
+
+- 🔁 Chat across **multiple providers**
+- 💾 Chat history and message persistence
+- 🧠 Memory and session management
+- ⚡ Fast, minimal UI with Chakra
+- ✨ Markdown, syntax highlighting, GitHub-flavored markdown
+
+---
+
+## 🧩 Setup Instructions
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/DineshThumma9/centralGPT.git
+cd centralGPT
+```
+## 🧩 Setup Instructions
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+### 3. Configure Environment Variables
+Create a .env file in the root directory:
+```
+VITE_API_URI=
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 4. Backend Setup (Required)
+Clone and set up the backend:
+```
+git clone https://github.com/DineshThumma9/centralGPT-backend.git
+```
+Follow the backend repo instructions to configure and run it.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+### 🧪 Development Scripts
+```
+npm run dev       # Start local dev server
+npm run build     # Build for production
+npm run preview   # Preview production build
 ```
