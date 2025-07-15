@@ -1,9 +1,10 @@
-import {Box, Editable, Flex, HStack, IconButton} from "@chakra-ui/react";
-import type {Message} from "../entities/Message.ts";
+import {Box, Editable, Flex, HStack, IconButton, VStack} from "@chakra-ui/react";
+import {type Message} from "../entities/Message.ts";
 import {Check, Copy, User} from "lucide-react";
 import {LuCheck, LuPencilLine, LuX} from "react-icons/lu";
 import {toaster} from "./ui/toaster.tsx";
 import {useState} from "react";
+import FileDisplayForUserMessage from "./FileDisplayForUserMessage.tsx";
 
 interface Props {
     msg: Message;
@@ -12,7 +13,7 @@ interface Props {
 const box = {
     bg: "linear-gradient(135deg, purple.500, violet.500)",
     px: 4,
-    py: 3,
+    py: 1,
     borderRadius: "xl",
     fontSize: "md",
     color: "white",
@@ -56,6 +57,12 @@ const actionButton = {
 const UserRequest = ({msg}: Props) => {
     const [copied, setCopied] = useState(false);
 
+    // Debug logging
+    console.log('UserRequest received message:', msg);
+    console.log('Message files:', msg.files);
+    console.log('Files exists:', !!msg.files);
+    console.log('Files length:', msg.files?.length);
+
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(msg.content.trimEnd());
@@ -77,51 +84,55 @@ const UserRequest = ({msg}: Props) => {
             align="flex-end"
             w="100%"
             maxW="100%"
-            gap={2}
+
+            px={2} // Optional small padding
         >
+
             <Flex
-                align="flex-start"
+                align="flex-end"
                 direction="row"
                 gap={3}
                 w="100%"
                 justify="flex-end"
             >
-                {/* Content container - Flexible width with proper constraints */}
-                <Box
-                    flex="1"
-                    maxW="80%"
-                    minW={0} // Critical for text wrapping
-                >
-                    <Box {...box}>
-                        <Editable.Root defaultValue={msg.content}>
-                            <Editable.Preview
-                                wordBreak="break-word"
-                                overflowWrap="break-word"
-                                whiteSpace="pre-wrap"
-                            />
-                            <Editable.Input {...editableInput} />
-
-                            <Editable.Control>
-                                <Editable.CancelTrigger asChild>
-                                    <IconButton
-                                        {...editableIcon}
-                                        aria-label="Cancel edit"
-                                    >
-                                        <LuX/>
-                                    </IconButton>
-                                </Editable.CancelTrigger>
-                                <Editable.SubmitTrigger asChild>
-                                    <IconButton
-                                        {...editableIcon}
-                                        aria-label="Submit edit"
-                                    >
-                                        <LuCheck/>
-                                    </IconButton>
-                                </Editable.SubmitTrigger>
-                            </Editable.Control>
-                        </Editable.Root>
+                {/* Files Section */}
+                <VStack align="flex-end" gap={1} maxW="80%">
+                    {msg.files && msg.files.length > 0 && (
+                        <Box maxW="full">
+                            <FileDisplayForUserMessage files={msg.files}/>
+                        </Box>
+                    )}
+                    <Box maxW="full" display="inline-block">
+                        <Box {...box}>
+                            <Editable.Root defaultValue={msg.content}>
+                                <Editable.Preview
+                                    wordBreak="break-word"
+                                    overflowWrap="break-word"
+                                    whiteSpace="pre-wrap"
+                                />
+                                <Editable.Input {...editableInput} />
+                                <Editable.Control>
+                                    <Editable.CancelTrigger asChild>
+                                        <IconButton
+                                            {...editableIcon}
+                                            aria-label="Cancel edit"
+                                        >
+                                            <LuX/>
+                                        </IconButton>
+                                    </Editable.CancelTrigger>
+                                    <Editable.SubmitTrigger asChild>
+                                        <IconButton
+                                            {...editableIcon}
+                                            aria-label="Submit edit"
+                                        >
+                                            <LuCheck/>
+                                        </IconButton>
+                                    </Editable.SubmitTrigger>
+                                </Editable.Control>
+                            </Editable.Root>
+                        </Box>
                     </Box>
-                </Box>
+                </VStack>
 
                 {/* Avatar - Fixed width */}
                 <Box flexShrink={0} mt={1}>

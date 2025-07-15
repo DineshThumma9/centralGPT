@@ -1,6 +1,4 @@
-// ===================================
 
-// Updated LLMModelChooser.tsx with Purple-Violet Theme
 import {HStack} from "@chakra-ui/react";
 import {Constants} from "../entities/Constants.ts";
 import {llmSelection, modelSelection} from "../api/session-api.ts";
@@ -9,9 +7,8 @@ import useInitStore from "../store/initStore.ts";
 import BadgeCompo from "./BadgeCompo.tsx";
 import APIKey from "./API-Key.tsx";
 import {useEffect} from "react";
-import StreamSwitch from "./Switch.tsx";
-import useSessionStore from "../store/sessionStore.ts";
 
+import useSessionStore from "../store/sessionStore.ts";
 
 const hstack = {
     gap: 3,
@@ -45,6 +42,9 @@ const LLMModelChooser = () => {
         providerModels,
         currentModel
     } = useInitStore();
+
+
+
 
     useEffect(() => {
         if (!currentLLMProvider) return;
@@ -108,6 +108,8 @@ const LLMModelChooser = () => {
                 disabled={!currentLLMProvider || modelMap.length === 0}
             />
 
+
+
             {(currentLLMProvider || currentModel || shouldStream) && (
                 <HStack gap={2}>
                     {currentLLMProvider && <BadgeCompo label={currentLLMProvider}/>}
@@ -115,11 +117,9 @@ const LLMModelChooser = () => {
                 </HStack>
             )}
 
-            <HStack>
-                <BadgeCompo label={shouldStream ? "streaming" : "not streaming"} key={"stream"}/>
-            </HStack>
 
-            <StreamSwitch/>
+
+
             <APIKey provider={currentAPIProvider} title={"API KEY"}/>
         </HStack>
     );

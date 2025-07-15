@@ -1,18 +1,12 @@
-import {
-    Avatar,
-    Button,
-    IconButton,
-    VStack,
-    Portal,
-    MenuPositioner,
-    Separator,
-    Text
-} from "@chakra-ui/react";
-import { BiCog, BiLogOut, BiUser } from "react-icons/bi";
-import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "./ui/menu.tsx";
-import { useAuth } from "../hooks/useAuth.ts";
-import { useNavigate } from "react-router-dom";
+import {Avatar, Button, HStack, IconButton, MenuPositioner, Portal, Separator, Text, VStack} from "@chakra-ui/react";
+import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
+import {MenuContent, MenuItem, MenuRoot, MenuTrigger} from "./ui/menu.tsx";
+import {useAuth} from "../hooks/useAuth.ts";
+import {useNavigate} from "react-router-dom";
 import useInitStore from "../store/initStore.ts";
+import {GithubIcon} from "lucide-react";
+import {useState} from "react";
+import GitDialog from "./GitDialog.tsx";
 
 // Theme-consistent styles
 const avatarButton = {
@@ -75,76 +69,116 @@ const iconButton = {
 };
 
 const AvatarExpandable = () => {
-    const { logout } = useAuth();
+    const {logout} = useAuth();
     const navigate = useNavigate();
-    const { username, email } = useInitStore();
+    const {username, email} = useInitStore();
 
     const handleLogout = () => {
         logout();
         navigate("/login");
     };
 
+
+    const [dialog, setDialog] = useState(false);
+
+
+    const handleGitDialog = () => {
+        setDialog(false)
+    }
+
+
     return (
-        <VStack gap={0}>
-            <MenuRoot>
-                <MenuTrigger asChild>
-                    <Button {...avatarButton}>
-                           <Avatar.Root
-                               bg="linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)"
-                            color="white">
-                            <Avatar.Fallback
-                                name={username || "user"}
 
-                            />
-                            <Avatar.Image  />
-                        </Avatar.Root>
+        <HStack>
+            <IconButton
+                aria-label="Git Creditionals"
+                onClick={() => setDialog(true)}
+                size="md"
+                variant="ghost"
+                color="rgba(255, 255, 255, 0.7)"
+                _hover={{
+                    bg: "rgba(139, 69, 197, 0.2)",
+                    color: "white"
+                }}
 
-                    </Button>
-                </MenuTrigger>
+            >
+                <GithubIcon size={16}/>
+            </IconButton>
 
-                <Portal>
-                    <MenuPositioner>
-                        <MenuContent {...menuContent}>
-                            <MenuItem value="username" {...menuItem}>
-                                <IconButton {...iconButton}>
-                                    <BiUser />
-                                </IconButton>
-                                <Text fontSize="sm" fontWeight="medium">
-                                    {username || "User"}
-                                </Text>
-                            </MenuItem>
+            <VStack gap={0}>
 
-                            <Separator {...separator} />
 
-                            <MenuItem value="email" {...menuItem}>
-                                <Text fontSize="xs" color="rgba(255, 255, 255, 0.7)" pl={6}>
-                                    {email || "No email"}
-                                </Text>
-                            </MenuItem>
+                <MenuRoot>
+                    <MenuTrigger asChild>
 
-                            <Separator {...separator} />
 
-                            <MenuItem value="customize" {...menuItem}>
-                                <IconButton {...iconButton}>
-                                    <BiCog />
-                                </IconButton>
-                                <Text fontSize="sm">Customize</Text>
-                            </MenuItem>
+                        <Button {...avatarButton}>
+                            <Avatar.Root
+                                bg="linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)"
+                                color="white">
+                                <Avatar.Fallback
+                                    name={username || "user"}
 
-                            <MenuItem value="logout" {...logoutMenuItem} onClick={handleLogout}>
-                                <IconButton
-                                    {...iconButton}
-                                    color="rgba(239, 68, 68, 0.8)"
-                                >
-                                    <BiLogOut />
-                                </IconButton>
-                                <Text fontSize="sm">Logout</Text>
-                            </MenuItem>
-                        </MenuContent>
-                    </MenuPositioner>
-                </Portal>
-            </MenuRoot>
-        </VStack>
+                                />
+                                <Avatar.Image/>
+                            </Avatar.Root>
+
+                        </Button>
+                    </MenuTrigger>
+
+                    <Portal>
+                        <MenuPositioner>
+                            <MenuContent {...menuContent}>
+                                <MenuItem value="username" {...menuItem}>
+                                    <IconButton {...iconButton}>
+                                        <BiUser/>
+                                    </IconButton>
+                                    <Text fontSize="sm" fontWeight="medium">
+                                        {username || "User"}
+                                    </Text>
+                                </MenuItem>
+
+                                <Separator {...separator} />
+
+                                <MenuItem value="email" {...menuItem}>
+                                    <Text fontSize="xs" color="rgba(255, 255, 255, 0.7)" pl={6}>
+                                        {email || "No email"}
+                                    </Text>
+                                </MenuItem>
+
+                                <Separator {...separator} />
+
+                                <MenuItem value="customize" {...menuItem}>
+                                    <IconButton {...iconButton}>
+                                        <BiCog/>
+                                    </IconButton>
+                                    <Text fontSize="sm">Customize</Text>
+                                </MenuItem>
+
+                                <MenuItem value="logout" {...logoutMenuItem} onClick={handleLogout}>
+                                    <IconButton
+                                        {...iconButton}
+                                        color="rgba(239, 68, 68, 0.8)"
+                                    >
+                                        <BiLogOut/>
+                                    </IconButton>
+                                    <Text fontSize="sm">Logout</Text>
+                                </MenuItem>
+                            </MenuContent>
+                        </MenuPositioner>
+                    </Portal>
+                </MenuRoot>
+
+                {
+                    dialog &&
+
+                    <GitDialog
+                        onCancel={() => setDialog(false)}
+                        onConfirm={handleGitDialog}
+                    />
+                }
+            </VStack>
+        </HStack>
     );
 };
 
