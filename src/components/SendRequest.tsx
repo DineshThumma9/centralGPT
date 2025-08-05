@@ -1,6 +1,6 @@
 import {Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
 import {Send} from "lucide-react";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import {v4} from "uuid";
@@ -8,6 +8,7 @@ import type { Message} from "../entities/Message.ts";
 import MediaPDF from "./MediaPDF.tsx";
 import {uploadDocument} from "../api/rag-api.ts";
 import useMessage from "../hooks/useMessage.ts";
+import {toaster} from "./ui/toaster.tsx";
 
 const box = {
     w: "full",
@@ -72,7 +73,19 @@ const SendRequest = () => {
     const {sending, setSending} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const {streamMessage} = useMessage();
+    const [sendingFiles,setSendingFiles] = useState(false);
     const {addMessage, files, setFiles} = sessionStore();
+
+
+    useEffect(() => {
+
+                toaster.create({
+                    title:"Files being Processed",
+                    description:"Files are currently being processed",
+                    type:"success"
+                })
+
+    }, [sendingFiles]);
 
 
     console.log(`Sending : ${sending}`)
@@ -81,13 +94,18 @@ const SendRequest = () => {
         if (!input.trim() || sending) return;
 
         console.log("Entered message", input.trim())
+
+
         const currentSession = sessionStore.getState().current_session;
+
+
         if (!currentSession) {
             console.error("No session selected.");
             return;
         }
 
-        // Create a copy of current files before clearing
+
+
         const displayCurrentFiles = []
         for(const file of files){
             displayCurrentFiles.push(file.name)
@@ -95,11 +113,11 @@ const SendRequest = () => {
         const currentFiles = [...files]
         const messageContent = input.trim();
 
-        // Clear input and files IMMEDIATELY
         setInput("");
         setFiles([]);
 
-        // Clear the file input element
+
+
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         if (fileInput) {
             fileInput.value = '';
@@ -118,19 +136,35 @@ const SendRequest = () => {
             files: displayCurrentFiles.length > 0 ? displayCurrentFiles : []
         };
 
-        // Add message to store
+
         addMessage(message);
 
         try {
-            setSending(true);
 
-            // Handle file upload if files exist
-            if (currentFiles.length > 0) {
-                const new_context_id = v4();
-                useSessionStore.getState().setContextID(new_context_id);
+
+            try{
+
+                 if (currentFiles.length > 0) {
+                  const new_context_id = v4();
+                 useSessionStore.getState().setContextID(new_context_id);
+                 setSendingFiles(true);
                  await uploadDocument(currentFiles, currentSession, new_context_id);
 
+               }
+
+
             }
+            catch(error){
+                toaster.create({
+                    title:"Error has occured while Processing Files",
+                    description:"Error has occured",
+                    type:"error"
+                })
+            }
+            finally {
+                setSendingFiles(false)
+            }
+
 
             await streamMessage(messageContent);
 
@@ -159,6 +193,8 @@ const SendRequest = () => {
     };
 
     return (
+
+
         <Box {...box}>
             <Box maxW="1000px" mx="auto">
                 <VStack {...hstack}>

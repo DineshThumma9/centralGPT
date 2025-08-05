@@ -1,8 +1,8 @@
 "use client"
 
 
-
 import {
+
 
     Button,
     Dialog,
@@ -10,18 +10,18 @@ import {
     HStack,
     Input,
     InputGroup,
-    Portal,
+    Portal, Spinner,
 
     useSlotRecipe,
     VStack
 } from "@chakra-ui/react"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {v4} from "uuid";
 import useSessionStore from "../store/sessionStore.ts";
 import {z} from "zod";
 import {gitFilesUpload} from "../api/rag-api.ts";
 import SelectOptions from "./Select.tsx";
-import { toaster } from "./ui/toaster.tsx"
+import {Toaster,toaster} from "./ui/toaster.tsx"
 
 
 interface Props {
@@ -95,74 +95,81 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
     }
 
 
-
-const handleGitSelected = async () => {
-  if (!owner.trim() || !repo.trim()) {
+    useEffect(() => {
+         if (loading) {
     toaster.create({
-      title: "Missing fields",
-      description: "Please provide both owner and repository name.",
-      type: "error",
-      duration: 3000,
+      title: "Loading...",
+      description: "Reading -> splitting -> indexing -> retriever",
+      type: "loading"
     });
-    return;
   }
+    },[loading])
 
-  onConfirm(); // close dialog immediately
+    const handleGitSelected = async () => {
+        if (!owner.trim() || !repo.trim()) {
+            toaster.create({
+                title: "Missing fields",
+                description: "Please provide both owner and repository name.",
+                type: "error",
+                duration: 3000,
+            });
+            return;
+        }
 
-  setLoading(true);
-  try {
-    const parsedDirs = dirInput.split(",").map(d => d.trim()).filter(Boolean);
-    const parsedExts = fileExtInput.split(",").map(e => e.trim()).filter(Boolean);
+        onConfirm();
 
-    const res_body = GitRequestSchema.parse({
-      owner: owner.trim(),
-      repo: repo.trim(),
-      commit: commit.trim() || undefined,
-      branch: branch.trim() || "main",
-      dir_include: dirOption[0] === "Include" ? parsedDirs : [],
-      dir_exclude: dirOption[0] === "Exclude" ? parsedDirs : [],
-      file_extension_include: fileExtOption[0] === "Include" ? parsedExts : undefined,
-      file_extension_exclude: fileExtOption[0] === "Exclude" ? parsedExts : undefined
-    });
 
-    const new_context_id = v4();
-    useSessionStore.getState().setContextID(new_context_id);
-    useSessionStore.getState().setContext("code");
 
-    const res = await gitFilesUpload(res_body, current_session, new_context_id);
+        setLoading(true);
+        try {
+            const parsedDirs = dirInput.split(",").map(d => d.trim()).filter(Boolean);
+            const parsedExts = fileExtInput.split(",").map(e => e.trim()).filter(Boolean);
 
-    toaster.create({
-      title: res ? "Upload Complete" : "Upload Failed",
-      description: res ? "Git repository connected and data indexed." : "Something went wrong with the upload.",
-      type: res ? "success" : "error",
-      duration: 3000,
-    });
-  } catch (error) {
-    console.error("Git upload error:", error);
-    toaster.create({
-      title: "Unexpected Error",
-      description: "Something went wrong while connecting.",
-      type: "error",
-      duration: 3000,
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+            const res_body = GitRequestSchema.parse({
+                owner: owner.trim(),
+                repo: repo.trim(),
+                commit: commit.trim() || undefined,
+                branch: branch.trim() || "main",
+                dir_include: dirOption[0] === "Include" ? parsedDirs : [],
+                dir_exclude: dirOption[0] === "Exclude" ? parsedDirs : [],
+                file_extension_include: fileExtOption[0] === "Include" ? parsedExts : undefined,
+                file_extension_exclude: fileExtOption[0] === "Exclude" ? parsedExts : undefined
+            });
+
+            const new_context_id = v4();
+            useSessionStore.getState().setContextID(new_context_id);
+            useSessionStore.getState().setContext("code");
+
+            const res = await gitFilesUpload(res_body, current_session, new_context_id);
+
+            toaster.create({
+                title: res ? "Upload Complete" : "Upload Failed",
+                description: res ? "Git repository connected and data indexed." : "Something went wrong with the upload.",
+                type: res ? "success" : "error",
+                duration: 3000,
+            });
+
+
+
+        } catch (error) {
+
+
+            console.error("Git upload error:", error);
+            toaster.create({
+                title: "Unexpected Error",
+                description: "Something went wrong while connecting.",
+                type: "error",
+                duration: 3000,
+            });
+
+
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <>
-
-            {
-                loading &&
-                    toaster.create({
-          description: "File saved successfully",
-          type: "loading",
-        })
-            }
-
-
-
 
 
 

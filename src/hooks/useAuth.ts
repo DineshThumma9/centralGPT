@@ -71,6 +71,7 @@ export const useAuth = () => {
        sessionStore.getState().clearAllSessions();
         useSessionStore.getState().setContextID("")
         useSessionStore.getState().setContext("vanilla")
+        useSessionStore.getState().setSending(false)
         logout()
   }
 

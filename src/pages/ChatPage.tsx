@@ -1,4 +1,4 @@
-import { Grid, GridItem, Box } from "@chakra-ui/react";
+import {Grid, GridItem, Box, Toaster} from "@chakra-ui/react";
 import Sidebar from "../components/SideBar";
 import ChatArea from "../components/ChatArea";
 import { useState } from "react";
@@ -41,6 +41,7 @@ const ChatPage = () => {
                 >
                     <ChatArea />
                 </GridItem>
+
             </Grid>
         </Box>
     );
