@@ -1,10 +1,10 @@
 import {Box, HStack, IconButton, Textarea, VStack,} from "@chakra-ui/react";
-import {Send} from "lucide-react";
+import {Pause, PauseIcon, Send} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 import sessionStore from "../store/sessionStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import {v4} from "uuid";
-import type { Message} from "../entities/Message.ts";
+import type {Message} from "../entities/Message.ts";
 import MediaPDF from "./MediaPDF.tsx";
 import {uploadDocument} from "../api/rag-api.ts";
 import useMessage from "../hooks/useMessage.ts";
@@ -70,20 +70,20 @@ const txtarea = {
 
 const SendRequest = () => {
     const [input, setInput] = useState("");
-    const {sending, setSending} = useSessionStore();
+    const {sending, setSending, isStreaming} = useSessionStore();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const {streamMessage} = useMessage();
-    const [sendingFiles,setSendingFiles] = useState(false);
-    const {addMessage, files, setFiles} = sessionStore();
+    const {streamMessage, abortStream} = useMessage();
+    const [sendingFiles, setSendingFiles] = useState(false);
+    const {addMessage, files, setFiles, setStreaming} = sessionStore();
 
 
     useEffect(() => {
 
-                toaster.create({
-                    title:"Files being Processed",
-                    description:"Files are currently being processed",
-                    type:"success"
-                })
+        toaster.create({
+            title: "Files being Processed",
+            description: "Files are currently being processed",
+            type: "success"
+        })
 
     }, [sendingFiles]);
 
@@ -105,9 +105,8 @@ const SendRequest = () => {
         }
 
 
-
         const displayCurrentFiles = []
-        for(const file of files){
+        for (const file of files) {
             displayCurrentFiles.push(file.name)
         }
         const currentFiles = [...files]
@@ -115,7 +114,6 @@ const SendRequest = () => {
 
         setInput("");
         setFiles([]);
-
 
 
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -132,6 +130,7 @@ const SendRequest = () => {
             message_id: v4(),
             content: messageContent,
             sender: "user",
+
             timestamp: new Date().toISOString(),
             files: displayCurrentFiles.length > 0 ? displayCurrentFiles : []
         };
@@ -142,26 +141,24 @@ const SendRequest = () => {
         try {
 
 
-            try{
+            try {
 
-                 if (currentFiles.length > 0) {
-                  const new_context_id = v4();
-                 useSessionStore.getState().setContextID(new_context_id);
-                 setSendingFiles(true);
-                 await uploadDocument(currentFiles, currentSession, new_context_id);
+                if (currentFiles.length > 0) {
+                    const new_context_id = v4();
+                    useSessionStore.getState().setContextID(new_context_id);
+                    setSendingFiles(true);
+                    await uploadDocument(currentFiles, currentSession, new_context_id);
 
-               }
+                }
 
 
-            }
-            catch(error){
+            } catch (error) {
                 toaster.create({
-                    title:"Error has occured while Processing Files",
-                    description:"Error has occured",
-                    type:"error"
+                    title: "Error has occured while Processing Files",
+                    description: "Error has occured",
+                    type: "error"
                 })
-            }
-            finally {
+            } finally {
                 setSendingFiles(false)
             }
 
@@ -212,37 +209,40 @@ const SendRequest = () => {
                         </MediaPDF>
 
                         <IconButton
-                            aria-label="Send message"
-                            onClick={handleSendMessage}
-                            disabled={!input.trim() || sending}
+                            aria-label={isStreaming ? "Stop streaming" : "Send message"}
+                            onClick={isStreaming ? abortStream : handleSendMessage}
+                            disabled={isStreaming ? false : !input.trim() || sending}
                             size="md"
-                            bg={input.trim() && !sending
-                                ? "linear-gradient(135deg, #8B5CF6, #A855F7)"
-                                : "rgba(100, 100, 120, 0.3)"
+                            bg={
+                                isStreaming || (input.trim() && !sending)
+                                    ? "linear-gradient(135deg, #8B5CF6, #A855F7)"
+                                    : "rgba(100, 100, 120, 0.3)"
                             }
                             color="white"
                             borderRadius="xl"
                             transition="all 0.3s ease"
-                            boxShadow={input.trim() && !sending
-                                ? "0 0 20px rgba(139, 92, 246, 0.4)"
-                                : "none"
+                            boxShadow={
+                                isStreaming || (input.trim() && !sending)
+                                    ? "0 0 20px rgba(139, 92, 246, 0.4)"
+                                    : "none"
                             }
                             _hover={{
-                                transform: input.trim() && !sending ? "scale(1.1)" : "none",
-                                boxShadow: input.trim() && !sending
+                                transform: isStreaming || (input.trim() && !sending) ? "scale(1.1)" : "none",
+                                boxShadow: isStreaming || (input.trim() && !sending)
                                     ? "0 0 30px rgba(139, 92, 246, 0.6)"
                                     : "none"
                             }}
                             _active={{
-                                transform: input.trim() && !sending ? "scale(0.95)" : "none"
+                                transform: isStreaming || (input.trim() && !sending) ? "scale(0.95)" : "none"
                             }}
                             _disabled={{
                                 cursor: "not-allowed",
                                 opacity: 0.4
                             }}
                         >
-                            <Send size={18}/>
+                            {isStreaming ? <PauseIcon size={18}/> : <Send size={18}/>}
                         </IconButton>
+
                     </HStack>
                 </VStack>
             </Box>

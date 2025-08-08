@@ -35,12 +35,38 @@ const API_BASE_URL = import.meta.env.VITE_API_URI;
 const useMessage = () => {
 
     const eventSourceRef = useRef<EventSource | null>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
+
+
+
+ const abortStream = () => {
+    if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+    }
+
+    if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+    }
+
+    setStreaming(false);
+    useSessionStore.getState().setSending(false)
+};
+
 
     useEffect(() => {
         return () => {
             if (eventSourceRef.current) {
                 eventSourceRef.current.close();
                 console.log("EventSource closed on unmount.");
+            }
+
+            if(abortControllerRef.current){
+                abortControllerRef.current.abort();
+                abortControllerRef.current = null;
+
+
             }
         };
     }, []);
@@ -57,6 +83,14 @@ const useMessage = () => {
 
 
     async function streamMessage(userMsg: string): Promise<void> {
+
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort(); // cancel any previous stream
+        }
+        abortControllerRef.current = new AbortController(); // new controller for this stream
+
+
+
         const token = useAuthStore.getState().accessToken;
         const assistantMsgId = uuidv4();
         const session_id = useSessionStore.getState().current_session;
@@ -101,6 +135,9 @@ const useMessage = () => {
 
             console.log('Starting stream with sessionId:', session_id, 'message:', userMsg);
 
+
+
+
             const response = await fetch(`${API_BASE_URL}/messages/simple-stream`, {
                 method: 'POST',
                 headers: {
@@ -115,6 +152,7 @@ const useMessage = () => {
                     context_id: context_id,
                     files:displayCurrentFiles
                 }),
+                signal:abortControllerRef.current.signal
             });
 
             console.log(`key Sending : ${session_id}_${context_id}_${context}`)
@@ -219,7 +257,17 @@ const useMessage = () => {
                                     }
 
 
+                                    case 'abort' : {
+                                        isStreamComplete=true;
+                                        break;
+                                    }
+
+
+
+
                                     case 'error':
+
+
                                         console.error('Stream error:', data.content);
                                         updateMessage(assistantMsgId, {
                                             content: `[Error: ${data.content}]`,
@@ -240,8 +288,12 @@ const useMessage = () => {
 
         } catch (err) {
             console.error('StreamMessage error:', err);
+            let content = '[Error streaming response]'
+            if(err.name == 'AbortError'){
+                content =  '[Interuptted Streaming]'
+            }
             updateMessage(assistantMsgId, {
-                content: '[Error streaming response]',
+                content: content,
                 isStreaming: false
             });
         } finally {
@@ -250,7 +302,8 @@ const useMessage = () => {
     }
 
     return {
-        streamMessage
+        streamMessage,
+        abortStream
     };
 }
 

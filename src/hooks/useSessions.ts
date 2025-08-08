@@ -24,7 +24,7 @@ const useSessions = () => {
     const {
          setSessions, removeSession, addSession, clear,
         setCurrentSessionId, current_session, setTitle,
-        setMessages, setStreaming,setLoading,
+        setMessages, setStreaming,setLoading,setContext,setContextID
 
     } = store;
 
@@ -45,6 +45,8 @@ const useSessions = () => {
 
             addSession(session);
             setCurrentSessionId(session.session_id);
+            setContext("vanilla")
+            setContextID(Math.random().toString())
             setTitle("New SessionComponent");
             clear();
 
