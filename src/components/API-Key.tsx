@@ -3,19 +3,23 @@ import {Button, Dialog, Field, Input, Portal, Stack, useSlotRecipe} from "@chakr
 import {useRef, useState} from "react";
 import {apiKeySelection} from "../api/session-api.ts";
 import useInitStore from "../store/initStore.ts";
+import {useNavigate} from "react-router-dom";
 
 interface Props {
     provider: string;
     title: string;
     selected?: string;
+    link?:string
 }
-const APIKey = ({provider, title}: Props) => {
+const APIKey = ({provider, title,link}: Props) => {
     const {
         dialogOpen,
         setDialogOpen,
         currentAPIProvider,
         setCurrentAPIKey,
     } = useInitStore();
+
+
 
     const ref = useRef<HTMLInputElement>(null);
     const [apiKey, setAPIKey] = useState("");
@@ -53,8 +57,9 @@ const APIKey = ({provider, title}: Props) => {
                             <Dialog.Title
                                 css={styles.title}
 
+
                             >
-                                Enter Your API Key - {provider}
+                                 Enter Your API Key-{provider}
                             </Dialog.Title>
                         </Dialog.Header>
                         <Dialog.Body p={6} pt={2}>

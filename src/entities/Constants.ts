@@ -5,6 +5,8 @@ export const Constants = () => {
     "mistralai/Mixtral-8x7B-Instruct-v0.1",
     "deepseek-ai/DeepSeek-V3-0324",
     "gemma/Gemma-3-27B",
+       "openai/gpt-oss-20b",
+      "openai/gpt-oss-120b",
     "togethercomputer/StripedHyena-Nous-7B",
     "togethercomputer/RedPajama-INCITE-Chat-3B-v1",
       "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
@@ -18,11 +20,25 @@ export const Constants = () => {
     "black-forest-labs/FLUX-pro",
   ];
 
-  const mistralModels: string[] = [
-    "mistral-small",
-    "mistral-medium",
-    "mistral-large",
-  ];
+const mistralModels: string[] = [
+  "magistral-medium",
+  "magistral-small",
+  "mistral-medium",
+  "mistral-large",
+  "pixtral-large",
+  "mistral-moderation",
+  "ministral-3b",
+  "ministral-8b",
+  "open-mistral-nemo",
+  "mistral-small",
+  "devstral-small",
+  "devstral-medium",
+  "mistral-saba",
+  "codestral",
+  "mistral-ocr",
+  "voxtral-small",
+  "voxtral-mini"
+];
 
   const openaiModels: string[] = [
     "gpt-4o",
@@ -60,6 +76,8 @@ export const Constants = () => {
     "compound-beta",
     "gemma2-9b-it",
     "compound-beta-mini",
+      "openai/gpt-oss-20b",
+      "openai/gpt-oss-120b",
     "llama3-70b-8192",
     "llama-3.1-8b-instant",
     "meta-llama/Llama-Guard-4-12",
@@ -104,6 +122,87 @@ export const Constants = () => {
 
   const llms: string[] = ["groq", "ollama", "openrouter"];
 
+const providers_api_link = new Map<string, string>([
+  ["groq", "https://console.groq.com/keys"],
+  ["ollama", ""],
+  ["together", "https://api.together.xyz/settings/api-keys"],
+  ["mistral", "https://console.mistral.ai/api-keys"],
+  ["openai", "https://platform.openai.com/api-keys"],
+  ["deepseek", "https://platform.deepseek.com/api_keys"],
+  ["gemini", "https://aistudio.google.com/app/apikey"],
+  ["openrouter", "https://openrouter.ai/settings/keys"],
+]);
+
+const api_providers_models = new Map<string, string >([
+  ["groq", "https://console.groq.com/docs/models"],
+  ["ollama", "https://ollama.com/library?sort=newest"],
+  ["together", "https://api.together.xyz/models"],
+  ["mistral", "https://docs.mistral.ai/getting-started/models/models_overview/"],
+  ["openai", "https://platform.openai.com/docs/models"],
+  ["deepseek", "https://api-docs.deepseek.com/quick_start/pricing"],
+  ["gemini", "https://ai.google.dev/gemini-api/docs/models"],
+  ["openrouter", "https://openrouter.ai/models"],
+]);
+
+
+type ProviderInfo = {
+  models: unknown;   // Replace `unknown` with the actual models type
+  api_link: string;
+  model_link: string;
+};
+
+const providers_dic = new Map<string, ProviderInfo>([
+  ["groq", {
+    models: groqModels,
+    api_link: providers_api_link.get("groq")!,
+    model_link: api_providers_models.get("groq")!
+  }],
+  ["ollama", {
+    models: ollamaModels,
+    api_link: providers_api_link.get("ollama")!,
+    model_link: api_providers_models.get("ollama")!
+  }],
+  ["together", {
+    models: togetherModels,
+    api_link: providers_api_link.get("together")!,
+    model_link: api_providers_models.get("together")!
+  }],
+  ["deepInfra", {
+    models: deepInfraModels,
+    api_link: "",
+    model_link: ""
+  }],
+  ["mistral", {
+    models: mistralModels,
+    api_link: providers_api_link.get("mistral")!,
+    model_link: api_providers_models.get("mistral")!
+  }],
+  ["openai", {
+    models: openaiModels,
+    api_link: providers_api_link.get("openai")!,
+    model_link: api_providers_models.get("openai")!
+  }],
+  ["qwen", {
+    models: qwenModels,
+    api_link: providers_api_link.get("qwen")!,
+    model_link: api_providers_models.get("qwen")!
+  }],
+  ["deepseek", {
+    models: deepseekModels,
+    api_link: providers_api_link.get("deepseek")!,
+    model_link: api_providers_models.get("deepseek")!
+  }],
+  ["gemini", {
+    models: geminiModels,
+    api_link: providers_api_link.get("gemini")!,
+    model_link: api_providers_models.get("gemini")!
+  }],
+  ["openrouter", {
+    models: openrouterModels,
+    api_link: providers_api_link.get("openrouter")!,
+    model_link: api_providers_models.get("openrouter")!
+  }],
+]);
 
 
  const  providers_models = new Map<string, string[]>([
@@ -122,10 +221,13 @@ export const Constants = () => {
 
   return {
     llms,
+    providers_dic,
+    providers_api_link,
+    providers_models,
     ollamaModels,
     groqModels,
     openrouterModels,
     modelsProviders,
-    providers_models,
+
   };
 };

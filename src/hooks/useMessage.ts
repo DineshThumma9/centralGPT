@@ -7,6 +7,7 @@ import {useEffect, useRef} from "react";
 import useSessions from "./useSessions.ts";
 
 
+
 const docSchema = z.object({
     doc_id: z.string().uuid(),
     metadata: z.object({

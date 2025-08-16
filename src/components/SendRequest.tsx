@@ -9,6 +9,8 @@ import MediaPDF from "./MediaPDF.tsx";
 import {uploadDocument} from "../api/rag-api.ts";
 import useMessage from "../hooks/useMessage.ts";
 import {toaster} from "./ui/toaster.tsx";
+import {useQuery} from "@tanstack/react-query";
+import {API_BASE_URL, ragAPI} from "../api/apiInstance.ts";
 
 const box = {
     w: "full",
@@ -77,6 +79,7 @@ const SendRequest = () => {
     const {addMessage, files, setFiles, setStreaming} = sessionStore();
 
 
+
     useEffect(() => {
 
         toaster.create({
@@ -86,6 +89,8 @@ const SendRequest = () => {
         })
 
     }, [sendingFiles]);
+
+
 
 
     console.log(`Sending : ${sending}`)
@@ -147,8 +152,29 @@ const SendRequest = () => {
                     const new_context_id = v4();
                     useSessionStore.getState().setContextID(new_context_id);
                     setSendingFiles(true);
-                    await uploadDocument(currentFiles, currentSession, new_context_id);
+                    const res = await uploadDocument(currentFiles, currentSession, new_context_id);
+                    if(res && res.status == 200){
 
+
+                            await streamMessage(messageContent)
+
+
+
+                    }
+                    else{
+
+                        toaster.create({
+                    title: "Error has occured while Processing Files",
+                    description: "Error has occured",
+                    type: "error"
+                })
+
+                    }
+
+
+
+                }else{
+                    await streamMessage(messageContent)
                 }
 
 
@@ -163,7 +189,6 @@ const SendRequest = () => {
             }
 
 
-            await streamMessage(messageContent);
 
         } catch (error) {
             console.error("Failed to send message:", error);
@@ -192,7 +217,10 @@ const SendRequest = () => {
     return (
 
 
+
         <Box {...box}>
+
+
             <Box maxW="1000px" mx="auto">
                 <VStack {...hstack}>
                     <HStack w="full" justifyContent="space-between">

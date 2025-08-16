@@ -26,7 +26,7 @@ const hstack = {
 
 
 const LLMModelChooser = () => {
-    const {providers_models, modelsProviders} = Constants();
+    const {providers_models, modelsProviders,providers_dic} = Constants();
     const {shouldStream} = useSessionStore();
 
 

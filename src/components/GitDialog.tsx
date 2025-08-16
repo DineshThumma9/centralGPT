@@ -1,28 +1,16 @@
 "use client"
 
-
-import {
-
-
-    Button,
-    Dialog,
-    Field,
-    HStack,
-    Input,
-    InputGroup,
-    Portal, Spinner,
-
-    useSlotRecipe,
-    VStack
-} from "@chakra-ui/react"
-import {useEffect, useState} from "react";
+import {Button, Dialog, Field, HStack, Input, InputGroup, Portal, useSlotRecipe, VStack} from "@chakra-ui/react"
+import {useState} from "react";
 import {v4} from "uuid";
 import useSessionStore from "../store/sessionStore.ts";
 import {z} from "zod";
 import {gitFilesUpload} from "../api/rag-api.ts";
 import SelectOptions from "./Select.tsx";
-import {Toaster,toaster} from "./ui/toaster.tsx"
-
+import {toaster} from "./ui/toaster.tsx"
+import {RiArrowRightLine} from "react-icons/ri";
+import GitExplorer from "./GitExplorer.tsx";
+import {ragAPI} from "../api/apiInstance.ts";
 
 interface Props {
     onCancel: () => void;
@@ -55,9 +43,33 @@ export const GitRequestSchema = z.object({
     dir_exclude: z.array(z.string()).optional(),
     file_extension_include: z.array(z.string()).optional(),
     file_extension_exclude: z.array(z.string()).optional(),
+    files: z.array(z.string()).optional()
 });
 
 export type GitRequestSchema = z.infer<typeof GitRequestSchema>
+
+// 1️⃣ Define the TypeScript type first
+export type GitTreeNodeType = {
+  name: string;
+  path: string;
+  type: "tree" | "blob";
+  sha?: string;
+  size?: number;
+  children?: GitTreeNodeType[] | null;
+};
+
+// 2️⃣ Use the type in z.lazy for strong typing
+export const GitTreeNodeSchema: z.ZodType<GitTreeNodeType> = z.lazy(() =>
+  z.object({
+    name: z.string(),
+    path: z.string(),
+    type: z.enum(["tree", "blob"]),
+    sha: z.string().optional(),
+    size: z.number().optional(),
+    children: z.array(GitTreeNodeSchema).nullable().optional(),
+  })
+);
+
 
 const GitDialog = ({onConfirm, onCancel}: Props) => {
     const [owner, setOwner] = useState("")
@@ -70,6 +82,9 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
     const [dirOption, setDirOption] = useState<string[]>([])
     const [fileExtOption, setFileExtOption] = useState<string[]>([])
     const [loading, setLoading] = useState(false)
+    const [explorer, setExplorer] = useState(false)
+    const [files, setFiles] = useState<GitTreeNodeType[]>([]);
+    const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
 
     const {current_session} = useSessionStore()
     const recipe = useSlotRecipe({key: "dialogHelper"})
@@ -95,15 +110,72 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
     }
 
 
-    useEffect(() => {
-         if (loading) {
-    toaster.create({
-      title: "Loading...",
-      description: "Reading -> splitting -> indexing -> retriever",
-      type: "loading"
-    });
-  }
-    },[loading])
+    const handleContinue = async () => {
+        if (!owner.trim() || !repo.trim()) {
+            toaster.create({
+                title: "Missing fields",
+                description: "Please provide both owner and repository name.",
+                type: "error",
+                duration: 3000,
+            });
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const body = {
+                "repo": repo.trim(),
+                "owner": owner.trim(),
+                "branch": branch.trim() || "main",
+                "commit": commit.trim() || undefined,
+            }
+
+            const res = await ragAPI.post("/tree", body, {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+
+            if (!res.data) {
+                toaster.create({
+                    type: "error",
+                    closable: true,
+                    description: "Some Error has occurred while continuing"
+                })
+                throw Error("Some error has occurred")
+            }
+
+            const files = res.data
+
+            // Parse and validate the files
+            const parsedFiles: GitTreeNodeType[] = []
+            for (const file of files) {
+                const parseResult = GitTreeNodeSchema.safeParse(file)
+                if (parseResult.success) {
+                    parsedFiles.push(parseResult.data)
+                } else {
+                    console.error("Failed to parse file:", file, parseResult.error)
+                    toaster.create({
+                        type: "error",
+                        description: `Some error has occurred parsing file: ${parseResult.error.message}`
+                    })
+                }
+            }
+
+            setFiles(parsedFiles)
+            setExplorer(true);
+
+        } catch (error) {
+            console.error("Error fetching tree:", error)
+            toaster.create({
+                type: "error",
+                closable: true,
+                description: "Failed to fetch repository tree"
+            })
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const handleGitSelected = async () => {
         if (!owner.trim() || !repo.trim()) {
@@ -116,11 +188,20 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
             return;
         }
 
+        // Only require selected files when in explorer mode
+        if (explorer && selectedFiles.length === 0) {
+            toaster.create({
+                title: "No files selected",
+                description: "Please select at least one file to continue.",
+                type: "error",
+                duration: 3000,
+            });
+            return;
+        }
+
         onConfirm();
-
-
-
         setLoading(true);
+
         try {
             const parsedDirs = dirInput.split(",").map(d => d.trim()).filter(Boolean);
             const parsedExts = fileExtInput.split(",").map(e => e.trim()).filter(Boolean);
@@ -133,7 +214,8 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                 dir_include: dirOption[0] === "Include" ? parsedDirs : [],
                 dir_exclude: dirOption[0] === "Exclude" ? parsedDirs : [],
                 file_extension_include: fileExtOption[0] === "Include" ? parsedExts : undefined,
-                file_extension_exclude: fileExtOption[0] === "Exclude" ? parsedExts : undefined
+                file_extension_exclude: fileExtOption[0] === "Exclude" ? parsedExts : undefined,
+                files: explorer ? selectedFiles : undefined
             });
 
             const new_context_id = v4();
@@ -149,11 +231,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                 duration: 3000,
             });
 
-
-
         } catch (error) {
-
-
             console.error("Git upload error:", error);
             toaster.create({
                 title: "Unexpected Error",
@@ -161,8 +239,6 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                 type: "error",
                 duration: 3000,
             });
-
-
         } finally {
             setLoading(false);
         }
@@ -170,9 +246,6 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
 
     return (
         <>
-
-
-
             <Dialog.Root role="alertdialog" open={true}>
                 <Portal>
                     <Dialog.Backdrop
@@ -205,113 +278,121 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                             </Dialog.Header>
 
                             <Dialog.Body {...dialogBody}>
-                                <VStack gap={6} align="stretch">
-                                    {/* Repository URL Preview */}
-                                    <InputGroup
-                                        startAddon="https://github.com/"
-                                        endAddon=".git"
-                                        css={{
-                                            "& > div": {
-                                                bg: "rgba(139, 92, 246, 0.1)",
-                                                border: "2px solid rgba(139, 92, 246, 0.3)",
-                                                borderRadius: "xl",
-                                                color: "rgba(255, 255, 255, 0.7)"
-                                            }
-                                        }}
-                                    >
-                                        <Input
-                                            placeholder="owner/repository"
-                                            value={`${owner}/${repo}`}
-                                            readOnly
-                                            {...inputStyles}
-                                        />
-                                    </InputGroup>
+                                {!explorer ? (
+                                    <VStack gap={6} align="stretch">
+                                        {/* Repository URL Preview */}
+                                        <InputGroup
+                                            startAddon="https://github.com/"
+                                            endAddon=".git"
+                                            css={{
+                                                "& > div": {
+                                                    bg: "rgba(139, 92, 246, 0.1)",
+                                                    border: "2px solid rgba(139, 92, 246, 0.3)",
+                                                    borderRadius: "xl",
+                                                    color: "rgba(255, 255, 255, 0.7)"
+                                                }
+                                            }}
+                                        >
+                                            <Input
+                                                placeholder="owner/repository"
+                                                value={`${owner}/${repo}`}
+                                                readOnly
+                                                {...inputStyles}
+                                            />
+                                        </InputGroup>
 
-                                    {/* Owner and Repository */}
-                                    <HStack gap={4}>
-                                        <Field.Root flex={1}>
-                                            <Field.Label color="white" fontSize="sm" fontWeight="medium">
-                                                Owner *
-                                            </Field.Label>
-                                            <Input
-                                                placeholder="github-username"
-                                                value={owner}
-                                                onChange={(e) => setOwner(e.target.value)}
-                                                {...inputStyles}
-                                            />
-                                        </Field.Root>
-                                        <Field.Root flex={1}>
-                                            <Field.Label color="white" fontSize="sm" fontWeight="medium">
-                                                Repository *
-                                            </Field.Label>
-                                            <Input
-                                                placeholder="repo-name"
-                                                value={repo}
-                                                onChange={(e) => setRepo(e.target.value)}
-                                                {...inputStyles}
-                                            />
-                                        </Field.Root>
-                                    </HStack>
-
-                                    {/* Branch and Commit */}
-                                    <HStack gap={4}>
-                                        <Field.Root flex={1}>
-                                            <Field.Label color="white" fontSize="sm" fontWeight="medium">
-                                                Branch
-                                            </Field.Label>
-                                            <Input
-                                                placeholder="main"
-                                                value={branch}
-                                                onChange={(e) => setBranch(e.target.value)}
-                                                {...inputStyles}
-                                            />
-                                        </Field.Root>
-                                        <Field.Root flex={1}>
-                                            <Field.Label color="white" fontSize="sm" fontWeight="medium">
-                                                Commit (optional)
-                                            </Field.Label>
-                                            <Input
-                                                placeholder="commit-hash"
-                                                value={commit}
-                                                onChange={(e) => setCommit(e.target.value)}
-                                                {...inputStyles}
-                                            />
-                                        </Field.Root>
-                                    </HStack>
-
-                                    {/* Directory Filters */}
-                                    <VStack gap={4} align="stretch">
-                                        <HStack gap={4} align="flex-end">
+                                        {/* Owner and Repository */}
+                                        <HStack gap={4}>
                                             <Field.Root flex={1}>
                                                 <Field.Label color="white" fontSize="sm" fontWeight="medium">
-                                                    Directory Filters (comma-separated)
+                                                    Owner *
                                                 </Field.Label>
                                                 <Input
-                                                    placeholder="src/, docs/, tests/"
-                                                    value={dirInput}
-                                                    onChange={(e) => setDirInput(e.target.value)}
+                                                    placeholder="github-username"
+                                                    value={owner}
+                                                    onChange={(e) => setOwner(e.target.value)}
                                                     {...inputStyles}
                                                 />
                                             </Field.Root>
-                                            <SelectOptions value={dirOption} setValue={setDirOption}/>
-                                        </HStack>
-
-                                        <HStack gap={4} align="flex-end">
                                             <Field.Root flex={1}>
                                                 <Field.Label color="white" fontSize="sm" fontWeight="medium">
-                                                    File Extension Filters (comma-separated)
+                                                    Repository *
                                                 </Field.Label>
                                                 <Input
-                                                    placeholder=".ts, .tsx, .js, .jsx"
-                                                    value={fileExtInput}
-                                                    onChange={(e) => setFileExtInput(e.target.value)}
+                                                    placeholder="repo-name"
+                                                    value={repo}
+                                                    onChange={(e) => setRepo(e.target.value)}
                                                     {...inputStyles}
                                                 />
                                             </Field.Root>
-                                            <SelectOptions value={fileExtOption} setValue={setFileExtOption}/>
                                         </HStack>
+
+                                        {/* Branch and Commit */}
+                                        <HStack gap={4}>
+                                            <Field.Root flex={1}>
+                                                <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                    Branch
+                                                </Field.Label>
+                                                <Input
+                                                    placeholder="main"
+                                                    value={branch}
+                                                    onChange={(e) => setBranch(e.target.value)}
+                                                    {...inputStyles}
+                                                />
+                                            </Field.Root>
+                                            <Field.Root flex={1}>
+                                                <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                    Commit (optional)
+                                                </Field.Label>
+                                                <Input
+                                                    placeholder="commit-hash"
+                                                    value={commit}
+                                                    onChange={(e) => setCommit(e.target.value)}
+                                                    {...inputStyles}
+                                                />
+                                            </Field.Root>
+                                        </HStack>
+
+                                        {/* Directory Filters */}
+                                        <VStack gap={4} align="stretch">
+                                            <HStack gap={4} align="flex-end">
+                                                <Field.Root flex={1}>
+                                                    <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                        Directory Filters (comma-separated)
+                                                    </Field.Label>
+                                                    <Input
+                                                        placeholder="src/, docs/, tests/"
+                                                        value={dirInput}
+                                                        onChange={(e) => setDirInput(e.target.value)}
+                                                        {...inputStyles}
+                                                    />
+                                                </Field.Root>
+                                                <SelectOptions value={dirOption} setValue={setDirOption}/>
+                                            </HStack>
+
+                                            <HStack gap={4} align="flex-end">
+                                                <Field.Root flex={1}>
+                                                    <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                        File Extension Filters (comma-separated)
+                                                    </Field.Label>
+                                                    <Input
+                                                        placeholder=".ts, .tsx, .js, .jsx"
+                                                        value={fileExtInput}
+                                                        onChange={(e) => setFileExtInput(e.target.value)}
+                                                        {...inputStyles}
+                                                    />
+                                                </Field.Root>
+                                                <SelectOptions value={fileExtOption} setValue={setFileExtOption}/>
+                                            </HStack>
+                                        </VStack>
                                     </VStack>
-                                </VStack>
+                                ) : (
+                                    <GitExplorer
+                                        files={files}
+                                        selectedFiles={selectedFiles}
+                                        setSelectedFiles={setSelectedFiles}
+                                    />
+                                )}
                             </Dialog.Body>
 
                             <Dialog.Footer {...dialogFooter}>
@@ -324,11 +405,11 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                             bg: "rgba(255, 255, 255, 0.1)"
                                         }}
                                         onClick={onCancel}
-
                                     >
                                         Cancel
                                     </Button>
                                 </Dialog.ActionTrigger>
+
                                 <Button
                                     bg="linear-gradient(135deg, #8B5CF6, #A855F7)"
                                     color="white"
@@ -341,14 +422,35 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                         transform: "translateY(0)"
                                     }}
                                     onClick={handleGitSelected}
-                                    disabled={loading || !owner.trim() || !repo.trim()}
+                                    disabled={loading || !owner.trim() || !repo.trim() || (explorer && selectedFiles.length === 0)}
                                     loading={loading}
                                     loadingText="Connecting..."
                                     transition="all 0.2s ease"
-
                                 >
-                                    Connect Repository
+                                    {explorer ? "Connect Repository" : "Add Files"}
                                 </Button>
+
+                                {!explorer && (
+                                    <Button
+                                        bg="linear-gradient(135deg, #8B5CF6, #A855F7)"
+                                        color="white"
+                                        borderRadius="xl"
+                                        _hover={{
+                                            transform: "translateY(-2px)",
+                                            boxShadow: "0 10px 30px rgba(139, 92, 246, 0.4)"
+                                        }}
+                                        _active={{
+                                            transform: "translateY(0)"
+                                        }}
+                                        onClick={handleContinue}
+                                        disabled={loading || !owner.trim() || !repo.trim()}
+                                        loading={loading}
+                                        loadingText="Loading..."
+                                        transition="all 0.2s ease"
+                                    >
+                                        Continue <RiArrowRightLine/>
+                                    </Button>
+                                )}
                             </Dialog.Footer>
                         </Dialog.Content>
                     </Dialog.Positioner>

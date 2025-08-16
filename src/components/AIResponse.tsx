@@ -33,7 +33,7 @@ export const messageBox = {
     fontFamily: "system-ui, -apple-system, sans-serif",
     bg: "rgba(30, 30, 50, 0.8)",
     backdropFilter: "blur(10px)",
-    p: 4,
+    p: 5,
     borderRadius: "xl",
     border: "2px solid",
     borderColor: "rgba(139, 92, 246, 0.3)",
@@ -56,63 +56,6 @@ export const avatarBox = {
     borderColor: "purple.300"
 }
 
-export const codeBlockContainer = {
-    position: "relative" as const,
-    bg: "rgba(15, 15, 25, 0.9)",
-    borderRadius: "lg",
-    overflow: "hidden" as const,
-    my: 3,
-    border: "2px solid",
-    borderColor: "rgba(139, 92, 246, 0.4)",
-    maxW: "100%",
-    _hover: {
-        borderColor: "rgba(139, 92, 246, 0.6)",
-        '& .copy-button': {
-            opacity: 1
-        }
-    },
-    transition: "border-color 0.2s",
-    boxShadow: "0 2px 15px rgba(147, 51, 234, 0.2)"
-}
-
-export const codeBlockHeader = {
-    justify: "space-between" as const,
-    align: "center" as const,
-    px: 4,
-    py: 2,
-    bg: "linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(168, 85, 247, 0.8))",
-    borderBottom: "1px solid",
-    borderColor: "rgba(139, 92, 246, 0.4)"
-}
-
-export const codeBlockContent = {
-    p: 4,
-    overflow: "auto" as const,
-    m: 0,
-    bg: "rgba(15, 15, 25, 0.9)",
-    maxH: "400px"
-}
-
-export const inlineCode = {
-    bg: "rgba(139, 92, 246, 0.2)",
-    px: 2,
-    py: 1,
-    borderRadius: "md",
-    fontSize: "13px",
-    fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace",
-    color: "purple.200",
-    border: "1px solid",
-    borderColor: "rgba(139, 92, 246, 0.3)"
-}
-
-export const streamingContent = {
-    whiteSpace: "pre-wrap" as const,
-    fontFamily: "ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace",
-    fontSize: "14px",
-    wordBreak: "break-word" as const,
-    overflowWrap: "break-word" as const,
-    color: "purple.100"
-}
 
 const actionButton = {
     size: "sm" as const,

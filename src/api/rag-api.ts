@@ -39,7 +39,7 @@ files.forEach((file, index) => {
     }
 
 
-    return response.data;
+    return response;
   } 
        
   catch (error) {
