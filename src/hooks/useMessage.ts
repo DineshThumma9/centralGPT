@@ -290,7 +290,7 @@ const useMessage = () => {
         } catch (err) {
             console.error('StreamMessage error:', err);
             let content = '[Error streaming response]'
-            if(err.name == 'AbortError'){
+            if(err == 'AbortError'){
                 content =  '[Interuptted Streaming]'
             }
             updateMessage(assistantMsgId, {
