@@ -11,8 +11,6 @@ export const apiKeySelection = async (api_prov: string, api_key: string) => {
         "api_key": api_key
     };
 
-    console.log("API Provider:", api_prov);
-    console.log("API KEY:", api_key);
 
     const res = await setupAPI.post("/init/", data, {
         headers: {"Content-Type": "application/json"}
@@ -38,7 +36,7 @@ export const modelSelection = async (model: string) => {
 
 export const newSession = async () => {
     const access = useAuthStore.getState().accessToken;
-    console.log("access token:", access);
+
 
     const res = await sessionAPI.post("/new", null, {
         headers: {"Authorization": `Bearer ${access}`}
@@ -48,7 +46,7 @@ export const newSession = async () => {
 
     const sessionId = res.data.session_id;
     useSessionStore.getState().setCurrentSessionId(sessionId);
-    console.log("Session Id Stored:", sessionId);
+
 
     return Session.parse({
         session_id: res.data.session_id,
@@ -58,7 +56,7 @@ export const newSession = async () => {
 export const getChatHistory = async (data: { session_id: string; limit?: number }) => {
     const res = await sessionAPI.get(`/history/${data.session_id}`);
     if (!res?.data) throw new Error("Session History Empty");
-    console.log(res.data)
+
 
     return res.data;
 };

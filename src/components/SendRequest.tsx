@@ -12,6 +12,7 @@ import { toaster } from "./ui/toaster.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "../api/apiInstance.ts";
 
+// Styling objects (box, hstack, txtarea) remain the same...
 const box = {
   w: "full",
   backdropFilter: "blur(20px)",
@@ -71,19 +72,24 @@ const txtarea = {
   },
 };
 
+interface PollResponse {
+  collection_name: string;
+  status: string;
+}
+
 const SendRequest = () => {
   const [input, setInput] = useState("");
   const { sending, setSending, isStreaming } = useSessionStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { streamMessage, abortStream } = useMessage();
-  const [sendingFiles, setSendingFiles] = useState(false);
-  const [waitingForIndexing, setWaitingForIndexing] = useState(false);
-  const { addMessage, files, setFiles, context_id, context, current_session } = sessionStore();
+  const { addMessage, files, setFiles, context_id, context, current_session } =
+    sessionStore();
 
-  // FIX: Only poll when we have files being processed
-  const shouldPoll= waitingForIndexing && context === "notes" && context_id !== null;
+  const [isWaitingForIndexing, setIsWaitingForIndexing] = useState(false);
+  const pendingMessageRef = useRef<string | null>(null);
 
-  const { data, refetch } = useQuery({
+  // ✅ 1. Destructure status variables from useQuery
+  const { data, isSuccess, isError, error } = useQuery<PollResponse, Error>({
     queryKey: ["status", context_id, context, current_session],
     queryFn: async () => {
       const res = await fetch(
@@ -92,30 +98,43 @@ const SendRequest = () => {
       if (!res.ok) throw new Error("Failed to fetch status");
       return res.json();
     },
-    refetchInterval: shouldPoll ? 2000 : false, // Only poll when needed
+    enabled: isWaitingForIndexing,
+    refetchInterval: isWaitingForIndexing ? 3000 : false,
     refetchIntervalInBackground: false,
-    enabled: shouldPoll, // Only enabled when we need to poll
+    // ❌ No onSuccess or onError callbacks here
   });
 
-  console.log("Status data:", data);
-
-  // FIX: Better status handling
+  // ✅ 2. Handle the success case in a useEffect hook
   useEffect(() => {
-    if (waitingForIndexing && data?.status === "ready") {
-      setWaitingForIndexing(false);
+    // We only proceed if the query was successful and the status is 'ready'
+    if (isSuccess && data?.status === "ready") {
+      setIsWaitingForIndexing(false); // Stop polling
       toaster.create({
         title: "Files Ready",
         description: "Your documents have been processed successfully!",
         type: "success",
       });
-    } else if (waitingForIndexing && data?.status === "indexing") {
+
+      // If there's a message waiting, send it now.
+      if (pendingMessageRef.current) {
+        streamMessage(pendingMessageRef.current);
+        pendingMessageRef.current = null; // Clear the ref
+      }
+    }
+  }, [isSuccess, data, streamMessage]); // Add dependencies
+
+
+  useEffect(() => {
+    if (isError) {
+      setIsWaitingForIndexing(false); // Stop polling on error
+      pendingMessageRef.current = null; // Clear any pending message
       toaster.create({
-        description: "Processing documents...",
-        type: "loading",
-          closable:true
+        title: "File Processing Error",
+        description: error.message,
+        type: "error",
       });
     }
-  }, [data?.status, waitingForIndexing]);
+  }, [isError, error]); // Add dependencies
 
   const handleSendMessage = async () => {
     if (!input.trim() || sending) return;
@@ -133,13 +152,11 @@ const SendRequest = () => {
     setInput("");
     setFiles([]);
 
-    // Reset file input
     const fileInput = document.querySelector(
       'input[type="file"]'
     ) as HTMLInputElement;
     if (fileInput) fileInput.value = "";
 
-    // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
@@ -159,8 +176,13 @@ const SendRequest = () => {
       if (currentFiles.length > 0) {
         const new_context_id = v4();
         useSessionStore.getState().setContextID(new_context_id);
-        setSendingFiles(true);
-        setWaitingForIndexing(true);
+        pendingMessageRef.current = messageContent;
+
+        toaster.create({
+          description: "Uploading and processing documents...",
+          type: "loading",
+          closable: true,
+        });
 
         const res = await uploadDocument(
           currentFiles,
@@ -169,61 +191,26 @@ const SendRequest = () => {
         );
 
         if (res && res.status === 200) {
-          // FIX: Wait for indexing to complete before sending message
-          toaster.create({
-            title: "Upload Successful",
-            description: "Please wait while we process your documents...",
-            type: "success",
-          });
-
-          // Don't send message immediately, wait for status to be ready
-          // The useEffect will handle sending the message when ready
+          setIsWaitingForIndexing(true);
         } else {
-          toaster.create({
-            title: "File Processing Error",
-            description: "Something went wrong while processing files.",
-            type: "error",
-          });
-          setWaitingForIndexing(false);
+          throw new Error("File upload failed.");
         }
       } else {
-        // No files, send message immediately
         await streamMessage(messageContent);
       }
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (err) {
+      console.error("Error:", err);
       toaster.create({
-        title: "File Upload Error",
-        description: "Error occurred while processing files.",
+        title: "Error",
+        description:
+          err instanceof Error ? err.message : "An unexpected error occurred.",
         type: "error",
       });
-      setWaitingForIndexing(false);
-    } finally {
-      setSendingFiles(false);
+      pendingMessageRef.current = null;
+      setIsWaitingForIndexing(false);
       setSending(false);
     }
   };
-
-  // FIX: Send message when indexing is complete
-  useEffect(() => {
-    if (data?.status === "ready" && waitingForIndexing) {
-      const sendDelayedMessage = async () => {
-        try {
-          const lastMessage = sessionStore.getState().messages.slice(-1)[0];
-          if (lastMessage && lastMessage.sender === "user") {
-            await streamMessage(lastMessage.content);
-          }
-        } catch (error) {
-          console.error("Error sending delayed message:", error);
-        } finally {
-          setWaitingForIndexing(false);
-        }
-      };
-
-      // Small delay to ensure index is fully ready
-      setTimeout(sendDelayedMessage, 1000);
-    }
-  }, [data?.status, waitingForIndexing]);
 
   const handleKeyPress = async (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -250,7 +237,7 @@ const SendRequest = () => {
                 value={input}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyPress}
-                disabled={sending || waitingForIndexing}
+                disabled={sending || isWaitingForIndexing}
                 {...txtarea}
                 maxH={"80px"}
               />
@@ -262,11 +249,12 @@ const SendRequest = () => {
               disabled={
                 isStreaming
                   ? false
-                  : !input.trim() || sending || waitingForIndexing
+                  : !input.trim() || sending || isWaitingForIndexing
               }
               size="md"
               bg={
-                isStreaming || (input.trim() && !sending && !waitingForIndexing)
+                isStreaming ||
+                (input.trim() && !sending && !isWaitingForIndexing)
                   ? "linear-gradient(135deg, #8B5CF6, #A855F7)"
                   : "rgba(100, 100, 120, 0.3)"
               }
@@ -274,23 +262,23 @@ const SendRequest = () => {
               borderRadius="xl"
               transition="all 0.3s ease"
               boxShadow={
-                isStreaming || (input.trim() && !sending && !waitingForIndexing)
+                isStreaming || (input.trim() && !sending)
                   ? "0 0 20px rgba(139, 92, 246, 0.4)"
                   : "none"
               }
               _hover={{
                 transform:
-                  isStreaming || (input.trim() && !sending && !waitingForIndexing)
+                  isStreaming || (input.trim() && !sending)
                     ? "scale(1.1)"
                     : "none",
                 boxShadow:
-                  isStreaming || (input.trim() && !sending && !waitingForIndexing)
+                  isStreaming || (input.trim() && !sending)
                     ? "0 0 30px rgba(139, 92, 246, 0.6)"
                     : "none",
               }}
               _active={{
                 transform:
-                  isStreaming || (input.trim() && !sending && !waitingForIndexing)
+                  isStreaming || (input.trim() && !sending)
                     ? "scale(0.95)"
                     : "none",
               }}

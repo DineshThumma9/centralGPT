@@ -48,7 +48,8 @@ export const GitRequestSchema = z.object({
 
 export type GitRequestSchema = z.infer<typeof GitRequestSchema>
 
-// 1️⃣ Define the TypeScript type first
+
+
 export type GitTreeNodeType = {
   name: string;
   path: string;
@@ -58,7 +59,8 @@ export type GitTreeNodeType = {
   children?: GitTreeNodeType[] | null;
 };
 
-// 2️⃣ Use the type in z.lazy for strong typing
+
+
 export const GitTreeNodeSchema: z.ZodType<GitTreeNodeType> = z.lazy(() =>
   z.object({
     name: z.string(),
@@ -147,7 +149,8 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
 
             const files = res.data
 
-            // Parse and validate the files
+
+
             const parsedFiles: GitTreeNodeType[] = []
             for (const file of files) {
                 const parseResult = GitTreeNodeSchema.safeParse(file)
@@ -188,7 +191,8 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
             return;
         }
 
-        // Only require selected files when in explorer mode
+
+
         if (explorer && selectedFiles.length === 0) {
             toaster.create({
                 title: "No files selected",

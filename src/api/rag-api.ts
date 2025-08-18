@@ -28,13 +28,11 @@ files.forEach((file, index) => {
   try {
     const response = await ragAPI.post("/upload", formData, {
       headers: {
-        "Content-Type": "multipart/form-data", // 🛠️ REQUIRED FOR FASTAPI
+        "Content-Type": "multipart/form-data",
       },
     });
 
     if(response.status  === 200){
-         console.log(`key:${sessionId}_${contextId}_notes`)
-         console.log("Request was succesful")
         useSessionStore.getState().setContext("notes")
     }
 
@@ -53,15 +51,7 @@ files.forEach((file, index) => {
 export const gitFilesUpload = async (body: GitRequestSchema,session_id:string|null,context_id:string|null)=>{
 
 
-    const res_body = {
-        "req":body,
-        "session_id":session_id,
-        "context_id":context_id
 
-    }
-
-
-    console.log(`res body ${res_body}` )
 
 const res = await ragAPI.post(`/git?session_id=${session_id}&context_id=${context_id}`, body, {
     headers: { "Content-Type": "application/json" }
@@ -70,8 +60,6 @@ const res = await ragAPI.post(`/git?session_id=${session_id}&context_id=${contex
 
 
     if(res.status  === 200){
-         console.log(`key:${session_id}_${context_id}_code`)
-         console.log("Request was succesful")
         useSessionStore.getState().setContext("code")
     }
 

@@ -5,13 +5,12 @@ interface FileDisplayProps {
 }
 
 const FileDisplayForUserMessage = ({ files }: FileDisplayProps) => {
-  // Add debug logging
+
   console.log('FileDisplayForUserMessage received files:', files);
   console.log('Files length:', files?.length);
   console.log('Files type:', typeof files);
 
   if (!files || files.length === 0) {
-    console.log('No files to display - returning null');
     return null;
   }
 

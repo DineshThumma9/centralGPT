@@ -245,8 +245,7 @@ br: () => <Text as="span" display="block" />,
       {children}
     </Em>
   ),
-  // Table support
-  // Table support
+
 table: ({ children }) => (
   <Table.Root
     size="sm"

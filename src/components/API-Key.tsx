@@ -3,15 +3,15 @@ import {Button, Dialog, Field, Input, Portal, Stack, useSlotRecipe} from "@chakr
 import {useRef, useState} from "react";
 import {apiKeySelection} from "../api/session-api.ts";
 import useInitStore from "../store/initStore.ts";
-import {useNavigate} from "react-router-dom";
 
 interface Props {
     provider: string;
     title: string;
     selected?: string;
-    link?:string
+    link?: string
 }
-const APIKey = ({provider, title,link}: Props) => {
+
+const APIKey = ({provider, title, link}: Props) => {
     const {
         dialogOpen,
         setDialogOpen,
@@ -20,12 +20,11 @@ const APIKey = ({provider, title,link}: Props) => {
     } = useInitStore();
 
 
-
     const ref = useRef<HTMLInputElement>(null);
     const [apiKey, setAPIKey] = useState("");
 
 
-    const recipe = useSlotRecipe({key:"dialogHelper"})
+    const recipe = useSlotRecipe({key: "dialogHelper"})
     const styles = recipe()
 
 
@@ -34,9 +33,9 @@ const APIKey = ({provider, title,link}: Props) => {
 
     const handleApiKeySelect = async () => {
 
-        if(currentAPIProvider != null && apiKey != null){
-             setDialogOpen(false);
-          await apiKeySelection(currentAPIProvider, apiKey);
+        if (currentAPIProvider != null && apiKey != null) {
+            setDialogOpen(false);
+            await apiKeySelection(currentAPIProvider, apiKey);
             setCurrentAPIKey(apiKey);
         }
 
@@ -47,7 +46,7 @@ const APIKey = ({provider, title,link}: Props) => {
         <Dialog.Root open={dialogOpen} onOpenChange={handleDialogChange}>
             <Portal>
                 <Dialog.Backdrop
-                     css={styles.backdrop}
+                    css={styles.backdrop}
                 />
                 <Dialog.Positioner>
                     <Dialog.Content
@@ -59,7 +58,7 @@ const APIKey = ({provider, title,link}: Props) => {
 
 
                             >
-                                 Enter Your API Key-{provider}
+                                Enter Your API Key-{provider}
                             </Dialog.Title>
                         </Dialog.Header>
                         <Dialog.Body p={6} pt={2}>
@@ -94,8 +93,8 @@ const APIKey = ({provider, title,link}: Props) => {
                             <Button
                                 onClick={handleApiKeySelect}
                                 css={{
-                                    bg:"purple.500",
-                                    borderRadius:"10px"
+                                    bg: "purple.500",
+                                    borderRadius: "10px"
                                 }}
                             >
                                 Save

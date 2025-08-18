@@ -8,7 +8,7 @@ import {GithubIcon} from "lucide-react";
 import {useState} from "react";
 import GitDialog from "./GitDialog.tsx";
 
-// Theme-consistent styles
+
 const avatarButton = {
     bg: "linear-gradient(135deg, rgba(26, 10, 46, 0.6) 0%, rgba(45, 27, 61, 0.6) 100%)",
     borderRadius: "50%",

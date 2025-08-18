@@ -131,7 +131,7 @@ const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
             >
                 {isExpanded ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
             </IconButton>
-            {/*</Flex>*/}
+
 
             <Collapsible.Root open={isExpanded}>
                 <Collapsible.Content gap={2}>
@@ -193,11 +193,11 @@ const AIResponse = ({msg, idx}: Props) => {
         [msg.isStreaming, isStreaming, isLastMessage]
     );
 
-    // Clean content by removing sources section if it exists
+
     const cleanContent = useMemo(() => {
         if (!displayed) return "";
 
-        // Remove sources section that might have been added by the old implementation
+
         const sourcesRegex = /\n\n📚 \*\*Sources:\*\*\n[\s\S]*$/;
         return displayed.replace(sourcesRegex, "");
     }, [displayed]);
@@ -256,23 +256,24 @@ const AIResponse = ({msg, idx}: Props) => {
             direction="row"
             gap={3}
         >
-            {/* Avatar - Fixed width */}
+
             <Box flexShrink={0} mt={1}>
                 <Box {...avatarBox}>
                     <Bot size={16} color="white"/>
                 </Box>
             </Box>
 
-            {/* Content container - Flexible width with proper constraints */}
+
+
             <Box
                 flex="1"
-                minW={0} // Critical for text wrapping
-                maxW="calc(100% - 60px)" // Account for avatar and gaps
+                minW={0}
+                maxW="calc(100% - 60px)"
             >
                 {!retry ? (
                     <Box>
                         <Box {...messageBox}>
-                            {/* Show streaming content with monospace font during streaming */}
+
                             <Box>
                                 {cleanContent ? (
                                     <ReactMarkdown
@@ -310,7 +311,7 @@ const AIResponse = ({msg, idx}: Props) => {
                             )}
                         </Box>
 
-                        {/* Sources Display - Only show if not streaming and sources exist */}
+
                         {!isCurrentlyStreaming && msg.sources && (
                             <SourcesDisplay sources={msg.sources}/>
                         )}

@@ -44,7 +44,6 @@ const footerBox = {
 
     w: "full",
     backdropFilter: "blur(10px)",
-    // borderColor: "purple.600",
     flexShrink: 0,
     zIndex: 100,
 }

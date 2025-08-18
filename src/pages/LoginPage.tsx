@@ -27,10 +27,10 @@ const LoginPage = () => {
 
     const {login} = useAuth();
     const navigate = useNavigate();
-    // Removed cardBg variable as it's not needed
     const {setUsername}=useInitStore()
 
-    // Clear fields on component mount
+
+
     useEffect(() => {
         clearAllFields();
     }, [clearAllFields]);
@@ -75,11 +75,11 @@ const LoginPage = () => {
         } catch (error) {
             console.error("Login error:", error);
 
-            // Clear previous errors first
+
             username.setError("");
             password.setError("");
 
-            // Set field errors for visual feedback
+
             setTimeout(() => {
                 username.setError("Invalid credentials");
                 password.setError("Invalid credentials");

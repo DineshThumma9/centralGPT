@@ -7,7 +7,7 @@ import useValidationStore from "../store/validationStore";
 
 export const API_BASE_URL =  import.meta.env.VITE_API_URI
 
-// Centralized auth error handler
+
 const handleAuthError = () => {
     console.log("Authentication failed - clearing user data");
 
@@ -19,7 +19,7 @@ const handleAuthError = () => {
     window.location.href = '/login';
 };
 
-// Request interceptor function
+
 const addAuthInterceptor = (instance: AxiosInstance) => {
     instance.interceptors.request.use((config) => {
         const token = useAuthStore.getState().accessToken;
@@ -30,12 +30,14 @@ const addAuthInterceptor = (instance: AxiosInstance) => {
     });
 };
 
-// Response interceptor function
+
+
+
 const addErrorInterceptor = (instance: AxiosInstance, apiName: string = "API", requiresAuth: boolean = true) => {
     instance.interceptors.response.use(
         (response) => response,
         (error: AxiosError) => {
-            // Only handle auth errors for authenticated endpoints
+
             if (error.response?.status === 401 && requiresAuth) {
                 console.error("Authentication error - token expired or invalid");
                 handleAuthError();
@@ -55,7 +57,9 @@ const addErrorInterceptor = (instance: AxiosInstance, apiName: string = "API", r
     );
 };
 
-// Factory function to create configured axios instances
+
+
+
 export const createApiInstance = (
     endpoint: string,
     options: {
@@ -82,21 +86,22 @@ export const createApiInstance = (
         validateStatus,
     });
 
-    // Only add auth interceptor if authentication is required
+
     if (requiresAuth) {
         addAuthInterceptor(instance);
     }
 
-    // Always add error interceptor, but handle auth errors differently
+
     addErrorInterceptor(instance, apiName, requiresAuth);
 
     return instance;
 };
 
-// Pre-configured instances
+
+
 export const authAPI = createApiInstance("/auth", {
     apiName: "Auth API",
-    requiresAuth: false // Auth endpoints don't need tokens
+    requiresAuth: false
 });
 
 export const sessionAPI = createApiInstance("/sessions", {
@@ -109,7 +114,7 @@ export const setupAPI = createApiInstance("/setup", {
     requiresAuth: true
 });
 
-// Future RAG API (ready to use)
+
 export const ragAPI = createApiInstance("/rag", {
     apiName: "RAG API",
     requiresAuth: true

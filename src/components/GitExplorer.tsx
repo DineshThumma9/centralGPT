@@ -4,7 +4,8 @@ import {Box, Breadcrumb, Button, Checkbox, HStack, Input, Text, VStack,} from "@
 import {useMemo, useState} from "react"
 import {LuChevronRight, LuFile, LuFolder, LuSearch} from "react-icons/lu"
 
-// GitTreeNode type that matches your existing schema
+
+
 export interface GitTreeNode {
     name: string
     path: string
@@ -24,7 +25,8 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
     const [currentPath, setCurrentPath] = useState<string[]>([])
     const [searchQuery, setSearchQuery] = useState("")
 
-    // Build a flat map of all files for easy lookup
+
+
     const flatFileMap = useMemo(() => {
         const map = new Map<string, GitTreeNode>()
 
@@ -41,7 +43,7 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
         return map
     }, [files])
 
-    // Get current directory contents
+
     const currentNodes = useMemo(() => {
         if (currentPath.length === 0) {
             return files
@@ -52,7 +54,8 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
         return currentNode?.children || []
     }, [currentPath, files, flatFileMap])
 
-    // Filter nodes based on search query
+
+
     const filteredNodes = useMemo(() => {
         if (!searchQuery.trim()) {
             return currentNodes
@@ -63,14 +66,17 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
         )
     }, [currentNodes, searchQuery])
 
-    // Handle file/folder selection
+
+
     const handleNodeClick = (node: GitTreeNode) => {
         if (node.type === "tree") {
-            // Navigate into directory
+
+
             const newPath = node.path.split("/").filter(Boolean)
             setCurrentPath(newPath)
         } else {
-            // Toggle file selection
+
+
             const isSelected = selectedFiles.includes(node.path)
             if (isSelected) {
                 setSelectedFiles(selectedFiles.filter(path => path !== node.path))
@@ -80,7 +86,8 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
         }
     }
 
-    // Handle breadcrumb navigation
+
+
     const handleBreadcrumbClick = (index: number) => {
         if (index === -1) {
             setCurrentPath([])
@@ -89,7 +96,8 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
         }
     }
 
-    // Select/deselect all visible files
+
+
     const handleSelectAll = () => {
         const visibleFiles = filteredNodes.filter(node => node.type === "blob")
         const visibleFilePaths = visibleFiles.map(file => file.path)
@@ -97,16 +105,18 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
         const allSelected = visibleFilePaths.every(path => selectedFiles.includes(path))
 
         if (allSelected) {
-            // Deselect all visible files
+
+
             setSelectedFiles(selectedFiles.filter(path => !visibleFilePaths.includes(path)))
         } else {
-            // Select all visible files
+
+
             const newSelected = [...new Set([...selectedFiles, ...visibleFilePaths])]
             setSelectedFiles(newSelected)
         }
     }
 
-    // Get breadcrumb items
+
     const breadcrumbItems = useMemo(() => {
         return currentPath.map((segment, index) => ({
             name: segment,
@@ -114,7 +124,8 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
         }))
     }, [currentPath])
 
-    // Check if all visible files are selected
+
+
     const visibleFiles = filteredNodes.filter(node => node.type === "blob")
     const allVisibleSelected = visibleFiles.length > 0 &&
         visibleFiles.every(file => selectedFiles.includes(file.path))

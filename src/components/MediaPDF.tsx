@@ -20,14 +20,15 @@ const MediaPDF = ({ children }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileUploadRef = useRef<any>(null);
 
-  // Controlled file change handler
+
   const handleFileChange = useCallback((details: any) => {
-    // Prevent duplicate processing
+
+
     if (!details.acceptedFiles || details.acceptedFiles.length === 0) {
       return;
     }
 
-    // Get unique files by comparing name, size, and lastModified
+
     const newFiles = details.acceptedFiles.filter((newFile: File) => {
       return !files.some(existingFile => 
         existingFile.name === newFile.name &&
@@ -37,29 +38,30 @@ const MediaPDF = ({ children }: Props) => {
     });
 
     if (newFiles.length > 0) {
-      // Replace files entirely to avoid duplicates
+
+
       setFiles(newFiles);
     }
   }, [files, setFiles]);
 
-  // Clear file input programmatically
+
   const clearFileInput = useCallback(() => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   }, []);
 
-  // Handle file removal
+
   const handleRemoveFile = useCallback((index: number) => {
     removeFile(index);
-    
-    // Clear input when no files left
+
+
     if (files.length === 1) {
       clearFileInput();
     }
   }, [files.length, removeFile, clearFileInput]);
 
-  // Effect to sync when files are cleared externally
+
   useEffect(() => {
     if (files.length === 0 && fileInputRef.current?.files?.length) {
       clearFileInput();
