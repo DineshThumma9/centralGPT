@@ -12,7 +12,6 @@ import { toaster } from "./ui/toaster.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "../api/apiInstance.ts";
 
-// Styling objects (box, hstack, txtarea) remain the same...
 const box = {
   w: "full",
   backdropFilter: "blur(20px)",
@@ -55,7 +54,7 @@ const hstack = {
 
 const txtarea = {
   resize: "none" as const,
-  minH: "44px",
+  minH: "30px",
   maxH: "120px",
   color: "white",
   border: "none",
@@ -87,8 +86,9 @@ const SendRequest = () => {
 
   const [isWaitingForIndexing, setIsWaitingForIndexing] = useState(false);
   const pendingMessageRef = useRef<string | null>(null);
+  const hasShownReadyToaster = useRef(false);
+  const loadingToastId = useRef<string | null>(null);
 
-  // ✅ 1. Destructure status variables from useQuery
   const { data, isSuccess, isError, error } = useQuery<PollResponse, Error>({
     queryKey: ["status", context_id, context, current_session],
     queryFn: async () => {
@@ -101,40 +101,48 @@ const SendRequest = () => {
     enabled: isWaitingForIndexing,
     refetchInterval: isWaitingForIndexing ? 3000 : false,
     refetchIntervalInBackground: false,
-    // ❌ No onSuccess or onError callbacks here
   });
 
-  // ✅ 2. Handle the success case in a useEffect hook
   useEffect(() => {
-    // We only proceed if the query was successful and the status is 'ready'
-    if (isSuccess && data?.status === "ready") {
-      setIsWaitingForIndexing(false); // Stop polling
+    if (isSuccess && data?.status === "ready" && !hasShownReadyToaster.current) {
+      hasShownReadyToaster.current = true;
+      setIsWaitingForIndexing(false);
+
+      if (loadingToastId.current) {
+        toaster.dismiss(loadingToastId.current);
+        loadingToastId.current = null;
+      }
+
       toaster.create({
         title: "Files Ready",
         description: "Your documents have been processed successfully!",
         type: "success",
       });
 
-      // If there's a message waiting, send it now.
       if (pendingMessageRef.current) {
         streamMessage(pendingMessageRef.current);
-        pendingMessageRef.current = null; // Clear the ref
+        pendingMessageRef.current = null;
       }
     }
-  }, [isSuccess, data, streamMessage]); // Add dependencies
-
+  }, [isSuccess, data, streamMessage]);
 
   useEffect(() => {
     if (isError) {
-      setIsWaitingForIndexing(false); // Stop polling on error
-      pendingMessageRef.current = null; // Clear any pending message
+      setIsWaitingForIndexing(false);
+      pendingMessageRef.current = null;
+
+      if (loadingToastId.current) {
+        toaster.dismiss(loadingToastId.current);
+        loadingToastId.current = null;
+      }
+
       toaster.create({
         title: "File Processing Error",
         description: error.message,
         type: "error",
       });
     }
-  }, [isError, error]); // Add dependencies
+  }, [isError, error]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || sending) return;
@@ -174,11 +182,12 @@ const SendRequest = () => {
 
     try {
       if (currentFiles.length > 0) {
+        hasShownReadyToaster.current = false;
         const new_context_id = v4();
         useSessionStore.getState().setContextID(new_context_id);
         pendingMessageRef.current = messageContent;
 
-        toaster.create({
+        loadingToastId.current = toaster.create({
           description: "Uploading and processing documents...",
           type: "loading",
           closable: true,
@@ -200,6 +209,12 @@ const SendRequest = () => {
       }
     } catch (err) {
       console.error("Error:", err);
+
+      if (loadingToastId.current) {
+        toaster.dismiss(loadingToastId.current);
+        loadingToastId.current = null;
+      }
+
       toaster.create({
         title: "Error",
         description:

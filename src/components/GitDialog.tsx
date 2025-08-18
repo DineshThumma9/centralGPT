@@ -226,14 +226,29 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
             useSessionStore.getState().setContextID(new_context_id);
             useSessionStore.getState().setContext("code");
 
-            const res = await gitFilesUpload(res_body, current_session, new_context_id);
+            const res =  gitFilesUpload(res_body, current_session, new_context_id);
 
-            toaster.create({
-                title: res ? "Upload Complete" : "Upload Failed",
-                description: res ? "Git repository connected and data indexed." : "Something went wrong with the upload.",
-                type: res ? "success" : "error",
-                duration: 3000,
-            });
+
+            toaster.promise(res ,{
+                success:{
+                    title:"Upload Complete",
+                    description:"Git repository connected and data indexed."
+                },
+                error:{
+                    title:"Error Has occured",
+                    description:"Git repository isn't connected and data indexed."
+                },
+                loading:{
+                    title:"Loading data ",
+                    description:"Git repository is being connected and data indexed."
+                }
+
+
+
+            })
+
+
+
 
         } catch (error) {
             console.error("Git upload error:", error);
