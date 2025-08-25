@@ -10,101 +10,105 @@ import useSessionStore from "../store/sessionStore";
 import {useEffect, useMemo, useState} from "react";
 import {toaster} from "./ui/toaster.tsx";
 import {createMarkdownComponents} from "./MarkdownComponents";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 interface Props {
     msg: Message;
     idx: number;
 }
 
-export const streamCursor = {
+// Style object generators
+const getStreamCursor = (colors: any) => ({
     display: "inline-block",
-    w: "2px",
-    h: "1em",
-    bg: "purple.300",
+    width: "2px",
+    height: "1.2em",
+    backgroundColor: colors.text.primary,
+    marginLeft: "2px",
     animation: "blink 1s infinite",
-    ml: 1
-}
+});
 
-export const messageBox = {
-    fontSize: "15px",
-    color: "white",
-    width: "100%",
-    lineHeight: "1.65",
-    fontFamily: "system-ui, -apple-system, sans-serif",
-    bg: "rgba(30, 30, 50, 0.8)",
-    backdropFilter: "blur(10px)",
+const getMessageBox = (colors: any) => ({
     p: 5,
-    borderRadius: "xl",
-    border: "2px solid",
-    borderColor: "rgba(139, 92, 246, 0.3)",
-    boxShadow: "0 4px 20px rgba(147, 51, 234, 0.2)",
-    wordBreak: "break-word" as const,
-    overflowWrap: "break-word" as const,
+    borderRadius: "lg",
+    backgroundColor: colors.background.secondary,
+    border: `1px solid ${colors.border.primary}`,
+    position: "relative" as const,
+    boxShadow: "sm",
+    transition: "all 0.2s",
     _hover: {
-        borderColor: "rgba(139, 92, 246, 0.5)",
-        boxShadow: "0 6px 25px rgba(147, 51, 234, 0.3)"
+        boxShadow: "md",
+        borderColor: colors.border.accent,
     },
-    transition: "all 0.3s ease"
-}
-
-export const avatarBox = {
-    p: 2,
-    bg: "linear-gradient(135deg, purple.500, violet.500)",
-    borderRadius: "full",
-    boxShadow: "0 4px 12px rgba(147, 51, 234, 0.4)",
-    border: "2px solid",
-    borderColor: "purple.300"
-}
-
-
-const actionButton = {
-    size: "sm" as const,
-    variant: "ghost" as const,
-    color: "purple.200",
-    _hover: {
-        bg: "rgba(139, 92, 246, 0.2)",
-        color: "purple.100"
+    // Improve text rendering
+    css: {
+        lineHeight: "1.6",
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif",
+        fontSize: "16px",
+        textRendering: "optimizeLegibility",
+        WebkitFontSmoothing: "antialiased",
+        MozOsxFontSmoothing: "grayscale"
     }
-}
+});
 
-const sourcesContainer = {
+const getAvatarBox = (colors: any) => ({
+    mr: 3,
+    mt: 1,
+    flexShrink: 0,
+});
+
+const getActionButton = (colors: any) => ({
+    color: colors.text.secondary,
+    _hover: { 
+        color: colors.text.primary,
+        backgroundColor: colors.background.accent 
+    },
+});
+
+const getSourcesContainer = (colors: any) => ({
     mt: 4,
     p: 3,
-    bg: "rgba(20, 20, 35, 0.9)",
-    borderRadius: "lg",
-    border: "1px solid",
-    borderColor: "rgba(139, 92, 246, 0.3)",
-    boxShadow: "0 2px 10px rgba(147, 51, 234, 0.1)"
-}
-
-const sourceItem = {
-    p: 3,
-    bg: "rgba(30, 30, 50, 0.6)",
     borderRadius: "md",
-    border: "1px solid",
-    borderColor: "rgba(139, 92, 246, 0.2)",
-    _hover: {
-        borderColor: "rgba(139, 92, 246, 0.4)",
-        bg: "rgba(30, 30, 50, 0.8)"
-    },
-    transition: "all 0.2s ease"
-}
+    backgroundColor: colors.background.accent,
+    border: `1px solid ${colors.border.secondary}`,
+});
 
-const StreamingCursor = () => (
-    <Box
-        {...streamCursor}
-        css={{
-            '@keyframes blink': {
-                '0%, 50%': {opacity: 1},
-                '51%, 100%': {opacity: 0}
-            }
-        }}
-    />
-);
+const getSourceItem = (colors: any) => ({
+    p: 3,
+    mb: 2,
+    borderRadius: "sm",
+    backgroundColor: colors.background.primary,
+    border: `1px solid ${colors.border.secondary}`,
+    transition: "all 0.2s",
+    _hover: {
+        backgroundColor: colors.background.secondary,
+        borderColor: colors.border.primary,
+    },
+});
+
+const StreamingCursor = () => {
+    const { colors } = useColorMode();
+    const streamCursor = getStreamCursor(colors);
+    
+    return (
+        <Box
+            {...streamCursor}
+            css={{
+                '@keyframes blink': {
+                    '0%, 50%': {opacity: 1},
+                    '51%, 100%': {opacity: 0}
+                }
+            }}
+        />
+    );
+};
 
 const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
+    const { colors } = useColorMode();
     const [isExpanded, setIsExpanded] = useState(false);
     const [copiedSource, setCopiedSource] = useState<string | null>(null);
+    
+    const sourcesContainer = getSourcesContainer(colors);
+    const sourceItem = getSourceItem(colors);
 
     const handleCopySource = async (text: string, docId: string) => {
         try {
@@ -124,8 +128,8 @@ const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
             <IconButton
                 size="xs"
                 variant="ghost"
-                color="purple.200"
-                _hover={{bg: "rgba(139, 92, 246, 0.2)"}}
+                color="green.200"
+                _hover={{bg: "rgba(34, 197, 94, 0.2)"}}
                 onClick={() => setIsExpanded(!isExpanded)}
                 aria-label={isExpanded ? "Collapse sources" : "Expand sources"}
             >
@@ -141,7 +145,7 @@ const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
                                 <VStack align="flex-start" gap={1} flex="1">
                                     <HStack>
                                         <Badge
-                                            colorScheme="purple"
+                                            colorScheme="green"
                                             variant="subtle"
                                             fontSize="xs"
                                         >
@@ -182,10 +186,16 @@ const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
 
 const AIResponse = ({msg, idx}: Props) => {
     const {messages, isStreaming} = useSessionStore();
+    const { colors } = useColorMode();
     const [displayed, setDisplayed] = useState(msg.content || "");
     const [copied, setCopied] = useState(false);
     const [retry, setRetry] = useState(false);
     const [copiedCodeBlocks, setCopiedCodeBlocks] = useState<Record<string, boolean>>({});
+
+    // Get dynamic style objects using colors from ColorModeContext
+    const messageBox = getMessageBox(colors);
+    const avatarBox = getAvatarBox(colors);
+    const actionButton = getActionButton(colors);
 
     const isLastMessage = useMemo(() => idx === messages.length - 1, [idx, messages.length]);
     const isCurrentlyStreaming = useMemo(() =>
@@ -245,7 +255,8 @@ const AIResponse = ({msg, idx}: Props) => {
     const markdownComponents = createMarkdownComponents(
         idx,
         copiedCodeBlocks,
-        handleCodeBlockCopy
+        handleCodeBlockCopy,
+        colors
     );
 
     return (
@@ -274,7 +285,19 @@ const AIResponse = ({msg, idx}: Props) => {
                     <Box>
                         <Box {...messageBox}>
 
-                            <Box>
+                            <Box
+                                className="markdown-content"
+                                css={{
+                                    wordBreak: "break-word",
+                                    overflowWrap: "anywhere",
+                                    "& > *:first-child": {
+                                        marginTop: 0
+                                    },
+                                    "& > *:last-child": {
+                                        marginBottom: 0
+                                    }
+                                }}
+                            >
                                 {cleanContent ? (
                                     <ReactMarkdown
                                         remarkPlugins={[remarkGfm, remarkBreaks]}
@@ -292,6 +315,8 @@ const AIResponse = ({msg, idx}: Props) => {
                                 <HStack mt={3} gap={2}>
                                     <IconButton
                                         {...actionButton}
+                                        size="sm"
+                                        variant="ghost"
                                         colorScheme={copied ? "purple" : "gray"}
                                         onClick={handleCopy}
                                         color={copied ? "purple.300" : "purple.200"}
@@ -302,6 +327,8 @@ const AIResponse = ({msg, idx}: Props) => {
 
                                     <IconButton
                                         {...actionButton}
+                                        size="sm"
+                                        variant="ghost"
                                         onClick={handleRetry}
                                         aria-label="Retry message"
                                     >

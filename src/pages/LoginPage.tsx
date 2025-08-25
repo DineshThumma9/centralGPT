@@ -1,16 +1,17 @@
-import {Flex} from '@chakra-ui/react';
+import {Flex, Box} from '@chakra-ui/react';
 import {toaster} from "../components/ui/toaster.tsx";
 import  {useState, useEffect} from "react";
 import {useAuth} from "../hooks/useAuth.ts";
 import {useNavigate} from "react-router-dom";
-// Removed useColorModeValue import as it's not needed for Chakra v3
 import {Fade} from '@chakra-ui/transition';
-import {z} from "zod/v4";
+import {z} from "zod";
 import useFieldForm from "../hooks/useFieldForm.ts";
 import InputField from "../components/InputField.tsx";
 import CrediantialCard from "../components/CrediantialCard.tsx";
 import useValidationStore from "../store/validationStore.ts";
 import useInitStore from "../store/initStore.ts";
+import { ColorModeToggle } from '../components/ColorModeToggle.tsx';
+import { useColorMode } from '../contexts/ColorModeContext';
 
 const loginSchema = z.object({
     username: z.string().min(1, "Username is required"),
@@ -21,6 +22,7 @@ const LoginPage = () => {
     const { clearAllFields } = useValidationStore();
     const username = useFieldForm("username");
     const password = useFieldForm("password");
+    const { colorMode } = useColorMode();
 
     const [isLoading, setIsLoading] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
@@ -44,7 +46,7 @@ const LoginPage = () => {
         const result = loginSchema.safeParse(values);
 
         if (!result.success) {
-            const {fieldErrors} = z.flattenError(result.error);
+            const {fieldErrors} = result.error.flatten();
 
             if (fieldErrors.username) {
                 username.setError(fieldErrors.username[0]);
@@ -99,13 +101,57 @@ const LoginPage = () => {
     };
 
     return (
-        <Flex
+        <Box
             minH="100vh"
-            align="center"
-            justify="center"
-            p={{base: 4, md: 8}}
-            bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
+            w="full"
+            position="relative"
+            bg={colorMode === 'light' ? "white" : "#000000"}
         >
+            {/* Teal Glow Background - Light Theme Only */}
+            {colorMode === 'light' && (
+                <Box
+                    position="absolute"
+                    inset={0}
+                    zIndex={0}
+                    style={{
+                        backgroundImage: `
+                            radial-gradient(125% 125% at 50% 90%, #ffffff 40%, #14b8a6 100%)
+                        `,
+                        backgroundSize: "100% 100%",
+                    }}
+                />
+            )}
+            
+            {/* Emerald Void Background - Dark Theme Only */}
+            {colorMode === 'dark' && (
+                <Box
+                    position="absolute"
+                    inset={0}
+                    zIndex={0}
+                    style={{
+                        background: "radial-gradient(125% 125% at 50% 10%, #000000 40%, #072607 100%)",
+                    }}
+                />
+            )}
+            
+            <Flex
+                minH="100vh"
+                align="center"
+                justify="center"
+                p={{base: 4, md: 8}}
+                position="relative"
+                zIndex={1}
+            >
+            {/* Theme Toggle - positioned in top right */}
+            <Box
+                position="absolute"
+                top="20px"
+                right="20px"
+                zIndex={1000}
+            >
+                <ColorModeToggle />
+            </Box>
+            
             <Fade in={!fadeOut} unmountOnExit transition={{exit: {duration: 0.3}}}>
                 <CrediantialCard
                     heading={"Login"}
@@ -135,10 +181,12 @@ const LoginPage = () => {
                         error={password.error ?? ""}
                         touched={password.touched}
                         shakey={password.shakey}
+                        type="password"
                     />
                 </CrediantialCard>
             </Fade>
-        </Flex>
+            </Flex>
+        </Box>
     );
 };
 

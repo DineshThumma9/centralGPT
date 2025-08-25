@@ -14,6 +14,7 @@ import {MenuContent, MenuItem, MenuRoot, MenuTrigger,} from "./ui/menu.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
 import DeleteAlert from "./DeleteAlert.tsx";
+import {useColorMode} from "../contexts/ColorModeContext.tsx";
 
 const toaster = createToaster({placement: "top"});
 
@@ -33,6 +34,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
     const [dialog, setIsDialog] = useState(false);
     const recipe = useSlotRecipe({key: "menuHelper"})
     const styles = recipe({visual: "session"})
+    const { colors } = useColorMode();
 
     const handleChangeTitleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -88,20 +90,20 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                 px={4}
                 py={3}
                 height="50px"
-                color="white"
+                color={colors.text.primary}
                 overflow="hidden"
                 transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
                 borderRadius="16px"
-                boxShadow="0 4px 15px rgba(26, 10, 46, 0.2)"
+                boxShadow={`0 4px 15px ${colors.shadow.md}`}
                 cursor="pointer"
-                border="1px solid rgba(139, 69, 197, 0.15)"
+                border={`1px solid ${colors.border.secondary}`}
                 backdropFilter="blur(10px)"
                 onClick={onSelect}
                 opacity={isDeleting ? 0.5 : 1}
                 _hover={{
-                    bg: "linear-gradient(135deg, rgba(139, 69, 197, 0.2) 0%, rgba(107, 70, 193, 0.2) 100%)",
+                    bg: colors.background.hover,
                     transform: "translateY(-1px)",
-                    boxShadow: "0 8px 25px rgba(139, 69, 197, 0.15)"
+                    boxShadow: `0 8px 25px ${colors.shadow.lg}`
                 }}
             >
                 <Flex justify="space-between" align="center" w="100%" h="100%" borderRadius={"inherit"}>
@@ -128,7 +130,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                                 <Text
                                     fontSize="sm"
                                     fontWeight="medium"
-                                    color="rgba(255, 255, 255, 0.95)"
+                                    color={colors.text.primary}
                                     overflow="hidden"
                                     whiteSpace="nowrap"
                                     textOverflow="ellipsis"
@@ -136,7 +138,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                                     cursor={isUpdatingTitle ? "default" : "text"}
                                     _hover={{
                                         opacity: isUpdatingTitle ? 0.7 : 0.8,
-                                        color: "rgba(139, 69, 197, 0.9)"
+                                        color: colors.text.accent
                                     }}
                                     transition="all 0.2s"
                                 >
@@ -149,14 +151,15 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                                 px={3}
                                 py={2}
                                 borderRadius="10px"
-                                color="white"
-                                bg="rgba(26, 10, 46, 0.8)"
-                                border="1px solid rgba(139, 69, 197, 0.4)"
+                                color={colors.text.primary}
+                                bg={colors.background.card}
+                                border="1px solid"
+                                borderColor={colors.border.default}
                                 _focus={{
-                                    borderColor: "#8b45c5",
-                                    boxShadow: "0 0 0 2px rgba(139, 69, 197, 0.2)",
+                                    borderColor: colors.border.focus,
+                                    boxShadow: `0 0 0 2px ${colors.border.focus}`,
                                     outline: "none",
-                                    bg: "rgba(26, 10, 46, 0.9)"
+                                    bg: colors.background.hover
                                 }}
                                 onClick={(e) => e.stopPropagation()}
                                 onKeyDown={(e) => {
@@ -182,10 +185,10 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                                     disabled={isDeleting || isUpdatingTitle}
                                     size="sm"
                                     variant="ghost"
-                                    color="rgba(255, 255, 255, 0.7)"
+                                    color={colors.text.secondary}
                                     _hover={{
-                                        bg: "rgba(139, 69, 197, 0.2)",
-                                        color: "white"
+                                        bg: colors.background.hover,
+                                        color: colors.text.primary
                                     }}
                                 >
                                     <MoreVertical size={16}/>
@@ -216,7 +219,7 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                                         <MenuItem
                                             value="delete"
                                             onClick={() => setIsDialog(true)}
-                                            _hover={{bg: "rgba(239, 68, 68, 0.2)", color: "white"}}
+                                            _hover={{bg: colors.background.hover, color: colors.text.danger}}
                                             disabled={isDeleting}
                                             css={styles.item}
                                         >

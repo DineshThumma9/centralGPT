@@ -11,15 +11,16 @@ import {useEffect} from "react";
 import useSessionStore from "../store/sessionStore.ts";
 
 const hstack = {
-    gap: 3,
+    gap: 1, // Minimal gap for maximum space efficiency
     flexWrap: "wrap",
     margin: "0px",
-    p: 4,
-    backdropFilter: "blur(10px)",
-    borderRadius: "xl",
-    // border:"1px solid"
-    borderColor: "rgba(139, 92, 246, 0.2)",
-    boxShadow: "0 0 30px rgba(139, 92, 246, 0.1)"
+    p: 1, // Minimal padding for maximum space efficiency
+    backdropFilter: "blur(6px)", // Less blur for more transparency
+    borderRadius: "md", // Even smaller border radius
+    borderColor: "rgba(139, 92, 246, 0.1)", // More subtle
+    boxShadow: "0 0 15px rgba(139, 92, 246, 0.05)", // More subtle shadow
+    alignItems: "center", // Ensure proper alignment
+    ml: 0, // Ensure left alignment
 }
 
 
@@ -110,13 +111,7 @@ const LLMModelChooser = () => {
 
 
 
-            {(currentLLMProvider || currentModel || shouldStream) && (
-                <HStack gap={2}>
-                    {currentLLMProvider && <BadgeCompo label={currentLLMProvider}/>}
-                    {currentModel && <BadgeCompo label={currentModel}/>}
-                </HStack>
-            )}
-
+       
 
 
 

@@ -6,32 +6,46 @@ import type {Message} from "../entities/Message.ts";
 import EmptyState from "./EmptyState.tsx";
 import UserRequest from "./UserRequest.tsx";
 import AIResponse from "./AIResponse.tsx";
-
-
-const box = {
-
-    h: "100%",
-    w: "full",
-    overflowY: "auto",
-    overflowX: "hidden",// Prevent horizontal scrolling
-    // bg: {backgroundColor},
-
-}
-
-const vstack = {
-    gap: 6,
-    align: "stretch",
-    w: "full",
-    maxW: "4xl",
-    mx: "auto",
-    px: 4,
-
-}
-
+import { useColorMode } from "../contexts/ColorModeContext";
 
 const Response = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const { colors } = useColorMode();
+
+    // Optimized styles for better space utilization
+    const box = {
+        h: "100%",
+        w: "full",
+        overflowY: "auto" as const,
+        overflowX: "hidden" as const,
+        bg: colors.background.body, // Use theme background
+        position: "relative" as const,
+        // Custom scrollbar styling
+        "&::-webkit-scrollbar": {
+            width: "6px",
+        },
+        "&::-webkit-scrollbar-track": {
+            bg: "transparent",
+        },
+        "&::-webkit-scrollbar-thumb": {
+            bg: colors.border.default,
+            borderRadius: "3px",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+            bg: colors.border.hover,
+        },
+    };
+
+    const vstack = {
+        gap: 3, // Even more reduced gap for compact layout
+        align: "stretch" as const,
+        w: "full",
+        maxW: "4xl",
+        mx: "auto",
+        px: 1, // Minimal horizontal padding for maximum reading width
+        py: 1, // Minimal vertical padding
+    };
 
     useEffect(() => {
         const unsubscribe = sessionStore.subscribe((state) => {

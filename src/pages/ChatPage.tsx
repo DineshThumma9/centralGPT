@@ -2,15 +2,17 @@ import {Grid, GridItem, Box, Toaster} from "@chakra-ui/react";
 import Sidebar from "../components/SideBar";
 import ChatArea from "../components/ChatArea";
 import { useState } from "react";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 const ChatPage = () => {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const { colors } = useColorMode();
 
     return (
         <Box
             h="100vh"
             w="100vw"
-            bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
+            bg={colors.background.body}
             overflow="hidden"
             position="relative"
         >
@@ -19,7 +21,7 @@ const ChatPage = () => {
                 templateColumns={isSidebarCollapsed ? "60px 1fr" : "280px 1fr"}
                 h="100vh"
                 w="100vw"
-                bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
+                bg={colors.background.body}
                 transition="all 0.3s ease-in-out"
                 overflow="hidden"
             >
@@ -36,7 +38,7 @@ const ChatPage = () => {
                 <GridItem
                     area="main"
                     overflow="hidden"
-                    bg="linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)"
+                    bg={colors.background.body}
                     position="relative"
                 >
                     <ChatArea />

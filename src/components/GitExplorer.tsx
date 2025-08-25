@@ -3,6 +3,7 @@
 import {Box, Breadcrumb, Button, Checkbox, HStack, Input, Text, VStack,} from "@chakra-ui/react"
 import {useMemo, useState} from "react"
 import {LuChevronRight, LuFile, LuFolder, LuSearch} from "react-icons/lu"
+import { useColorMode } from "../contexts/ColorModeContext"
 
 
 
@@ -22,6 +23,7 @@ interface GitExplorerProps {
 }
 
 const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProps) => {
+    const { colors } = useColorMode();
     const [currentPath, setCurrentPath] = useState<string[]>([])
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -141,7 +143,7 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
                         top="50%"
                         transform="translateY(-50%)"
                         zIndex={1}
-                        color="rgba(255, 255, 255, 0.6)"
+                        color={colors.text.secondary}
                     >
                         <LuSearch />
                     </Box>
@@ -152,18 +154,18 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
                         pl="40px"
                         borderRadius="xl"
                         border="2px solid"
-                        borderColor="rgba(139, 92, 246, 0.3)"
-                        bg="rgba(139, 92, 246, 0.05)"
-                        color="white"
-                        _placeholder={{ color: "rgba(255, 255, 255, 0.6)" }}
+                        borderColor={colors.border.default}
+                        bg={colors.background.subtle}
+                        color={colors.text.primary}
+                        _placeholder={{ color: colors.text.secondary }}
                         _hover={{
-                            borderColor: "rgba(139, 92, 246, 0.5)",
-                            bg: "rgba(139, 92, 246, 0.1)"
+                            borderColor: colors.border.hover,
+                            bg: colors.background.hover
                         }}
                         _focus={{
-                            borderColor: "rgba(139, 92, 246, 0.6)",
-                            boxShadow: "0 0 0 3px rgba(139, 92, 246, 0.2)",
-                            bg: "rgba(139, 92, 246, 0.1)"
+                            borderColor: colors.border.focus,
+                            boxShadow: `0 0 0 3px ${colors.shadow.sm}`,
+                            bg: colors.background.hover
                         }}
                     />
                 </Box>
@@ -172,10 +174,10 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
                     <Button
                         size="sm"
                         variant="ghost"
-                        color="white"
+                        color={colors.text.primary}
                         onClick={handleSelectAll}
                         borderRadius="xl"
-                        _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
+                        _hover={{ bg: colors.background.hover }}
                     >
                         {allVisibleSelected ? "Deselect All" : "Select All"}
                     </Button>
@@ -192,8 +194,8 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
                 <Breadcrumb.Item>
                     <Breadcrumb.Link
                         onClick={() => handleBreadcrumbClick(-1)}
-                        color="rgba(255, 255, 255, 0.7)"
-                        _hover={{ color: "white" }}
+                        color={colors.text.secondary}
+                        _hover={{ color: colors.text.primary }}
                         display="flex"
                         alignItems="center"
                         gap="4px"
@@ -203,13 +205,13 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
                 </Breadcrumb.Item>
                 {breadcrumbItems.map(({ name, index }) => (
                     <Breadcrumb.Item key={index}>
-                        <Box color="rgba(255, 255, 255, 0.4)">
+                        <Box color={colors.text.muted}>
                             <LuChevronRight />
                         </Box>
                         <Breadcrumb.Link
                             onClick={() => handleBreadcrumbClick(index)}
-                            color="rgba(255, 255, 255, 0.7)"
-                            _hover={{ color: "white" }}
+                            color={colors.text.secondary}
+                            _hover={{ color: colors.text.primary }}
                             ml={2}
                         >
                             {name}
@@ -222,11 +224,11 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
             {selectedFiles.length > 0 && (
                 <Text
                     fontSize="sm"
-                    color="rgba(255, 255, 255, 0.7)"
-                    bg="rgba(139, 92, 246, 0.1)"
+                    color={colors.text.secondary}
+                    bg={colors.background.subtle}
                     p={2}
                     borderRadius="lg"
-                    border="1px solid rgba(139, 92, 246, 0.2)"
+                    border={`1px solid ${colors.border.secondary}`}
                 >
                     {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''} selected
                 </Text>
@@ -236,15 +238,15 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
             <Box
                 flex={1}
                 overflow="auto"
-                border="2px solid rgba(139, 92, 246, 0.2)"
+                border={`2px solid ${colors.border.secondary}`}
                 borderRadius="xl"
-                bg="rgba(139, 92, 246, 0.02)"
+                bg={colors.background.card}
                 p={3}
                 maxH="300px"
             >
                 {filteredNodes.length === 0 ? (
                     <HStack justify="center" align="center" h="100px">
-                        <Text color="rgba(255, 255, 255, 0.6)">
+                        <Text color={colors.text.secondary}>
                             {searchQuery ? "No files match your search" : "No files found"}
                         </Text>
                     </HStack>
@@ -255,7 +257,7 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
                                 key={node.path}
                                 p={2}
                                 borderRadius="lg"
-                                _hover={{ bg: "rgba(139, 92, 246, 0.1)" }}
+                                _hover={{ bg: colors.background.hover }}
                                 cursor="pointer"
                                 onClick={() => handleNodeClick(node)}
                                 justify="space-between"
@@ -265,23 +267,23 @@ const GitExplorer = ({ files, selectedFiles, setSelectedFiles }: GitExplorerProp
                                 <HStack gap={2} flex={1}>
                                     {node.type === "tree" ? (
                                         <>
-                                            <Box color="rgba(139, 92, 246, 0.8)">
+                                            <Box color={colors.background.accent}>
                                                 <LuFolder />
                                             </Box>
-                                            <Text color="white" fontSize="sm">
+                                            <Text color={colors.text.primary} fontSize="sm">
                                                 {node.name}
                                             </Text>
                                         </>
                                     ) : (
                                         <>
-                                            <Box color="rgba(255, 255, 255, 0.6)">
+                                            <Box color={colors.text.secondary}>
                                                 <LuFile />
                                             </Box>
-                                            <Text color="rgba(255, 255, 255, 0.9)" fontSize="sm">
+                                            <Text color={colors.text.primary} fontSize="sm">
                                                 {node.name}
                                             </Text>
                                             {node.size && (
-                                                <Text color="rgba(255, 255, 255, 0.5)" fontSize="xs">
+                                                <Text color={colors.text.muted} fontSize="xs">
                                                     ({(node.size / 1024).toFixed(1)}KB)
                                                 </Text>
                                             )}

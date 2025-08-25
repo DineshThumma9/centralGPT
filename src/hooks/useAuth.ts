@@ -15,7 +15,7 @@ export const useAuth = () => {
   const {clearAllFields} = useValidationStore();
 
   const {createNewSession} = useSessions()
-
+  const {current_session} = useSessionStore()
   const {setAccessToken,setRefreshToken} = useAuthStore()
   const {clearInit} = useInitStore()
 
@@ -32,7 +32,10 @@ export const useAuth = () => {
 
       setAccessToken(access)
       setRefreshToken(refresh)
-      await createNewSession()
+      if(current_session?.length != 0){
+          await createNewSession()
+      }
+ 
 
 
       console.log("Login successful, tokens stored");

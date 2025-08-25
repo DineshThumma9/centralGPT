@@ -5,70 +5,74 @@ import {useAuth} from "../hooks/useAuth.ts";
 import {useNavigate} from "react-router-dom";
 import useInitStore from "../store/initStore.ts";
 import {GithubIcon} from "lucide-react";
+import {ColorModeToggle} from "./ColorModeToggle";
 import {useState} from "react";
 import GitDialog from "./GitDialog.tsx";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 
-const avatarButton = {
-    bg: "linear-gradient(135deg, rgba(26, 10, 46, 0.6) 0%, rgba(45, 27, 61, 0.6) 100%)",
-    borderRadius: "50%",
-    border: "1px solid rgba(139, 69, 197, 0.15)",
-    boxShadow: "0 4px 15px rgba(26, 10, 46, 0.2)",
-    backdropFilter: "blur(10px)",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    _hover: {
-        bg: "linear-gradient(135deg, rgba(139, 69, 197, 0.2) 0%, rgba(107, 70, 193, 0.2) 100%)",
-        transform: "translateY(-1px)",
-        boxShadow: "0 8px 25px rgba(139, 69, 197, 0.15)"
-    },
-    p: 0,
-    minW: "auto",
-    h: "40px",
-    w: "40px"
-};
+const AvaterExpandable = () => {
+    const { colors } = useColorMode();
 
-const menuContent = {
-    bg: "linear-gradient(135deg, #1a0a2e 0%, #2d1b3d 100%)",
-    borderColor: "rgba(139, 69, 197, 0.3)",
-    shadow: "0 10px 40px rgba(26, 10, 46, 0.4)",
-    borderRadius: "12px",
-    border: "1px solid rgba(139, 69, 197, 0.2)",
-    backdropFilter: "blur(20px)",
-    minW: "200px"
-};
+    const avatarButton = {
+        bg: colors.background.card,
+        borderRadius: "50%",
+        border: `1px solid ${colors.border.default}`,
+        boxShadow: `0 4px 15px ${colors.background.body}`,
+        backdropFilter: "blur(10px)",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        _hover: {
+            bg: colors.background.hover,
+            transform: "translateY(-1px)",
+            boxShadow: `0 8px 25px ${colors.border.hover}`
+        },
+        p: 0,
+        minW: "auto",
+        h: "40px",
+        w: "40px"
+    };
 
-const menuItem = {
-    color: "rgba(255, 255, 255, 0.9)",
-    borderRadius: "8px",
-    mx: 1,
-    my: 1,
-    _hover: {
-        bg: "rgba(139, 69, 197, 0.2)",
-        color: "white"
-    }
-};
+    const menuContent = {
+        bg: colors.background.card,
+        borderColor: colors.border.default,
+        shadow: `0 10px 40px ${colors.background.body}`,
+        borderRadius: "12px",
+        border: `1px solid ${colors.border.default}`,
+        backdropFilter: "blur(20px)",
+        minW: "200px"
+    };
 
-const logoutMenuItem = {
-    ...menuItem,
-    _hover: {
-        bg: "rgba(239, 68, 68, 0.2)",
-        color: "white"
-    }
-};
+    const menuItem = {
+        color: colors.text.primary,
+        borderRadius: "8px",
+        mx: 1,
+        my: 1,
+        _hover: {
+            bg: colors.background.hover,
+            color: colors.text.primary
+        }
+    };
 
-const separator = {
-    borderColor: "rgba(139, 69, 197, 0.2)",
-    my: 1
-};
+    const logoutMenuItem = {
+        ...menuItem,
+        _hover: {
+            bg: colors.text.danger,
+            color: colors.text.primary
+        }
+    };
 
-const iconButton = {
-    size: "sm" as const,
-    variant: "ghost" as const,
-    color: "rgba(255, 255, 255, 0.7)",
-    minW: "auto"
-};
+    const separator = {
+        borderColor: colors.border.default,
+        my: 1
+    };
 
-const AvatarExpandable = () => {
+    const iconButton = {
+        size: "sm" as const,
+        variant: "ghost" as const,
+        color: colors.text.secondary,
+        minW: "auto"
+    };
+
     const {logout} = useAuth();
     const navigate = useNavigate();
     const {username, email} = useInitStore();
@@ -95,15 +99,17 @@ const AvatarExpandable = () => {
                 onClick={() => setDialog(true)}
                 size="md"
                 variant="ghost"
-                color="rgba(255, 255, 255, 0.7)"
+                color={colors.text.secondary}
                 _hover={{
-                    bg: "rgba(139, 69, 197, 0.2)",
-                    color: "white"
+                    bg: colors.background.hover,
+                    color: colors.text.primary
                 }}
 
             >
                 <GithubIcon size={16}/>
             </IconButton>
+
+            <ColorModeToggle />
 
             <VStack gap={0}>
 
@@ -114,8 +120,8 @@ const AvatarExpandable = () => {
 
                         <Button {...avatarButton}>
                             <Avatar.Root
-                                bg="linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)"
-                                color="white">
+                                bg={colors.background.accent}
+                                color={colors.text.primary}>
                                 <Avatar.Fallback
                                     name={username || "user"}
 
@@ -141,7 +147,7 @@ const AvatarExpandable = () => {
                                 <Separator {...separator} />
 
                                 <MenuItem value="email" {...menuItem}>
-                                    <Text fontSize="xs" color="rgba(255, 255, 255, 0.7)" pl={6}>
+                                    <Text fontSize="xs" color={colors.text.secondary} pl={6}>
                                         {email || "No email"}
                                     </Text>
                                 </MenuItem>
@@ -158,7 +164,7 @@ const AvatarExpandable = () => {
                                 <MenuItem value="logout" {...logoutMenuItem} onClick={handleLogout}>
                                     <IconButton
                                         {...iconButton}
-                                        color="rgba(239, 68, 68, 0.8)"
+                                        color={colors.text.danger}
                                     >
                                         <BiLogOut/>
                                     </IconButton>
@@ -182,4 +188,4 @@ const AvatarExpandable = () => {
     );
 };
 
-export default AvatarExpandable;
+export default AvaterExpandable;

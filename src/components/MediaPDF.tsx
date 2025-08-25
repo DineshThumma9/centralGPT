@@ -10,6 +10,7 @@ import { X } from "lucide-react";
 import type {ReactNode} from "react";
 import useSessionStore from "../store/sessionStore.ts";
 import { useRef, useEffect, useCallback } from "react";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 interface Props {
   children: ReactNode;
@@ -18,6 +19,7 @@ interface Props {
 const MediaPDF = ({ children }: Props) => {
   const { files, setFiles, removeFile } = useSessionStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { colors } = useColorMode();
   const fileUploadRef = useRef<any>(null);
 
 
@@ -96,8 +98,8 @@ const MediaPDF = ({ children }: Props) => {
                   minW="240px"
                   maxW="240px"
                   h="50px"
-                  bg="rgba(139, 92, 246, 0.15)"
-                  border="1px solid rgba(139, 92, 246, 0.3)"
+                  bg={colors.background.card}
+                  border={`1px solid ${colors.border.default}`}
                   borderRadius="12px"
                   p={3}
                   display="flex"
@@ -107,13 +109,13 @@ const MediaPDF = ({ children }: Props) => {
                   flexShrink={0}
                 >
                   <HStack gap={3} flex={1} overflow="hidden">
-                    <Box fontSize="24px" color="white" flexShrink={0}>
+                    <Box fontSize="24px" color={colors.text.primary} flexShrink={0}>
                       📄
                     </Box>
                     <Box 
                       fontSize="sm" 
                       fontWeight="500" 
-                      color="white" 
+                      color={colors.text.primary} 
                       overflow="hidden"
                       textOverflow="ellipsis"
                       whiteSpace="nowrap"
@@ -128,9 +130,9 @@ const MediaPDF = ({ children }: Props) => {
                     variant="ghost"
                     onClick={() => handleRemoveFile(index)}
                     aria-label="Remove file"
-                    color="white"
+                    color={colors.text.muted}
                     flexShrink={0}
-                    _hover={{ bg: "rgba(139, 92, 246, 0.3)" }}
+                    _hover={{ bg: colors.background.hover }}
                   >
                     <X size={14} />
                   </IconButton>

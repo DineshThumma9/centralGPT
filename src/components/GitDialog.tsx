@@ -11,6 +11,7 @@ import {toaster} from "./ui/toaster.tsx"
 import {RiArrowRightLine} from "react-icons/ri";
 import GitExplorer from "./GitExplorer.tsx";
 import {ragAPI} from "../api/apiInstance.ts";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 interface Props {
     onCancel: () => void;
@@ -20,18 +21,6 @@ interface Props {
 const dialogHeader = {
     p: 6,
     pb: 4
-};
-
-const dialogBody = {
-    p: 6,
-    pt: 2,
-    color: "rgba(255, 255, 255, 0.9)"
-};
-
-const dialogFooter = {
-    p: 6,
-    pt: 4,
-    gap: 3
 };
 
 export const GitRequestSchema = z.object({
@@ -74,6 +63,20 @@ export const GitTreeNodeSchema: z.ZodType<GitTreeNodeType> = z.lazy(() =>
 
 
 const GitDialog = ({onConfirm, onCancel}: Props) => {
+    const { colors } = useColorMode();
+    
+    const dialogBody = {
+        p: 6,
+        pt: 2,
+        color: colors.text.primary
+    };
+
+    const dialogFooter = {
+        p: 6,
+        pt: 4,
+        gap: 3
+    };
+
     const [owner, setOwner] = useState("")
     const [repo, setRepo] = useState("")
     const [branch, setBranch] = useState("main")
@@ -95,18 +98,18 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
     const inputStyles = {
         borderRadius: "xl",
         border: "2px solid",
-        borderColor: "rgba(139, 92, 246, 0.3)",
-        bg: "rgba(139, 92, 246, 0.05)",
-        color: "white",
-        _placeholder: {color: "rgba(255, 255, 255, 0.6)"},
+        borderColor: colors.border.default,
+        bg: colors.background.subtle,
+        color: colors.text.primary,
+        _placeholder: {color: colors.text.secondary},
         _hover: {
-            borderColor: "rgba(139, 92, 246, 0.5)",
-            bg: "rgba(139, 92, 246, 0.1)"
+            borderColor: colors.border.hover,
+            bg: colors.background.hover
         },
         _focus: {
-            borderColor: "rgba(139, 92, 246, 0.6)",
-            boxShadow: "0 0 0 3px rgba(139, 92, 246, 0.2)",
-            bg: "rgba(139, 92, 246, 0.1)"
+            borderColor: colors.border.focus,
+            boxShadow: `0 0 0 3px ${colors.shadow.sm}`,
+            bg: colors.background.hover
         },
         transition: "all 0.2s ease"
     }
@@ -271,18 +274,18 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                         css={{
                             ...styles.backdrop,
                             backdropFilter: "blur(8px)",
-                            bg: "rgba(0, 0, 0, 0.6)"
+                            bg: colors.shadow.md
                         }}
                     />
                     <Dialog.Positioner>
                         <Dialog.Content
                             css={{
                                 ...styles.content,
-                                bg: "rgba(20, 20, 30, 0.95)",
+                                bg: colors.background.card,
                                 backdropFilter: "blur(20px)",
-                                border: "2px solid rgba(139, 92, 246, 0.3)",
+                                border: `2px solid ${colors.border.default}`,
                                 borderRadius: "2xl",
-                                boxShadow: "0 25px 50px rgba(0, 0, 0, 0.5)"
+                                boxShadow: `0 25px 50px ${colors.shadow.lg}`
                             }}
                         >
                             <Dialog.Header {...dialogHeader}>
@@ -305,10 +308,10 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                             endAddon=".git"
                                             css={{
                                                 "& > div": {
-                                                    bg: "rgba(139, 92, 246, 0.1)",
-                                                    border: "2px solid rgba(139, 92, 246, 0.3)",
+                                                    bg: colors.background.subtle,
+                                                    border: `2px solid ${colors.border.default}`,
                                                     borderRadius: "xl",
-                                                    color: "rgba(255, 255, 255, 0.7)"
+                                                    color: colors.text.secondary
                                                 }
                                             }}
                                         >
@@ -418,10 +421,10 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                 <Dialog.ActionTrigger asChild>
                                     <Button
                                         variant="ghost"
-                                        color="white"
+                                        color={colors.text.primary}
                                         borderRadius="xl"
                                         _hover={{
-                                            bg: "rgba(255, 255, 255, 0.1)"
+                                            bg: colors.background.hover
                                         }}
                                         onClick={onCancel}
                                     >
@@ -430,12 +433,12 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                 </Dialog.ActionTrigger>
 
                                 <Button
-                                    bg="linear-gradient(135deg, #8B5CF6, #A855F7)"
-                                    color="white"
+                                    bg={colors.primary.default}
+                                    color={colors.text.inverse}
                                     borderRadius="xl"
                                     _hover={{
                                         transform: "translateY(-2px)",
-                                        boxShadow: "0 10px 30px rgba(139, 92, 246, 0.4)"
+                                        boxShadow: `0 10px 30px ${colors.shadow.md}`
                                     }}
                                     _active={{
                                         transform: "translateY(0)"
@@ -451,12 +454,12 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
 
                                 {!explorer && (
                                     <Button
-                                        bg="linear-gradient(135deg, #8B5CF6, #A855F7)"
-                                        color="white"
+                                        bg={colors.primary.default}
+                                        color={colors.text.inverse}
                                         borderRadius="xl"
                                         _hover={{
                                             transform: "translateY(-2px)",
-                                            boxShadow: "0 10px 30px rgba(139, 92, 246, 0.4)"
+                                            boxShadow: `0 10px 30px ${colors.shadow.md}`
                                         }}
                                         _active={{
                                             transform: "translateY(0)"

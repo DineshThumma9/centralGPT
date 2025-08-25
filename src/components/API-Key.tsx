@@ -3,6 +3,7 @@ import {Button, Dialog, Field, Input, Portal, Stack, useSlotRecipe} from "@chakr
 import {useRef, useState} from "react";
 import {apiKeySelection} from "../api/session-api.ts";
 import useInitStore from "../store/initStore.ts";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 interface Props {
     provider: string;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const APIKey = ({provider, title, link}: Props) => {
+    const { colors } = useColorMode();
     const {
         dialogOpen,
         setDialogOpen,
@@ -65,7 +67,7 @@ const APIKey = ({provider, title, link}: Props) => {
                             <Stack gap={4}>
                                 <Field.Root>
                                     <Field.Label
-                                        color="rgba(255, 255, 255, 0.9)"
+                                        color={colors.text.primary}
                                         fontSize="sm"
                                         fontWeight="medium"
                                         mb={2}
@@ -93,7 +95,7 @@ const APIKey = ({provider, title, link}: Props) => {
                             <Button
                                 onClick={handleApiKeySelect}
                                 css={{
-                                    bg: "purple.500",
+                                    bg: colors.background.accent,
                                     borderRadius: "10px"
                                 }}
                             >

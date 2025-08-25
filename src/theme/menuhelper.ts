@@ -7,8 +7,8 @@ export const menuSlots = defineSlotRecipe(({
     base: {
         item: {
             _hover: {
-                bg: "rgba(147, 51, 234, 0.2)",
-                color: "purple.200"
+                bg: "rgba(34, 197, 94, 0.2)",
+                color: "green.200"
             },
             color: "white",
             textTransform: "capitalize",
@@ -17,32 +17,32 @@ export const menuSlots = defineSlotRecipe(({
             transition: "all 0.2s",
         },
         content: {
-            bg: "linear-gradient(135deg, #2d1b69 0%, #1a0b2e 100%)",
-            borderColor: "purple.500",
+            bg: "linear-gradient(135deg, #1a1a1a 0%, #000000 100%)",
+            borderColor: "green.500",
             border: "1px solid",
             borderRadius: "lg",
-            boxShadow: "0 12px 40px rgba(147, 51, 234, 0.3)",
+            boxShadow: "0 12px 40px rgba(34, 197, 94, 0.3)",
             backdropFilter: "blur(12px)",
         },
         button: {
 
 
             color: "white",
-            bg: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
+            bg: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)",
             border: "1px solid",
-            borderColor: "purple.400",
+            borderColor: "green.400",
             _hover: {
-                bg: "linear-gradient(135deg, #6d28d9 0%, #9333ea 100%)",
-                borderColor: "purple.300",
+                bg: "linear-gradient(135deg, #15803d 0%, #16a34a 100%)",
+                borderColor: "green.300",
                 transform: "translateY(-1px)",
-                boxShadow: "0 4px 16px rgba(147, 51, 234, 0.4)"
+                boxShadow: "0 4px 16px rgba(34, 197, 94, 0.4)"
             },
             _active: {
                 transform: "translateY(0)",
-                boxShadow: "0 2px 8px rgba(147, 51, 234, 0.3)"
+                boxShadow: "0 2px 8px rgba(34, 197, 94, 0.3)"
             },
             transition: "all 0.2s",
-            boxShadow: "0 2px 8px rgba(147, 51, 234, 0.2)",
+            boxShadow: "0 2px 8px rgba(34, 197, 94, 0.2)",
         }
     },
     variants:{

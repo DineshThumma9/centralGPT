@@ -15,12 +15,12 @@ export const editableRecipes = defineSlotRecipe({
       wordBreak: "break-word",
       overflowWrap: "break-word",
       whiteSpace: "pre-wrap",
-      background: "purple.600",
+      background: "green.600",
       border: "1px solid",
-      borderColor: "purple.400",
+      borderColor: "green.400",
       _focus: {
-        borderColor: "purple.300",
-        boxShadow: "0 0 0 1px rgba(147, 51, 234, 0.3)",
+        borderColor: "green.300",
+        boxShadow: "0 0 0 1px rgba(34, 197, 94, 0.3)",
       },
     },
     control: {

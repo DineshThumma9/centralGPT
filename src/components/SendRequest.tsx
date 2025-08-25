@@ -1,7 +1,6 @@
-import { Box, HStack, IconButton, Textarea, VStack } from "@chakra-ui/react";
+import { Box, HStack, IconButton, Textarea } from "@chakra-ui/react";
 import { PauseIcon, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import sessionStore from "../store/sessionStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
 import { v4 } from "uuid";
 import type { Message } from "../entities/Message.ts";
@@ -11,65 +10,58 @@ import useMessage from "../hooks/useMessage.ts";
 import { toaster } from "./ui/toaster.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { API_BASE_URL } from "../api/apiInstance.ts";
+import useTheme from "../hooks/useTheme.ts";
 
-const box = {
+const box = (themeColors: any) => ({
   w: "full",
-  backdropFilter: "blur(20px)",
-  py: 4,
-  px: 4,
+  bg: "transparent", // Transparent parent box to blend with theme
+  borderTop: `1px solid ${themeColors.border.subtle}`, // Add subtle border
+  py: 1, // Minimal padding for maximum reading space
+  px: 2, // Reduced horizontal padding
   overflow: "auto" as const,
-};
+});
 
-const hstack = {
+const hstack = (themeColors: any) => ({
   backdropFilter: "blur(10px)",
-  border: "2px solid",
-  alignItems: "flex-start",
-  borderColor: "rgba(139, 92, 246, 0.3)",
-  borderRadius: "2xl",
+  border: "1px solid",
+  alignItems: "center",
+  borderColor: themeColors.border.default,
+  borderRadius: "lg",
   marginLeft: "3px",
-  px: 2,
+  px: 3,
   py: 2,
-  gap: 1,
-  boxShadow: "0 0 40px rgba(139, 92, 246, 0.2)",
+  gap: 2,
+  bg: themeColors.background.card, // Use theme card background
+  boxShadow: themeColors.shadow.sm,
   _focusWithin: {
-    borderColor: "rgba(139, 92, 246, 0.6)",
-    boxShadow: "0 0 60px rgba(139, 92, 246, 0.3)",
-    transform: "translateY(-2px)",
+    borderColor: themeColors.border.focus,
+    boxShadow: themeColors.shadow.md,
+    transform: "translateY(-1px)",
   },
-  transition: "all 0.3s ease",
-  position: "relative" as const,
-  _before: {
-    content: '""',
-    position: "absolute" as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: "2xl",
-    background:
-      "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1))",
-    zIndex: -1,
-  },
-};
+  transition: "all 0.2s ease",
+});
 
-const txtarea = {
+const txtarea = (themeColors: any) => ({
   resize: "none" as const,
-  minH: "30px",
-  maxH: "120px",
-  color: "white",
+  minH: "18px", // Even smaller default height
+  maxH: "100px", // Reduced max height for more reading space
+  color: themeColors.text.primary,
   border: "none",
   px: 0,
-  py: 2,
+  py: 0.5, // Reduced padding
   overflow: "auto" as const,
   placeholder: "Type your message...",
-  fontSize: "md",
+  fontSize: "sm",
   bg: "transparent",
-  _placeholder: { color: "rgba(255, 255, 255, 0.5)" },
+  _placeholder: { 
+    color: themeColors.text.muted, // Use theme muted text color
+    fontSize: "sm"
+  },
   _focus: {
     boxShadow: "none",
     outline: "none",
   },
-};
+});
 
 interface PollResponse {
   collection_name: string;
@@ -82,7 +74,8 @@ const SendRequest = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { streamMessage, abortStream } = useMessage();
   const { addMessage, files, setFiles, context_id, context, current_session } =
-    sessionStore();
+    useSessionStore();
+    const { themeColors } = useTheme();
 
   const [isWaitingForIndexing, setIsWaitingForIndexing] = useState(false);
   const pendingMessageRef = useRef<string | null>(null);
@@ -147,7 +140,7 @@ const SendRequest = () => {
   const handleSendMessage = async () => {
     if (!input.trim() || sending) return;
 
-    const currentSession = sessionStore.getState().current_session;
+    const currentSession = useSessionStore.getState().current_session;
     if (!currentSession) {
       console.error("No session selected.");
       return;
@@ -237,75 +230,84 @@ const SendRequest = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     const textarea = e.target;
-    textarea.style.height = "auto";
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
+    textarea.style.height = "20px"; // Reset to minimum height
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px"; // Max 120px expansion
   };
 
   return (
-    <Box {...box}>
-      <Box maxW="1000px" mx="auto">
-        <VStack {...hstack}>
-          <HStack w="full" justifyContent="space-between">
-            <MediaPDF>
-              <Textarea
-                ref={textareaRef}
-                value={input}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyPress}
-                disabled={sending || isWaitingForIndexing}
-                {...txtarea}
-                maxH={"80px"}
-              />
-            </MediaPDF>
+    <Box {...box(themeColors)}>
+      <Box maxW="4xl" mx="auto" px={1}> {/* Match Response component max width */}
+        <HStack {...hstack(themeColors)}>
+          <MediaPDF>
+            <Textarea
+              ref={textareaRef}
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyPress}
+              disabled={sending || isWaitingForIndexing}
+              {...txtarea(themeColors)}
+              flex="1"
+            />
+          </MediaPDF>
 
-            <IconButton
-              aria-label={isStreaming ? "Stop streaming" : "Send message"}
-              onClick={isStreaming ? abortStream : handleSendMessage}
-              disabled={
-                isStreaming
-                  ? false
-                  : !input.trim() || sending || isWaitingForIndexing
-              }
-              size="md"
-              bg={
-                isStreaming ||
-                (input.trim() && !sending && !isWaitingForIndexing)
-                  ? "linear-gradient(135deg, #8B5CF6, #A855F7)"
-                  : "rgba(100, 100, 120, 0.3)"
-              }
-              color="white"
-              borderRadius="xl"
-              transition="all 0.3s ease"
-              boxShadow={
+          <IconButton
+            aria-label={isStreaming ? "Stop streaming" : "Send message"}
+            onClick={isStreaming ? abortStream : handleSendMessage}
+            disabled={
+              isStreaming
+                ? false
+                : !input.trim() || sending || isWaitingForIndexing
+            }
+            size="sm"
+            bg={
+              isStreaming ||
+              (input.trim() && !sending && !isWaitingForIndexing)
+                ? themeColors.green.dark // Use green dark color
+                : themeColors.background.hover // Use hover background
+            }
+            color={
+              isStreaming ||
+              (input.trim() && !sending && !isWaitingForIndexing)
+                ? "white"
+                : themeColors.text.muted
+            }
+            borderRadius="md"
+            transition="all 0.2s ease"
+            boxShadow={
+              isStreaming || (input.trim() && !sending)
+                ? themeColors.shadow.sm
+                : "none"
+            }
+            _hover={{
+              transform:
                 isStreaming || (input.trim() && !sending)
-                  ? "0 0 20px rgba(139, 92, 246, 0.4)"
-                  : "none"
-              }
-              _hover={{
-                transform:
-                  isStreaming || (input.trim() && !sending)
-                    ? "scale(1.1)"
-                    : "none",
-                boxShadow:
-                  isStreaming || (input.trim() && !sending)
-                    ? "0 0 30px rgba(139, 92, 246, 0.6)"
-                    : "none",
-              }}
-              _active={{
-                transform:
-                  isStreaming || (input.trim() && !sending)
-                    ? "scale(0.95)"
-                    : "none",
-              }}
-              _disabled={{
-                cursor: "not-allowed",
-                opacity: 0.4,
-              }}
-            >
-              {isStreaming ? <PauseIcon size={18} /> : <Send size={18} />}
-            </IconButton>
-          </HStack>
-        </VStack>
+                  ? "scale(1.05)"
+                  : "none",
+              bg:
+                isStreaming || (input.trim() && !sending)
+                  ? themeColors.green.darker
+                  : themeColors.background.hover,
+              boxShadow:
+                isStreaming || (input.trim() && !sending)
+                  ? themeColors.shadow.md
+                  : "none",
+            }}
+            _active={{
+              transform:
+                isStreaming || (input.trim() && !sending)
+                  ? "scale(0.95)"
+                  : "none",
+            }}
+            _disabled={{
+              cursor: "not-allowed",
+              opacity: 0.5,
+              bg: themeColors.background.hover, // Use hover background instead
+              color: themeColors.text.muted,
+            }}
+          >
+            {isStreaming ? <PauseIcon size={16} /> : <Send size={16} />}
+          </IconButton>
+        </HStack>
       </Box>
     </Box>
   );

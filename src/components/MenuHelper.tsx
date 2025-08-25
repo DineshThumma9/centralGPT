@@ -1,7 +1,8 @@
 // src/components/MenuHelper.tsx
-import {Button, Menu, MenuPositioner, Portal, useSlotRecipe} from "@chakra-ui/react";
+import {Button, Menu, MenuPositioner, Portal} from "@chakra-ui/react";
 import {MenuTrigger} from "./ui/menu.tsx";
 import {ChevronDownIcon} from "lucide-react";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 interface Props {
     title: string
@@ -13,14 +14,35 @@ interface Props {
 
 
 const MenuHelper = ({title, options, onSelect, selected, disabled}: Props) => {
-    // Use useSlotRecipe for slot recipes, not useRecipe
-    const recipe = useSlotRecipe({key: "menuHelper"});
-    const styles = recipe();
+    const { colors } = useColorMode();
+
+    const buttonStyles = {
+        bg: colors.background.card,
+        borderColor: colors.border.default,
+        color: colors.text.primary,
+        _hover: {
+            bg: colors.background.hover,
+            borderColor: colors.border.hover
+        }
+    };
+
+    const contentStyles = {
+        bg: colors.background.card,
+        borderColor: colors.border.default,
+        boxShadow: `0 4px 12px ${colors.background.body}`
+    };
+
+    const itemStyles = {
+        color: colors.text.primary,
+        _hover: {
+            bg: colors.background.hover
+        }
+    };
 
     return (
         <Menu.Root>
             <MenuTrigger asChild>
-                <Button css={styles.button} disabled={disabled}>
+                <Button {...buttonStyles} disabled={disabled}>
                     {selected?.slice(0,25) || title}
                     <ChevronDownIcon/>
                 </Button>
@@ -28,12 +50,12 @@ const MenuHelper = ({title, options, onSelect, selected, disabled}: Props) => {
 
             <Portal>
                 <MenuPositioner>
-                    <Menu.Content css={styles.content}>
+                    <Menu.Content {...contentStyles}>
                         {options.map((option) => (
                             <Menu.Item
                                 value={option}
                                 key={option}
-                                css={styles.item}
+                                {...itemStyles}
                                 onClick={() => onSelect(option)}
                             >
                                 {option.split("-")}

@@ -4,63 +4,18 @@ import {FiChevronLeft, FiChevronRight} from "react-icons/fi";
 import {useEffect, useState} from "react";
 import SideBarNav from "./SideBarNav";
 import SessionComponent from "./SessionComponent";
-import useSessions from "../hooks/useSessions";
+import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore";
 import type {Session} from "../entities/Session";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 interface SidebarProps {
     onCollapse?: (collapsed: boolean) => void;
 }
 
-const boxStyles = {
-    transition: "all 0.3s ease-in-out",
-    bg: "linear-gradient(180deg, #1a0b2e 0%, #16213e 50%, #0f3460 100%)",
-    color: "white",
-    h: "100vh",
-    p: 4,
-    overflow: "hidden",
-    borderColor: "purple.600",
-    position: "relative" as const,
-    boxShadow: "4px 0 20px rgba(147, 51, 234, 0.1)",
-};
-
-const collapsibleButtonStyles = {
-    bg: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-    color: "white",
-    border: "1px solid",
-    borderColor: "purple.400",
-    _hover: {
-        bg: "linear-gradient(135deg, #6d28d9 0%, #9333ea 100%)",
-        transform: "scale(1.05)",
-        boxShadow: "0 4px 16px rgba(147, 51, 234, 0.4)"
-    },
-    _active: {
-        transform: "scale(0.95)",
-    },
-    transition: "all 0.2s",
-    boxShadow: "0 2px 12px rgba(147, 51, 234, 0.3)",
-    size: "sm" as const,
-    mb: 4,
-    borderRadius: "full"
-};
-
-const stackStyles = {
-    gap: 3,
-    align: "stretch" as const,
-    overflowY: "auto" as const,
-    flex: "1",
-    pr: 2,
-};
-
-const sessionStackStyles = {
-    borderRadius: "lg",
-    padding: "2px",
-    margin: "0",
-    transition: "all 0.2s ease-in-out"
-};
-
 export default function Sidebar({onCollapse}: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
+    const { colors } = useColorMode();
 
     // ✅ Directly use Zustand selectors
     const sessions = sessionStore((s) => s.sessions);
@@ -68,6 +23,52 @@ export default function Sidebar({onCollapse}: SidebarProps) {
     const isLoading = sessionStore((s) => s.isLoading);
 
     const {getSessions, selectSession} = useSessions();
+
+    const boxStyles = {
+        transition: "all 0.3s ease-in-out",
+        bg: colors.background.card,
+        color: colors.text.primary,
+        h: "100vh",
+        p: 3,
+        overflow: "hidden",
+        borderRight: `1px solid ${colors.border.default}`,
+        position: "relative" as const,
+        boxShadow: `2px 0 8px ${colors.shadow.sm}`,
+    };
+
+    const collapsibleButtonStyles = {
+        bg: colors.text.primary,
+        color: colors.background.primary,
+        border: "2px solid",
+        borderColor: colors.border.default,
+        _hover: {
+            bg: colors.text.secondary,
+            transform: "scale(1.05)",
+            borderColor: colors.border.hover,
+        },
+        _active: {
+            transform: "scale(0.95)",
+        },
+        transition: "all 0.2s",
+        size: "sm" as const,
+        mb: 4,
+        borderRadius: "full"
+    };
+
+    const stackStyles = {
+        gap: 3,
+        align: "stretch" as const,
+        overflowY: "auto" as const,
+        flex: "1",
+        pr: 2,
+    };
+
+    const sessionStackStyles = {
+        borderRadius: "lg",
+        padding: "2px",
+        margin: "0",
+        transition: "all 0.2s ease-in-out"
+    };
 
     const handleToggle = () => {
         const newCollapsed = !collapsed;
@@ -106,14 +107,14 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                 <Stack
                     key={sessionId}
                     {...sessionStackStyles}
-                    bg={isActive ? "rgba(147, 51, 234, 0.2)" : "transparent"}
+                    bg={isActive ? colors.background.active : "transparent"}
                     border={isActive ? "1px solid" : "1px solid transparent"}
-                    borderColor={isActive ? "purple.400" : "transparent"}
+                    borderColor={isActive ? colors.border.focus : "transparent"}
                     borderRadius="22px"
                 >
                     <SessionComponent
-                        bg={isActive ? "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)" : "rgba(45, 27, 105, 0.3)"}
-                        color="white"
+                        bg={isActive ? colors.background.hover : colors.background.card}
+                        color={colors.text.primary}
                         title={session.title || "New Chat"}
                         sessionId={sessionId}
                         onSelect={() => handleSessionSelect(sessionId)}
@@ -125,12 +126,12 @@ export default function Sidebar({onCollapse}: SidebarProps) {
 
     return (
         <Box
-            w={collapsed ? "60px" : "280px"}
+            w={collapsed ? "50px" : "240px"}
             {...boxStyles}
         >
             <Button
-                width={collapsed ? "32px" : "52px"}
-                height={collapsed ? "32px" : "52px"}
+                width={collapsed ? "28px" : "40px"}
+                height={collapsed ? "28px" : "40px"}
                 onClick={handleToggle}
                 aria-label="Toggle sidebar"
                 {...collapsibleButtonStyles}
@@ -146,7 +147,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                         <VStack {...stackStyles}>
                             {isLoading && sessions.length === 0 && (
                                 <Box p={4}>
-                                    <Text fontSize="sm" color="purple.200" textAlign="center">
+                                    <Text fontSize="sm" color={colors.text.muted} textAlign="center">
                                         Loading sessions...
                                     </Text>
                                 </Box>
@@ -154,7 +155,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
 
                             {!isLoading && sessions.length === 0 && (
                                 <Box p={4}>
-                                    <Text fontSize="sm" color="purple.300" textAlign="center" lineHeight="1.6">
+                                    <Text fontSize="sm" color={colors.text.secondary} textAlign="center" lineHeight="1.6">
                                         No chat sessions yet.
                                         <br/>
                                         Create your first chat!

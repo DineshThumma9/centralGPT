@@ -4,6 +4,7 @@
 
 import {
     Blockquote,
+    Box,
     Code,
     CodeBlock,
     CodeBlockAdapterProvider,
@@ -20,6 +21,7 @@ import {
 import React from "react";
 import type {Components} from "react-markdown";
 import type {HighlighterGeneric} from "shiki";
+import { colors, typography, borderRadius, spacing, commonStyles } from "../theme/styleDefinitions";
 
 interface CodeComponentProps {
   node?: unknown;
@@ -30,6 +32,7 @@ interface CodeComponentProps {
   idx: number;
   copiedCodeBlocks: Record<string, boolean>;
   onCodeBlockCopy: (code: string, blockId: string) => void;
+  themeColors: any;
 }
 
 const shikiAdapter = createShikiAdapter<HighlighterGeneric<any, any>>({
@@ -61,7 +64,8 @@ const shikiAdapter = createShikiAdapter<HighlighterGeneric<any, any>>({
 const CodeComponent = ({
   inline,
   className,
-  children
+  children,
+  themeColors
 }: CodeComponentProps) => {
   const match = /language-(\w+)/.exec(className || "");
 
@@ -84,15 +88,19 @@ const CodeComponent = ({
   if (inline) {
     return (
       <Code
-        colorPalette="purple"
         variant="subtle"
         size="sm"
-        bg="rgba(139, 92, 246, 0.2)"
-        color="purple.200"
-        px={1}
-        py={0.5}
-        borderRadius="md"
+        bg={themeColors.background.code}
+        color={themeColors.text.code}
+        px={2}
+        py={1}
+        borderRadius={borderRadius.sm}
         fontFamily="ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace"
+        fontSize="14px"
+        whiteSpace="normal"
+        wordBreak="keep-all"
+        display="inline"
+        verticalAlign="baseline"
       >
         {children}
       </Code>
@@ -102,16 +110,22 @@ const CodeComponent = ({
   // Plain text block
   if (language === "plaintext") {
     return (
-
         <Text
-          color="purple.100"
+          color={themeColors.text.primary}
           lineHeight="1.6"
-          fontSize="sm"
+          fontSize="14px"
           whiteSpace="pre-wrap"
+          bg={themeColors.background.code}
+          p={3}
+          borderRadius={borderRadius.md}
+          fontFamily="ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace"
+          css={{
+            wordBreak: "break-word",
+            overflowWrap: "break-word"
+          }}
         >
           {codeString}
         </Text>
-
     );
   }
 
@@ -121,7 +135,6 @@ const CodeComponent = ({
       <CodeBlock.Root
         code={codeString}
         language={language}
-        colorPalette="purple"
         size="sm"
       >
         <CodeBlock.Header>
@@ -145,7 +158,8 @@ const CodeComponent = ({
 export const createMarkdownComponents = (
   idx: number,
   copiedCodeBlocks: Record<string, boolean>,
-  onCodeBlockCopy: (code: string, blockId: string) => void
+  onCodeBlockCopy: (code: string, blockId: string) => void,
+  themeColors: any
 ): Components => ({
   code: (props) => (
     <CodeComponent
@@ -153,21 +167,34 @@ export const createMarkdownComponents = (
       idx={idx}
       copiedCodeBlocks={copiedCodeBlocks}
       onCodeBlockCopy={onCodeBlockCopy}
+      themeColors={themeColors}
     />
   ),
   p: ({ children }) => (
-    <Text mb={3} lineHeight="1.7" wordBreak="break-word" color="purple.50">
+    <Text
+      fontSize="16px"
+      lineHeight="1.7"
+      mb={4}
+      color={themeColors.text.primary}
+      whiteSpace="pre-wrap"
+      overflowWrap="break-word"
+      wordBreak="normal"
+    >
       {children}
     </Text>
   ),
   h1: ({ children }) => (
     <Text
       as="h1"
-      fontSize="xl"
-      fontWeight="bold"
-      mb={3}
-      mt={4}
-      color="purple.200"
+      fontSize="24px"
+      fontWeight="700"
+      mb={5}
+      mt={8}
+      color={themeColors.text.primary}
+      borderBottom="2px solid"
+      borderColor={themeColors.border.accent}
+      pb={2}
+      lineHeight="1.3"
     >
       {children}
     </Text>
@@ -176,11 +203,12 @@ export const createMarkdownComponents = (
   h2: ({ children }) => (
     <Text
       as="h2"
-      fontSize="lg"
-      fontWeight="bold"
-      mb={2}
-      mt={3}
-      color="purple.200"
+      fontSize="20px"
+      fontWeight="600"
+      mb={4}
+      mt={6}
+      color={themeColors.text.primary}
+      lineHeight="1.4"
     >
       {children}
     </Text>
@@ -188,75 +216,125 @@ export const createMarkdownComponents = (
   h3: ({ children }) => (
     <Text
       as="h3"
-      fontSize="md"
-      fontWeight="bold"
-      mb={2}
-      mt={2}
-      color="purple.200"
+      fontSize="18px"
+      fontWeight="600"
+      mb={3}
+      mt={5}
+      color={themeColors.text.primary}
+      lineHeight="1.4"
     >
       {children}
     </Text>
   ),
   ol: ({ children }) => (
-    <List.Root as="ol" mb={1} color="purple.50">
-      <List.Item>
+    <List.Root as="ol" mb={4} pl={6} color={themeColors.text.primary}>
+      <Box css={{ "& li": { marginBottom: "4px" } }}>
         {children}
-      </List.Item>
-
+      </Box>
     </List.Root>
   ),
-  //   ul: ({ children }) => (
-  //   <List.Root as="ul" mb={1} color="purple.50">
-  //     <List.Item>
-  //       {children}
-  //     </List.Item>
-  //
-  //   </List.Root>
-  // ),
+  ul: ({ children }) => (
+    <List.Root as="ul" mb={4} pl={6} color={themeColors.text.primary}>
+      <Box css={{ "& li": { marginBottom: "4px" } }}>
+        {children}
+      </Box>
+    </List.Root>
+  ),
   li: ({ children }) => (
-    <List.Root as="li" mb={1} color="purple.50">
-      <List.Item>
-        {children}
-      </List.Item>
-
-    </List.Root>
+    <List.Item 
+      mb={1} 
+      color={themeColors.text.primary}
+      lineHeight="1.6"
+      overflowWrap="break-word"
+      wordBreak="normal"
+    >
+      {children}
+    </List.Item>
   ),
-br: () => <Text as="span" display="block" />,
+  br: () => <br />,
 
 
 
   blockquote: ({ children }) => (
     <Blockquote.Root
-      bg="rgba(139, 92, 246, 0.1)"
-      borderRadius="md"
-      color="purple.100"
+      bg={themeColors.background.muted}
+      borderRadius={borderRadius.md}
+      color={themeColors.text.secondary}
+      my={4}
+      pl={4}
+      pr={4}
+      py={3}
+      borderLeft="4px solid"
+      borderColor={themeColors.border.accent}
+      fontSize="16px"
+      lineHeight="1.6"
+      fontStyle="italic"
     >
-      {children}
+      <Blockquote.Content>
+        {children}
+      </Blockquote.Content>
     </Blockquote.Root>
   ),
 
   strong: ({ children }) => (
-    <Text as="strong" color="purple.200" fontWeight="bold">
+    <Text as="strong" fontWeight="600" color={themeColors.text.primary} display="inline">
       {children}
     </Text>
   ),
+  
   em: ({ children }) => (
-    <Em  color="purple.200" fontStyle="italic">
+    <Em color={themeColors.text.primary} fontStyle="italic" display="inline">
       {children}
     </Em>
   ),
 
+  a: ({ children, href, ...props }) => (
+    <a
+      href={href}
+      style={{
+        color: themeColors.background.accent,
+        textDecoration: "underline",
+        display: "inline",
+        cursor: "pointer"
+      }}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={(e) => {
+        e.currentTarget.style.color = themeColors.border.accent;
+        e.currentTarget.style.textDecoration = "none";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.color = themeColors.background.accent;
+        e.currentTarget.style.textDecoration = "underline";
+      }}
+      {...props}
+    >
+      {children}
+    </a>
+  ),
+
+  // strong: ({ children }) => (
+  //   <Text as="strong" fontSize={24} color={themeColors.text.secondary} fontWeight={typography.fontWeight.bold}>
+  //     {children}
+  //   </Text>
+  // ),
+  // em: ({ children }) => (
+  //   <Em color={themeColors.text.secondary} fontStyle="italic">
+  //     {children}
+  //   </Em>
+  // ),
+
 table: ({ children }) => (
   <Table.Root
     size="sm"
-
-    colorScheme="purple"
+    my={spacing.lg}
     css={{
-      borderRadius: "md",
+      borderRadius: borderRadius.md,
       overflow: "hidden",
       border: "1px solid",
-      borderColor: "purple.400",
-      bg: "rgba(139, 92, 246, 0.05)"
+      borderColor: colors.border.default,
+      bg: themeColors.background.card,
+      width: "100%"
     }}
   >
     {children}
@@ -265,48 +343,46 @@ table: ({ children }) => (
 
 caption: ({ children }) => (
   <Table.Caption
-    color="purple.200"
-    fontSize="sm"
+    color={themeColors.text.secondary}
+    fontSize={typography.fontSize.sm}
     textAlign="left"
-    p={2}
-    bg="rgba(139, 92, 246, 0.1)"
+    p={spacing.sm}
+    bg={themeColors.background.muted}
   >
     {children}
   </Table.Caption>
 ),
-span:({children}) => (
-      <Span>
-          {children}
-      </Span>
+// span: ({ children }) => (
+//   <Span color={themeColors.text.accent}>
+//     {children}
+//   </Span>
+// ),
+// mark: ({ children }) => (
+//   <Mark bg={themeColors.background.highlight} color={themeColors.text.primary}>
+//     {children}
+//   </Mark>
+// ),
+dl: ({ children }) => (
+  <DataList.Root my={spacing.md}>
+    {children}
+  </DataList.Root>
 ),
-    mark:({children}) => (
-      <Mark>
-          {children}
-      </Mark>
+dt: ({ children }) => (
+  <DataList.ItemLabel color={themeColors.text.secondary} fontWeight={typography.fontWeight.bold}>
+    {children}
+  </DataList.ItemLabel>
 ),
-    dl:({children}) => (
-      <DataList.Root>
-          <DataList.Item>
-              {children}
-          </DataList.Item>
-      </DataList.Root>
-),
-    dt:({children}) => (
-      <DataList.ItemLabel>
-          {children}
-      </DataList.ItemLabel>
-),
-        dd:({children}) => (
-      <DataList.ItemValue>
-          {children}
-      </DataList.ItemValue>
+dd: ({ children }) => (
+  <DataList.ItemValue color={themeColors.text.accent} mb={spacing.sm}>
+    {children}
+  </DataList.ItemValue>
 ),
 
 thead: ({ children }) => (
   <Table.Header
-    bg="rgba(139, 92, 246, 0.2)"
-    color="purple.200"
-    fontWeight="bold"
+    bg={themeColors.background.muted}
+    color={themeColors.text.secondary}
+    fontWeight={typography.fontWeight.bold}
   >
     {children}
   </Table.Header>
@@ -315,27 +391,27 @@ thead: ({ children }) => (
 tbody: ({ children }) => (
   <Table.Body
     css={{
-      "& tr:nth-of-type(odd)": { bg: "rgba(139, 92, 246, 0.05)" },
+      "& tr:nth-of-type(odd)": { bg: themeColors.background.subtle },
       "& tr:nth-of-type(even)": { bg: "transparent" }
     }}
-    color="purple.50"
+    color={themeColors.text.accent}
   >
     {children}
   </Table.Body>
 ),
 
 tfoot: ({ children }) => (
-  <Table.Footer bg="rgba(139, 92, 246, 0.15)" color="purple.300">
+  <Table.Footer bg={themeColors.background.muted} color={themeColors.text.muted}>
     {children}
   </Table.Footer>
 ),
 
 tr: ({ children }) => (
   <Table.Row
-      bg={"rgba(139, 92, 246, 0.1)"}
-    _hover={{ bg: "rgba(139, 92, 246, 0.1)" }}
+    bg={themeColors.background.card}
+    _hover={{ bg: themeColors.background.hover }}
     borderBottom="1px solid"
-    borderColor="purple.400"
+    borderColor={colors.border.default}
   >
     {children}
   </Table.Row>
@@ -343,10 +419,12 @@ tr: ({ children }) => (
 
 th: ({ children }) => (
   <Table.ColumnHeader
-    color="purple.200"
-    fontWeight="bold"
+    color={themeColors.text.secondary}
+    fontWeight={typography.fontWeight.bold}
     borderBottom="2px solid"
-    borderColor="purple.400"
+    borderColor={themeColors.border.accent}
+    p={spacing.md}
+    textAlign="left"
   >
     {children}
   </Table.ColumnHeader>
@@ -354,9 +432,10 @@ th: ({ children }) => (
 
 td: ({ children }) => (
   <Table.Cell
-    color="purple.50"
+    color={themeColors.text.primary}
     borderBottom="1px solid"
-    borderColor="purple.400"
+    borderColor={colors.border.default}
+    p={spacing.md}
   >
     {children}
   </Table.Cell>

@@ -2,6 +2,7 @@
 
 import {Box, HStack, IconButton} from "@chakra-ui/react";
 import {X} from "lucide-react";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 interface FileItemProps {
     files: File[];
@@ -10,18 +11,20 @@ interface FileItemProps {
 }
 
 const FileUploadList = ({files, onRemove, isUserMessage = false}: FileItemProps) => {
+    const { colors } = useColorMode();
+    
     if (files.length === 0) return null;
 
     return (
-        <HStack overflowX="auto" gap={2} pb={2} justifyContent={"flex-start"} color={"white"}>
+        <HStack overflowX="auto" gap={2} pb={2} justifyContent={"flex-start"} color={colors.text.primary}>
             {files.map((file, index) => (
                 <Box
                     key={`${file.name}-${index}`}
                     minW="240px"
                     maxW="240px"
                     h="50px"
-                    bg="rgba(139, 92, 246, 0.15)"
-                    border="1px solid rgba(139, 92, 246, 0.3)"
+                    bg={colors.background.accent}
+                    border={`1px solid ${colors.border.accent}`}
                     borderRadius="12px"
                     p={3}
                     display="flex"
@@ -30,10 +33,10 @@ const FileUploadList = ({files, onRemove, isUserMessage = false}: FileItemProps)
                     position="relative"
                 >
                     <HStack gap={3} flex={1} overflow="hidden">
-                        <Box fontSize="24px" color={"white"}>
+                        <Box fontSize="24px" color={colors.text.primary}>
                             📄
                         </Box>
-                        <Box fontSize="sm" fontWeight="500" color={"white"} truncate>
+                        <Box fontSize="sm" fontWeight="500" color={colors.text.primary} truncate>
                             {file.name}
                         </Box>
                     </HStack>
@@ -43,8 +46,8 @@ const FileUploadList = ({files, onRemove, isUserMessage = false}: FileItemProps)
                             variant="ghost"
                             onClick={() => onRemove(index)}
                             aria-label="Remove file"
-                            color="white"
-                            _hover={{bg: "rgba(139, 92, 246, 0.3)"}}
+                            color={colors.text.primary}
+                            _hover={{bg: colors.background.hover}}
                         >
                             <X size={14}/>
                         </IconButton>

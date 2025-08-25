@@ -5,57 +5,73 @@ import {LuCheck, LuPencilLine, LuX} from "react-icons/lu";
 import {toaster} from "./ui/toaster.tsx";
 import {useState} from "react";
 import FileDisplayForUserMessage from "./FileDisplayForUserMessage.tsx";
+import { useColorMode } from "../contexts/ColorModeContext";
+import { colors } from "../theme/styleDefinitions";
 
 interface Props {
     msg: Message;
 }
 
-const box = {
-    bg: "linear-gradient(135deg, purple.500, violet.500)",
-    px: 4,
-    py: 1,
-    borderRadius: "xl",
-    fontSize: "md",
-    color: "white",
-    lineHeight: "1.6",
-    whiteSpace: "pre-wrap" as const,
-    wordBreak: "break-word" as const,
-    overflowWrap: "break-word" as const,
-    boxShadow: "0 2px 12px rgba(147, 51, 234, 0.3)",
-    border: "1px solid",
-    borderColor: "purple.400"
-}
-
-const editableInput = {
-    wordBreak: "break-word" as const,
-    overflowWrap: "break-word" as const,
-    whiteSpace: "pre-wrap" as const,
-    bg: "purple.600",
-    border: "1px solid",
-    borderColor: "purple.400",
-    _focus: {
-        borderColor: "purple.300",
-        boxShadow: "0 0 0 1px rgba(147, 51, 234, 0.3)"
-    }
-}
-
-const editableIcon = {
-    variant: "outline" as const,
-    size: "xs" as const,
-    colorScheme: "purple",
-    bg: "white",
-    color: "purple.600",
-    _hover: {bg: "purple.50"}
-}
-
-const actionButton = {
-    size: "sm" as const,
-    variant: "ghost" as const,
-    _hover: {bg: "purple.50"}
-}
-
 const UserRequest = ({msg}: Props) => {
     const [copied, setCopied] = useState(false);
+    const { colors: themeColors } = useColorMode();
+
+    const box = {
+        bg: themeColors.text.primary,
+        px: 4,
+        py: 1,
+        borderRadius: "xl",
+        fontSize: "md",
+        color: themeColors.background.primary,
+        lineHeight: "1.6",
+        whiteSpace: "pre-wrap" as const,
+        wordBreak: "break-word" as const,
+        overflowWrap: "break-word" as const,
+        boxShadow: `0 2px 12px ${themeColors.background.hover}`,
+        border: "2px solid",
+        borderColor: themeColors.border.default
+    }
+
+    const editableInput = {
+        wordBreak: "break-word" as const,
+        overflowWrap: "break-word" as const,
+        whiteSpace: "pre-wrap" as const,
+        bg: themeColors.background.card,
+        border: "1px solid",
+        borderColor: themeColors.border.default,
+        color: themeColors.text.primary,
+        _focus: {
+            borderColor: themeColors.border.focus,
+            boxShadow: `0 0 0 1px ${themeColors.border.focus}`
+        }
+    }
+
+    const editableIcon = {
+        variant: "outline" as const,
+        size: "xs" as const,
+        bg: themeColors.background.primary,
+        color: themeColors.text.primary,
+        border: "1px solid",
+        borderColor: themeColors.border.default,
+        _hover: {
+            bg: themeColors.background.hover,
+            borderColor: themeColors.border.hover
+        }
+    }
+
+    const actionButton = {
+        size: "sm" as const,
+        variant: "ghost" as const,
+        _hover: { 
+            bg: themeColors.background.hover,
+            color: colors.green.dark // Use green accent for hover
+        },
+        _active: {
+            bg: themeColors.background.active,
+            color: colors.green.darker // Use darker green for active
+        },
+        transition: "all 0.2s ease"
+    }
 
     // Debug logging
     console.log('UserRequest received message:', msg);
@@ -138,11 +154,11 @@ const UserRequest = ({msg}: Props) => {
                 <Box flexShrink={0} mt={1}>
                     <Box
                         p={2}
-                        bg="linear-gradient(135deg, violet.500, purple.500)"
+                        bg={colors.text.primary}
                         borderRadius="full"
-                        boxShadow="0 2px 8px rgba(147, 51, 234, 0.3)"
+                        boxShadow={`0 2px 8px ${colors.background.hover}`}
                     >
-                        <User size={16} color="white"/>
+                        <User size={16} color={colors.background.primary}/>
                     </Box>
                 </Box>
             </Flex>
@@ -151,18 +167,29 @@ const UserRequest = ({msg}: Props) => {
             <HStack gap={2} mr={12}>
                 <IconButton
                     {...actionButton}
-                    colorScheme={copied ? "purple" : "gray"}
+                    bg={copied ? colors.green.light : themeColors.background.card}
+                    color={copied ? "white" : themeColors.text.muted}
                     onClick={handleCopy}
                     aria-label="Copy message"
+                    _hover={{
+                        ...actionButton._hover,
+                        bg: copied ? colors.green.dark : themeColors.background.hover,
+                        color: copied ? "white" : colors.green.dark
+                    }}
                 >
-                    {copied ? <Check color="purple" size={16}/> : <Copy color="gray" size={16}/>}
+                    {copied ? <Check size={16}/> : <Copy size={16}/>}
                 </IconButton>
 
                 <IconButton
                     {...actionButton}
+                    color={themeColors.text.muted}
                     aria-label="Edit message"
+                    _hover={{
+                        ...actionButton._hover,
+                        color: colors.green.dark
+                    }}
                 >
-                    <LuPencilLine color="gray" size={16}/>
+                    <LuPencilLine size={16}/>
                 </IconButton>
             </HStack>
         </Flex>

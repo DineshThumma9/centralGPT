@@ -3,20 +3,7 @@ import {Plus} from "lucide-react";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
 import {iconButton} from "../theme/iconButton.ts";
-
-
-const hstack = {
-    width: "100%",
-    // bg: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)",
-    backdropFilter: "blur(20px)",
-    borderRadius: "20px",
-    justifyContent: "space-between",
-    height: "50px",
-    px: 3,
-    border: "1px solid rgba(139, 69, 197, 0.1)",
-    boxShadow: "0 4px 20px rgba(139, 69, 197, 0.1)",
-
-}
+import { useColorMode } from "../contexts/ColorModeContext.tsx";
 
 
 // const hstackplus = {
@@ -59,8 +46,20 @@ const hstack = {
 
 
 const SideBarNav = () => {
+    const { colors } = useColorMode();
     const {createNewSession} = useSessions();
     const [isCreating, setIsCreating] = useState(false);
+
+    const hstackStyles = {
+        width: "100%",
+        backdropFilter: "blur(20px)",
+        borderRadius: "20px",
+        justifyContent: "space-between",
+        height: "50px",
+        px: 3,
+        border: `1px solid ${colors.border.secondary}`,
+        boxShadow: `0 4px 20px ${colors.shadow.md}`,
+    };
 
 
     const handleCreateNewSession = async () => {
@@ -80,7 +79,7 @@ const SideBarNav = () => {
 
     return (
         <HStack
-            {...hstack}
+            {...hstackStyles}
         >
             <IconButton
                 recipe={iconButton}

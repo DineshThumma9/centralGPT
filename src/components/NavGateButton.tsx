@@ -1,5 +1,7 @@
 import {Button, ButtonGroup, Separator} from "@chakra-ui/react";
 import {Link} from "react-router-dom";
+import useTheme from "../hooks/useTheme.ts";
+import { useColorMode } from "../contexts/ColorModeContext";
 
 interface Props {
     login_register: string,
@@ -9,56 +11,65 @@ interface Props {
     altlink: string
 }
 
-const buttonGroup = {
-    alignSelf: "start",
-    alignContent: "center",
-    flexDirection: "column" as const,
-    alignItems: "stretch",
-    gap: 4,
-    width: "100%",
-}
-
-const submitButtonStyles = {
-    bg: "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)",
-    color: "white",
-    border: "1px solid",
-    borderColor: "purple.400",
-    _hover: {
-        bg: "linear-gradient(135deg, #6d28d9 0%, #9333ea 100%)",
-        transform: "scale(1.02)",
-        boxShadow: "0 8px 25px rgba(147, 51, 234, 0.4)"
-    },
-    _active: {
-        transform: "scale(0.98)",
-    },
-    transition: "all 0.2s",
-    boxShadow: "0 4px 16px rgba(147, 51, 234, 0.3)",
-    fontWeight: "bold",
-    py: 3,
-    borderRadius: "lg"
-}
-
-const outlineButtonStyles = {
-    bg: "transparent",
-    color: "white",
-    border: "1px solid",
-    borderColor: "rgba(147, 51, 234, 0.5)",
-    _hover: {
-        bg: "rgba(147, 51, 234, 0.1)",
-        borderColor: "purple.400",
-        transform: "scale(1.02)",
-    },
-    _active: {
-        transform: "scale(0.98)",
-    },
-    transition: "all 0.2s",
-    fontWeight: "medium",
-    py: 3,
-    borderRadius: "lg",
-    width: "100%"
-}
-
 const NavGateButton = ({login_register, message, isLoading, onSubmit, altlink}: Props) => {
+    const { themeColors } = useTheme();
+    const { colorMode } = useColorMode();
+
+    const buttonGroup = {
+        alignSelf: "start",
+        alignContent: "center",
+        flexDirection: "column" as const,
+        alignItems: "stretch",
+        gap: 4,
+        width: "100%",
+    }
+
+    const submitButtonStyles = {
+        bg: themeColors.green.dark, // Use darker green for better contrast
+        color: "white",
+        border: "2px solid", // Thicker border for better definition
+        borderColor: colorMode === 'light' ? "rgba(255, 255, 255, 0.3)" : themeColors.border.default,
+        _hover: {
+            bg: themeColors.green.darker, // Even darker on hover
+            transform: "scale(1.02)",
+            boxShadow: colorMode === 'light' ? 
+                `0 12px 40px rgba(21, 128, 61, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.5)` :
+                `0 8px 25px ${themeColors.shadow.sm}`
+        },
+        _active: {
+            transform: "scale(0.98)",
+        },
+        transition: "all 0.2s",
+        boxShadow: colorMode === 'light' ? 
+            `0 8px 25px rgba(21, 128, 61, 0.3)` :
+            `0 4px 16px ${themeColors.shadow.md}`,
+        fontWeight: "bold",
+        py: 3,
+        borderRadius: "lg"
+    }
+
+    const outlineButtonStyles = {
+        bg: colorMode === 'light' ? "rgba(255, 255, 255, 0.8)" : "transparent",
+        color: themeColors.text.primary,
+        border: "2px solid", // Thicker border for better definition
+        borderColor: colorMode === 'light' ? "rgba(29, 78, 216, 0.3)" : themeColors.border.default,
+        _hover: {
+            bg: colorMode === 'light' ? "rgba(255, 255, 255, 0.9)" : themeColors.background.hover,
+            borderColor: colorMode === 'light' ? "rgba(29, 78, 216, 0.5)" : themeColors.border.focus,
+            transform: "scale(1.02)",
+            boxShadow: colorMode === 'light' ? 
+                `0 8px 25px rgba(0, 0, 0, 0.1)` : undefined,
+        },
+        _active: {
+            transform: "scale(0.98)",
+        },
+        transition: "all 0.2s",
+        fontWeight: colorMode === 'light' ? "600" : "medium", // Bolder text in light mode
+        py: 3,
+        borderRadius: "lg",
+        width: "100%"
+    }
+
     return (
         <ButtonGroup {...buttonGroup}>
             <Button
@@ -70,7 +81,7 @@ const NavGateButton = ({login_register, message, isLoading, onSubmit, altlink}: 
             </Button>
 
             <Separator
-                borderColor="rgba(147, 51, 234, 0.3)"
+                borderColor={themeColors.border.default}
                 my={2}
             />
 

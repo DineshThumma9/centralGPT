@@ -1,4 +1,5 @@
 import {Button, Dialog, Portal, useSlotRecipe} from "@chakra-ui/react"
+import { useColorMode } from "../contexts/ColorModeContext"
 
 interface Props {
     onCancel: () => void;
@@ -6,26 +7,25 @@ interface Props {
 }
 
 
-const dialogHeader = {
-    p: 6,
-    pb: 4
-};
-
-
-const dialogBody = {
-    p: 6,
-    pt: 2,
-    color: "rgba(255, 255, 255, 0.9)"
-};
-
-const dialogFooter = {
-    p: 6,
-    pt: 4,
-    gap: 3
-};
-
-
 const DeleteAlert = ({onConfirm, onCancel}: Props) => {
+    const { colors } = useColorMode();
+
+    const dialogHeader = {
+        p: 6,
+        pb: 4
+    };
+
+    const dialogBody = {
+        p: 6,
+        pt: 2,
+        color: colors.text.primary
+    };
+
+    const dialogFooter = {
+        p: 6,
+        pt: 4,
+        gap: 3
+    };
 
 
     const recipe = useSlotRecipe({key: "dialogHelper"})
@@ -60,8 +60,8 @@ const DeleteAlert = ({onConfirm, onCancel}: Props) => {
                             </Dialog.ActionTrigger>
                             <Button
                                 css={{
-                                    bg: "red.500",
-                                   color: "white",
+                                    bg: colors.text.danger,
+                                   color: colors.background.primary,
                                     borderRadius:"10px"
                                 }}
                                 onClick={onConfirm}
