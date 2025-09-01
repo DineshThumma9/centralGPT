@@ -2,12 +2,15 @@
 
 import {createListCollection, Select} from "@chakra-ui/react";
 
+
 interface Props {
     value: string[];
     setValue: (value: string[]) => void;
 }
 
 const SelectOptions = ({value, setValue}: Props) => {
+    
+
     return (
         <Select.Root
             collection={include_exclude}
@@ -19,7 +22,7 @@ const SelectOptions = ({value, setValue}: Props) => {
         >
             <Select.HiddenSelect/>
             <Select.Label
-                color="white"
+                color={"fg"}
                 fontSize="sm"
                 fontWeight="medium"
             >
@@ -27,51 +30,72 @@ const SelectOptions = ({value, setValue}: Props) => {
             </Select.Label>
             <Select.Control>
                 <Select.Trigger
-                    bg="rgba(139, 92, 246, 0.1)"
-                    border="2px solid"
-                    borderColor="rgba(139, 92, 246, 0.3)"
-                    borderRadius="xl"
-                    color="white"
+                    bg={"bg.panel"}
+                    border="1px solid"
+                    borderColor={"border.subtle"}
+                    borderRadius="12px"
+                    color={"fg"}
+                    px={4}
+                    py={3}
+                    fontSize="sm"
+                    fontWeight="medium"
                     _hover={{
-                        borderColor: "rgba(139, 92, 246, 0.5)",
-                        bg: "rgba(139, 92, 246, 0.15)"
+                        borderColor: "border",
+                        bg: "bg.subtle",
+                        transform: "scale(1.02)"
                     }}
                     _focus={{
-                        borderColor: "rgba(139, 92, 246, 0.6)",
-                        boxShadow: "0 0 0 3px rgba(139, 92, 246, 0.2)"
+                        borderColor: "border.emphasized",
+                        boxShadow: `0 0 0 1px ${"border.emphasized"}`
+                    }}
+                    _active={{
+                        transform: "scale(0.98)"
                     }}
                     transition="all 0.2s ease"
                 >
                     <Select.ValueText
                         placeholder="Select option"
-                        color="white"
-                        _placeholder={{color: "rgba(255, 255, 255, 0.6)"}}
+                        color={"fg"}
+                        _placeholder={{color: "fg.muted"}}
                     />
                 </Select.Trigger>
                 <Select.IndicatorGroup>
-                    <Select.Indicator color="white"/>
+                    <Select.Indicator color={"fg"}/>
                 </Select.IndicatorGroup>
             </Select.Control>
             <Select.Positioner>
                 <Select.Content
-                    bg="rgba(30, 30, 40, 0.95)"
+                    bg={"bg.panel"}
                     backdropFilter="blur(10px)"
-                    border="2px solid"
-                    borderColor="rgba(139, 92, 246, 0.3)"
-                    borderRadius="xl"
-                    boxShadow="0 10px 40px rgba(0, 0, 0, 0.3)"
+                    border="1px solid"
+                    borderColor={"border.subtle"}
+                    borderRadius="12px"
+                    boxShadow={`0 10px 40px ${"lg"}`}
+                    py={2}
+                    minW="200px"
                 >
                     {include_exclude.items.map((option) => (
                         <Select.Item
                             key={option.value}
                             item={option}
-                            color="white"
-                            _hover={{bg: "rgba(139, 92, 246, 0.2)"}}
-                            _selected={{bg: "rgba(139, 92, 246, 0.3)"}}
+                            color={"fg"}
+                            px={3}
+                            py={2}
+                            borderRadius="8px"
+                            mx={1}
+                            fontWeight="medium"
+                            _hover={{
+                                bg: "bg.subtle",
+                                transform: "scale(1.02)"
+                            }}
+                            _selected={{
+                                bg: "bg.muted",
+                                fontWeight: "bold"
+                            }}
                             transition="all 0.2s ease"
                         >
                             {option.label}
-                            <Select.ItemIndicator color="rgba(139, 92, 246, 0.8)"/>
+                            <Select.ItemIndicator color={"colorPalette.500"}/>
                         </Select.Item>
                     ))}
                 </Select.Content>

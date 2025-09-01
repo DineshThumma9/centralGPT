@@ -1,201 +1,76 @@
 // src/components/AIResponse.tsx
-import {Badge, Box, Collapsible, Flex, HStack, IconButton, Spinner, Text, VStack} from "@chakra-ui/react";
-import {Bot, Check, ChevronDown, ChevronUp, Copy, RepeatIcon} from "lucide-react";
+import {Box, Flex, HStack, IconButton, Skeleton, SkeletonText, Spinner, VStack} from "@chakra-ui/react";
+import {Check, Copy, RepeatIcon} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeHighlight from "rehype-highlight";
-import type {Message, SourceDocument} from "../entities/Message";
+import type {Message} from "../entities/Message";
 import useSessionStore from "../store/sessionStore";
 import {useEffect, useMemo, useState} from "react";
 import {toaster} from "./ui/toaster.tsx";
 import {createMarkdownComponents} from "./MarkdownComponents";
-import { useColorMode } from "../contexts/ColorModeContext";
+
+import SourcesDisplay from "./SourceDisplay.tsx";
 
 interface Props {
     msg: Message;
     idx: number;
 }
 
-// Style object generators
-const getStreamCursor = (colors: any) => ({
-    display: "inline-block",
-    width: "2px",
-    height: "1.2em",
-    backgroundColor: colors.text.primary,
-    marginLeft: "2px",
-    animation: "blink 1s infinite",
-});
 
-const getMessageBox = (colors: any) => ({
+const getMessageBox = () => ({
     p: 5,
     borderRadius: "lg",
-    backgroundColor: colors.background.secondary,
-    border: `1px solid ${colors.border.primary}`,
+    backgroundColor: "bg.panel",
+    border: `1px solid {"border.subtle"}`,
     position: "relative" as const,
     boxShadow: "sm",
     transition: "all 0.2s",
     _hover: {
         boxShadow: "md",
-        borderColor: colors.border.accent,
+        borderColor: "colorPalette.500",
     },
-    // Improve text rendering
+
     css: {
         lineHeight: "1.6",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif",
-        fontSize: "16px",
+        fontSize:16,
+
         textRendering: "optimizeLegibility",
         WebkitFontSmoothing: "antialiased",
         MozOsxFontSmoothing: "grayscale"
     }
 });
 
-const getAvatarBox = (colors: any) => ({
-    mr: 3,
-    mt: 1,
-    flexShrink: 0,
-});
 
-const getActionButton = (colors: any) => ({
-    color: colors.text.secondary,
-    _hover: { 
-        color: colors.text.primary,
-        backgroundColor: colors.background.accent 
-    },
-});
-
-const getSourcesContainer = (colors: any) => ({
-    mt: 4,
-    p: 3,
-    borderRadius: "md",
-    backgroundColor: colors.background.accent,
-    border: `1px solid ${colors.border.secondary}`,
-});
-
-const getSourceItem = (colors: any) => ({
-    p: 3,
-    mb: 2,
-    borderRadius: "sm",
-    backgroundColor: colors.background.primary,
-    border: `1px solid ${colors.border.secondary}`,
-    transition: "all 0.2s",
+const getActionButton = () => ({
+    color: { base: "brand.700", _dark: "brand.600" },
+    borderRadius: "8px",
+    transition: "all 0.2s ease",
     _hover: {
-        backgroundColor: colors.background.secondary,
-        borderColor: colors.border.primary,
+        color: { base: "brand.800", _dark: "brand.500" },
+        backgroundColor: { base: "brand.50", _dark: "brand.950" },
+        transform: "scale(1.05)",
     },
+    _active: {
+        backgroundColor: { base: "brand.100", _dark: "brand.900" },
+        transform: "scale(0.95)",
+    }
 });
 
-const StreamingCursor = () => {
-    const { colors } = useColorMode();
-    const streamCursor = getStreamCursor(colors);
-    
-    return (
-        <Box
-            {...streamCursor}
-            css={{
-                '@keyframes blink': {
-                    '0%, 50%': {opacity: 1},
-                    '51%, 100%': {opacity: 0}
-                }
-            }}
-        />
-    );
-};
-
-const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
-    const { colors } = useColorMode();
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [copiedSource, setCopiedSource] = useState<string | null>(null);
-    
-    const sourcesContainer = getSourcesContainer(colors);
-    const sourceItem = getSourceItem(colors);
-
-    const handleCopySource = async (text: string, docId: string) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopiedSource(docId);
-            setTimeout(() => setCopiedSource(null), 2000);
-        } catch (err) {
-            console.error('Copy failed:', err);
-        }
-    };
-
-    if (!sources || sources.length === 0) return null;
-
-    return (
-        <Box {...sourcesContainer}>
-
-            <IconButton
-                size="xs"
-                variant="ghost"
-                color="green.200"
-                _hover={{bg: "rgba(34, 197, 94, 0.2)"}}
-                onClick={() => setIsExpanded(!isExpanded)}
-                aria-label={isExpanded ? "Collapse sources" : "Expand sources"}
-            >
-                {isExpanded ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
-            </IconButton>
-
-
-            <Collapsible.Root open={isExpanded}>
-                <Collapsible.Content gap={2}>
-                    {sources.map((source, index) => (
-                        <Box key={source.doc_id} {...sourceItem}>
-                            <Flex justify="space-between" align="flex-start" mb={2}>
-                                <VStack align="flex-start" gap={1} flex="1">
-                                    <HStack>
-                                        <Badge
-                                            colorScheme="green"
-                                            variant="subtle"
-                                            fontSize="xs"
-                                        >
-                                            #{index + 1}
-                                        </Badge>
-                                        <Text fontSize="sm" fontWeight="medium" color="white">
-                                            {source.metadata.file_name || 'Unknown File'}
-                                        </Text>
-                                    </HStack>
-                                    <HStack fontSize="xs" color="purple.200">
-                                        <Text>Page: {source.metadata.page_label || 'N/A'}</Text>
-                                        <Text>•</Text>
-                                        <Text>Relevance: {(source.score * 100).toFixed(1)}%</Text>
-                                    </HStack>
-                                </VStack>
-                                <IconButton
-                                    size="xs"
-                                    variant="ghost"
-                                    color={copiedSource === source.doc_id ? "purple.300" : "purple.200"}
-                                    _hover={{bg: "rgba(139, 92, 246, 0.2)"}}
-                                    onClick={() => handleCopySource(source.text, source.doc_id)}
-                                    aria-label="Copy source text"
-                                >
-                                    {copiedSource === source.doc_id ? <Check size={12}/> : <Copy size={12}/>}
-                                </IconButton>
-                            </Flex>
-                            <Text fontSize="xs" color="purple.100" lineHeight="1.4">
-                                {source.text.substring(0, 200)}
-                                {source.text.length > 200 && '...'}
-                            </Text>
-                        </Box>
-                    ))}
-                </Collapsible.Content>
-            </Collapsible.Root>
-        </Box>
-    );
-};
 
 const AIResponse = ({msg, idx}: Props) => {
     const {messages, isStreaming} = useSessionStore();
-    const { colors } = useColorMode();
+    
     const [displayed, setDisplayed] = useState(msg.content || "");
     const [copied, setCopied] = useState(false);
     const [retry, setRetry] = useState(false);
     const [copiedCodeBlocks, setCopiedCodeBlocks] = useState<Record<string, boolean>>({});
 
-    // Get dynamic style objects using colors from ColorModeContext
-    const messageBox = getMessageBox(colors);
-    const avatarBox = getAvatarBox(colors);
-    const actionButton = getActionButton(colors);
+    // Get dynamic style objects
+    const messageBox = getMessageBox();
+
+    const actionButton = getActionButton();
 
     const isLastMessage = useMemo(() => idx === messages.length - 1, [idx, messages.length]);
     const isCurrentlyStreaming = useMemo(() =>
@@ -247,46 +122,47 @@ const AIResponse = ({msg, idx}: Props) => {
     };
 
     useEffect(() => {
-        if (msg.content !== displayed) {
-            setDisplayed(msg.content || "");
+        // Only update displayed content if there's a significant change
+        // This prevents rapid re-renders during streaming
+        if (msg.content && msg.content !== displayed) {
+            const timeoutId = setTimeout(() => {
+                setDisplayed(msg.content || "");
+            }, 16); // Throttle updates to ~60fps
+            
+            return () => clearTimeout(timeoutId);
         }
-    }, [msg.content]);
+    }, [msg.content, displayed]);
 
     const markdownComponents = createMarkdownComponents(
         idx,
         copiedCodeBlocks,
-        handleCodeBlockCopy,
-        colors
+        handleCodeBlockCopy
     );
 
     return (
         <Flex
+            justify="center"
             align="flex-start"
             w="100%"
             maxW="100%"
             direction="row"
-            gap={3}
+            gap={2}
+            bg={"bg.canvas"}
         >
-
-            <Box flexShrink={0} mt={1}>
-                <Box {...avatarBox}>
-                    <Bot size={16} color="white"/>
-                </Box>
-            </Box>
-
 
 
             <Box
                 flex="1"
                 minW={0}
-                maxW="calc(100% - 60px)"
+                maxW="800px"
+                mx="auto"
             >
                 {!retry ? (
                     <Box>
                         <Box {...messageBox}>
-
                             <Box
                                 className="markdown-content"
+                                minH={isCurrentlyStreaming ? "60px" : "auto"}
                                 css={{
                                     wordBreak: "break-word",
                                     overflowWrap: "anywhere",
@@ -299,15 +175,51 @@ const AIResponse = ({msg, idx}: Props) => {
                                 }}
                             >
                                 {cleanContent ? (
-                                    <ReactMarkdown
-                                        remarkPlugins={[remarkGfm, remarkBreaks]}
-                                        rehypePlugins={[rehypeHighlight]}
-                                        components={markdownComponents}
-                                    >
-                                        {cleanContent}
-                                    </ReactMarkdown>
+                                    <>
+                                        <ReactMarkdown
+                                            remarkPlugins={[remarkGfm, remarkBreaks]}
+                                            rehypePlugins={[rehypeHighlight]}
+                                            components={markdownComponents}
+                                        >
+                                            {cleanContent}
+                                        </ReactMarkdown>
+                                        {isCurrentlyStreaming && (
+                                            <Box
+                                                as="span"
+                                                display="inline-block"
+                                                w="2px"
+                                                h="1.2em"
+                                                bg={{ base: "brand.600", _dark: "brand.500" }}
+                                                ml="1px"
+                                                animation="blink 1s infinite"
+                                                css={{
+                                                    "@keyframes blink": {
+                                                        "0%, 50%": { opacity: 1 },
+                                                        "51%, 100%": { opacity: 0 }
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </>
+                                ) : isCurrentlyStreaming ? (
+                                    <VStack align="stretch" gap={4} py={2}>
+                                        <HStack gap={3} w="full">
+                                            <Skeleton height="4" width="25%" />
+                                            <Skeleton height="4" width="45%" />
+                                            <Skeleton height="4" width="20%" />
+                                        </HStack>
+                                        <SkeletonText noOfLines={4} gap="3" />
+                                        <HStack gap={2} w="full">
+                                            <Skeleton height="4" width="35%" />
+                                            <Skeleton height="4" width="30%" />
+                                        </HStack>
+                                    </VStack>
                                 ) : (
-                                    StreamingCursor()
+                                    <VStack align="stretch" gap={3}>
+                                        <SkeletonText noOfLines={3} gap="4"/>
+                                        <Skeleton height="20px" borderRadius="md"/>
+                                        <Skeleton height="16px" width="80%" borderRadius="md"/>
+                                    </VStack>
                                 )}
                             </Box>
 
@@ -317,9 +229,9 @@ const AIResponse = ({msg, idx}: Props) => {
                                         {...actionButton}
                                         size="sm"
                                         variant="ghost"
-                                        colorScheme={copied ? "purple" : "gray"}
+                                        bg={copied ? { base: "brand.100", _dark: "brand.900" } : "transparent"}
                                         onClick={handleCopy}
-                                        color={copied ? "purple.300" : "purple.200"}
+                                        color={copied ? { base: "brand.800", _dark: "brand.400" } : { base: "brand.700", _dark: "brand.600" }}
                                         aria-label="Copy message"
                                     >
                                         {copied ? <Check size={16}/> : <Copy size={16}/>}
@@ -329,6 +241,8 @@ const AIResponse = ({msg, idx}: Props) => {
                                         {...actionButton}
                                         size="sm"
                                         variant="ghost"
+                                        bg="transparent"
+                                        color={{ base: "brand.700", _dark: "brand.600" }}
                                         onClick={handleRetry}
                                         aria-label="Retry message"
                                     >
@@ -345,7 +259,7 @@ const AIResponse = ({msg, idx}: Props) => {
                     </Box>
                 ) : (
                     <Flex justify="center" p={4}>
-                        <Spinner color="purple.400" size="lg"/>
+                        <Spinner color="app.button.primary" size="lg"/>
                     </Flex>
                 )}
             </Box>

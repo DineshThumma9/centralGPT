@@ -1,14 +1,10 @@
-
 import {HStack} from "@chakra-ui/react";
 import {Constants} from "../entities/Constants.ts";
 import {llmSelection, modelSelection} from "../api/session-api.ts";
 import MenuHelper from "./MenuHelper.tsx";
 import useInitStore from "../store/initStore.ts";
-import BadgeCompo from "./BadgeCompo.tsx";
 import APIKey from "./API-Key.tsx";
 import {useEffect} from "react";
-
-import useSessionStore from "../store/sessionStore.ts";
 
 const hstack = {
     gap: 1, // Minimal gap for maximum space efficiency
@@ -24,11 +20,8 @@ const hstack = {
 }
 
 
-
-
 const LLMModelChooser = () => {
-    const {providers_models, modelsProviders,providers_dic} = Constants();
-    const {shouldStream} = useSessionStore();
+    const {providers_models, modelsProviders, providers_dic} = Constants();
 
 
     const {
@@ -43,8 +36,6 @@ const LLMModelChooser = () => {
         providerModels,
         currentModel
     } = useInitStore();
-
-
 
 
     useEffect(() => {
@@ -70,6 +61,16 @@ const LLMModelChooser = () => {
 
         } catch (error) {
             console.error("Failed to set LLM provider:", error);
+        }
+    };
+
+    const handleProviderDoubleClick = (provider: string) => {
+        // Get the model documentation link for the provider
+        const modelLink = providers_dic.get(provider)?.model_link;
+        
+        if (modelLink) {
+            // Open the model documentation page in a new tab
+            window.open(modelLink, '_blank', 'noopener,noreferrer');
         }
     };
 
@@ -99,6 +100,7 @@ const LLMModelChooser = () => {
                 options={[...providerModels.keys()]}
                 selected={currentLLMProvider}
                 onSelect={handleProviderSelection}
+                onDoubleClick={handleProviderDoubleClick}
             />
 
             <MenuHelper
@@ -108,11 +110,6 @@ const LLMModelChooser = () => {
                 onSelect={handleModelSelection}
                 disabled={!currentLLMProvider || modelMap.length === 0}
             />
-
-
-
-       
-
 
 
             <APIKey provider={currentAPIProvider} title={"API KEY"}/>

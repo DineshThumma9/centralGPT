@@ -11,7 +11,7 @@ import {toaster} from "./ui/toaster.tsx"
 import {RiArrowRightLine} from "react-icons/ri";
 import GitExplorer from "./GitExplorer.tsx";
 import {ragAPI} from "../api/apiInstance.ts";
-import { useColorMode } from "../contexts/ColorModeContext";
+
 
 interface Props {
     onCancel: () => void;
@@ -38,37 +38,35 @@ export const GitRequestSchema = z.object({
 export type GitRequestSchema = z.infer<typeof GitRequestSchema>
 
 
-
 export type GitTreeNodeType = {
-  name: string;
-  path: string;
-  type: "tree" | "blob";
-  sha?: string;
-  size?: number;
-  children?: GitTreeNodeType[] | null;
+    name: string;
+    path: string;
+    type: "tree" | "blob";
+    sha?: string;
+    size?: number;
+    children?: GitTreeNodeType[] | null;
 };
 
 
-
 export const GitTreeNodeSchema: z.ZodType<GitTreeNodeType> = z.lazy(() =>
-  z.object({
-    name: z.string(),
-    path: z.string(),
-    type: z.enum(["tree", "blob"]),
-    sha: z.string().optional(),
-    size: z.number().optional(),
-    children: z.array(GitTreeNodeSchema).nullable().optional(),
-  })
+    z.object({
+        name: z.string(),
+        path: z.string(),
+        type: z.enum(["tree", "blob"]),
+        sha: z.string().optional(),
+        size: z.number().optional(),
+        children: z.array(GitTreeNodeSchema).nullable().optional(),
+    })
 );
 
 
 const GitDialog = ({onConfirm, onCancel}: Props) => {
-    const { colors } = useColorMode();
     
+
     const dialogBody = {
         p: 6,
         pt: 2,
-        color: colors.text.primary
+        color: "fg"
     };
 
     const dialogFooter = {
@@ -98,18 +96,18 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
     const inputStyles = {
         borderRadius: "xl",
         border: "2px solid",
-        borderColor: colors.border.default,
-        bg: colors.background.subtle,
-        color: colors.text.primary,
-        _placeholder: {color: colors.text.secondary},
+        borderColor: "border.default",
+        bg: "bg.panel",
+        color: "fg",
+        _placeholder: {color: "fg.muted"},
         _hover: {
-            borderColor: colors.border.hover,
-            bg: colors.background.hover
+            borderColor: "border.emphasized",
+            bg: "bg.subtle"
         },
         _focus: {
-            borderColor: colors.border.focus,
-            boxShadow: `0 0 0 3px ${colors.shadow.sm}`,
-            bg: colors.background.hover
+            borderColor: "border.accent",
+            boxShadow: "0 0 0 3px rgba(34, 197, 94, 0.1)",
+            bg: "bg.subtle"
         },
         transition: "all 0.2s ease"
     }
@@ -153,7 +151,6 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
             const files = res.data
 
 
-
             const parsedFiles: GitTreeNodeType[] = []
             for (const file of files) {
                 const parseResult = GitTreeNodeSchema.safeParse(file)
@@ -195,7 +192,6 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
         }
 
 
-
         if (explorer && selectedFiles.length === 0) {
             toaster.create({
                 title: "No files selected",
@@ -229,28 +225,25 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
             useSessionStore.getState().setContextID(new_context_id);
             useSessionStore.getState().setContext("code");
 
-            const res =  gitFilesUpload(res_body, current_session, new_context_id);
+            const res = gitFilesUpload(res_body, current_session, new_context_id);
 
 
-            toaster.promise(res ,{
-                success:{
-                    title:"Upload Complete",
-                    description:"Git repository connected and data indexed."
+            toaster.promise(res, {
+                success: {
+                    title: "Upload Complete",
+                    description: "Git repository connected and data indexed."
                 },
-                error:{
-                    title:"Error Has occured",
-                    description:"Git repository isn't connected and data indexed."
+                error: {
+                    title: "Error Has occured",
+                    description: "Git repository isn't connected and data indexed."
                 },
-                loading:{
-                    title:"Loading data ",
-                    description:"Git repository is being connected and data indexed."
+                loading: {
+                    title: "Loading data ",
+                    description: "Git repository is being connected and data indexed."
                 }
 
 
-
             })
-
-
 
 
         } catch (error) {
@@ -274,24 +267,24 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                         css={{
                             ...styles.backdrop,
                             backdropFilter: "blur(8px)",
-                            bg: colors.shadow.md
+                            bg: "md"
                         }}
                     />
                     <Dialog.Positioner>
                         <Dialog.Content
                             css={{
                                 ...styles.content,
-                                bg: colors.background.card,
+                                bg: "bg.panel",
                                 backdropFilter: "blur(20px)",
-                                border: `2px solid ${colors.border.default}`,
+                                border: `2px solid ${"border.subtle"}`,
                                 borderRadius: "2xl",
-                                boxShadow: `0 25px 50px ${colors.shadow.lg}`
+                                boxShadow: `0 25px 50px ${"lg"}`
                             }}
                         >
                             <Dialog.Header {...dialogHeader}>
                                 <Dialog.Title css={{
                                     ...styles.title,
-                                    color: "white",
+                                    color: "fg",
                                     fontSize: "2xl",
                                     fontWeight: "bold"
                                 }}>
@@ -308,10 +301,10 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                             endAddon=".git"
                                             css={{
                                                 "& > div": {
-                                                    bg: colors.background.subtle,
-                                                    border: `2px solid ${colors.border.default}`,
+                                                    bg: "bg.muted",
+                                                    border: `2px solid ${"border.subtle"}`,
                                                     borderRadius: "xl",
-                                                    color: colors.text.secondary
+                                                    color: "fg.subtle"
                                                 }
                                             }}
                                         >
@@ -326,7 +319,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                         {/* Owner and Repository */}
                                         <HStack gap={4}>
                                             <Field.Root flex={1}>
-                                                <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                <Field.Label color="fg" fontSize="sm" fontWeight="medium">
                                                     Owner *
                                                 </Field.Label>
                                                 <Input
@@ -337,7 +330,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                                 />
                                             </Field.Root>
                                             <Field.Root flex={1}>
-                                                <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                <Field.Label color="fg" fontSize="sm" fontWeight="medium">
                                                     Repository *
                                                 </Field.Label>
                                                 <Input
@@ -363,7 +356,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                                 />
                                             </Field.Root>
                                             <Field.Root flex={1}>
-                                                <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                <Field.Label color="fg" fontSize="sm" fontWeight="medium">
                                                     Commit (optional)
                                                 </Field.Label>
                                                 <Input
@@ -379,7 +372,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                         <VStack gap={4} align="stretch">
                                             <HStack gap={4} align="flex-end">
                                                 <Field.Root flex={1}>
-                                                    <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                    <Field.Label color={"fg"} fontSize="sm" fontWeight="medium">
                                                         Directory Filters (comma-separated)
                                                     </Field.Label>
                                                     <Input
@@ -394,7 +387,7 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
 
                                             <HStack gap={4} align="flex-end">
                                                 <Field.Root flex={1}>
-                                                    <Field.Label color="white" fontSize="sm" fontWeight="medium">
+                                                    <Field.Label color={"fg"} fontSize="sm" fontWeight="medium">
                                                         File Extension Filters (comma-separated)
                                                     </Field.Label>
                                                     <Input
@@ -421,10 +414,10 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                 <Dialog.ActionTrigger asChild>
                                     <Button
                                         variant="ghost"
-                                        color={colors.text.primary}
+                                        color={"fg"}
                                         borderRadius="xl"
                                         _hover={{
-                                            bg: colors.background.hover
+                                            bg: "bg.subtle"
                                         }}
                                         onClick={onCancel}
                                     >
@@ -433,12 +426,12 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
                                 </Dialog.ActionTrigger>
 
                                 <Button
-                                    bg={colors.primary.default}
-                                    color={colors.text.inverse}
+                                    bg="colorPalette.500"
+                                    color={"fg.inverted"}
                                     borderRadius="xl"
                                     _hover={{
                                         transform: "translateY(-2px)",
-                                        boxShadow: `0 10px 30px ${colors.shadow.md}`
+                                        boxShadow: `0 10px 30px ${"md"}`
                                     }}
                                     _active={{
                                         transform: "translateY(0)"
@@ -454,12 +447,12 @@ const GitDialog = ({onConfirm, onCancel}: Props) => {
 
                                 {!explorer && (
                                     <Button
-                                        bg={colors.primary.default}
-                                        color={colors.text.inverse}
+                                        bg="colorPalette.500"
+                                        color={"fg.inverted"}
                                         borderRadius="xl"
                                         _hover={{
                                             transform: "translateY(-2px)",
-                                            boxShadow: `0 10px 30px ${colors.shadow.md}`
+                                            boxShadow: `0 10px 30px ${"md"}`
                                         }}
                                         _active={{
                                             transform: "translateY(0)"

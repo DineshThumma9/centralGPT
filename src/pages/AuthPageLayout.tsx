@@ -1,8 +1,7 @@
 // src/pages/AuthPageLayout.tsx
-import { Box, Flex, Image, Text, useColorMode } from "@chakra-ui/react";
-import { ReactNode } from "react";
-import { colors } from "../theme/styleDefinitions";
-import ColorModeToggle from "../components/ColorModeToggle";
+import { Box, Flex, Image, Text } from "@chakra-ui/react";
+import type { ReactNode } from "react";
+import { ColorModeToggle } from "../components/ColorModeToggle";
 
 interface AuthPageLayoutProps {
   children: ReactNode;
@@ -11,15 +10,12 @@ interface AuthPageLayoutProps {
 }
 
 const AuthPageLayout = ({ children, title, illustration }: AuthPageLayoutProps) => {
-  const { colorMode } = useColorMode();
-  const themeColors = colorMode === "light" ? colors.light : colors.dark;
-
   return (
     <Flex minH="100vh" w="100vw">
       {/* Left Side - Illustration */}
       <Box
         flex="1"
-        bg={themeColors.background.primary}
+        bg="bg.panel"
         display={{ base: "none", md: "flex" }}
         alignItems="center"
         justifyContent="center"
@@ -31,10 +27,10 @@ const AuthPageLayout = ({ children, title, illustration }: AuthPageLayoutProps) 
         </Box>
         <Flex direction="column" align="center" justify="center" textAlign="center">
           <Image src={illustration} alt={title} maxW="80%" mb={8} />
-          <Text fontSize="3xl" fontWeight="bold" color={themeColors.text.primary}>
+          <Text fontSize="3xl" fontWeight="bold" color="fg">
             {title}
           </Text>
-          <Text fontSize="lg" color={themeColors.text.secondary} mt={2}>
+          <Text fontSize="lg" color="fg.muted" mt={2}>
             Your intelligent coding assistant
           </Text>
         </Flex>
@@ -46,7 +42,7 @@ const AuthPageLayout = ({ children, title, illustration }: AuthPageLayoutProps) 
         align="center"
         justify="center"
         p={{ base: 4, md: 8 }}
-        bg={themeColors.background.body}
+        bg="bg"
       >
         {children}
       </Flex>

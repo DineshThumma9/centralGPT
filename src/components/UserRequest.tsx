@@ -1,12 +1,10 @@
 import {Box, Editable, Flex, HStack, IconButton, VStack} from "@chakra-ui/react";
 import {type Message} from "../entities/Message.ts";
-import {Check, Copy, User} from "lucide-react";
-import {LuCheck, LuPencilLine, LuX} from "react-icons/lu";
+import {Check, Copy} from "lucide-react";
+import {LuCheck, LuX} from "react-icons/lu";
 import {toaster} from "./ui/toaster.tsx";
 import {useState} from "react";
 import FileDisplayForUserMessage from "./FileDisplayForUserMessage.tsx";
-import { useColorMode } from "../contexts/ColorModeContext";
-import { colors } from "../theme/styleDefinitions";
 
 interface Props {
     msg: Message;
@@ -14,70 +12,55 @@ interface Props {
 
 const UserRequest = ({msg}: Props) => {
     const [copied, setCopied] = useState(false);
-    const { colors: themeColors } = useColorMode();
-
-    const box = {
-        bg: themeColors.text.primary,
-        px: 4,
-        py: 1,
-        borderRadius: "xl",
-        fontSize: "md",
-        color: themeColors.background.primary,
-        lineHeight: "1.6",
-        whiteSpace: "pre-wrap" as const,
-        wordBreak: "break-word" as const,
-        overflowWrap: "break-word" as const,
-        boxShadow: `0 2px 12px ${themeColors.background.hover}`,
-        border: "2px solid",
-        borderColor: themeColors.border.default
-    }
 
     const editableInput = {
         wordBreak: "break-word" as const,
         overflowWrap: "break-word" as const,
         whiteSpace: "pre-wrap" as const,
-        bg: themeColors.background.card,
+        bg: "bg.surface",
         border: "1px solid",
-        borderColor: themeColors.border.default,
-        color: themeColors.text.primary,
+        borderColor: "border.default",
+        color: "fg.default",
         _focus: {
-            borderColor: themeColors.border.focus,
-            boxShadow: `0 0 0 1px ${themeColors.border.focus}`
+            borderColor: "border.accent",
+            boxShadow: `0 0 0 1px token(colors.border.accent)`
         }
     }
 
     const editableIcon = {
         variant: "outline" as const,
         size: "xs" as const,
-        bg: themeColors.background.primary,
-        color: themeColors.text.primary,
+        bg: "bg.canvas",
+        color: { base: "brand.700", _dark: "brand.600" },
         border: "1px solid",
-        borderColor: themeColors.border.default,
+        borderColor: "border.default",
+        transition: "all 0.2s ease",
         _hover: {
-            bg: themeColors.background.hover,
-            borderColor: themeColors.border.hover
+            bg: { base: "brand.50", _dark: "brand.950" },
+            borderColor: { base: "brand.300", _dark: "brand.700" },
+            color: { base: "brand.800", _dark: "brand.500" },
+            transform: "scale(1.05)"
         }
     }
 
     const actionButton = {
         size: "sm" as const,
         variant: "ghost" as const,
-        _hover: { 
-            bg: themeColors.background.hover,
-            color: colors.green.dark // Use green accent for hover
+        borderRadius: "8px",
+        transition: "all 0.2s ease",
+        color: { base: "brand.700", _dark: "brand.600" },
+        _hover: {
+            bg: { base: "brand.50", _dark: "brand.950" },
+            color: { base: "brand.800", _dark: "brand.500" },
+            transform: "scale(1.05)",
         },
         _active: {
-            bg: themeColors.background.active,
-            color: colors.green.darker // Use darker green for active
-        },
-        transition: "all 0.2s ease"
+            bg: { base: "brand.100", _dark: "brand.900" },
+            color: { base: "brand.800", _dark: "brand.500" },
+            transform: "scale(0.95)",
+        }
     }
 
-    // Debug logging
-    console.log('UserRequest received message:', msg);
-    console.log('Message files:', msg.files);
-    console.log('Files exists:', !!msg.files);
-    console.log('Files length:', msg.files?.length);
 
     const handleCopy = async () => {
         try {
@@ -119,7 +102,7 @@ const UserRequest = ({msg}: Props) => {
                         </Box>
                     )}
                     <Box maxW="full" display="inline-block">
-                        <Box {...box}>
+                        <Box css={{ userRequest: {} }}>
                             <Editable.Root defaultValue={msg.content}>
                                 <Editable.Preview
                                     wordBreak="break-word"
@@ -150,46 +133,19 @@ const UserRequest = ({msg}: Props) => {
                     </Box>
                 </VStack>
 
-                {/* Avatar - Fixed width */}
-                <Box flexShrink={0} mt={1}>
-                    <Box
-                        p={2}
-                        bg={colors.text.primary}
-                        borderRadius="full"
-                        boxShadow={`0 2px 8px ${colors.background.hover}`}
-                    >
-                        <User size={16} color={colors.background.primary}/>
-                    </Box>
-                </Box>
+
             </Flex>
 
             {/* Action buttons */}
-            <HStack gap={2} mr={12}>
+            <HStack gap={2}>
                 <IconButton
                     {...actionButton}
-                    bg={copied ? colors.green.light : themeColors.background.card}
-                    color={copied ? "white" : themeColors.text.muted}
                     onClick={handleCopy}
                     aria-label="Copy message"
-                    _hover={{
-                        ...actionButton._hover,
-                        bg: copied ? colors.green.dark : themeColors.background.hover,
-                        color: copied ? "white" : colors.green.dark
-                    }}
+                    bg={copied ? { base: "brand.100", _dark: "brand.900" } : "transparent"}
+                    color={copied ? { base: "brand.800", _dark: "brand.400" } : { base: "brand.700", _dark: "brand.600" }}
                 >
                     {copied ? <Check size={16}/> : <Copy size={16}/>}
-                </IconButton>
-
-                <IconButton
-                    {...actionButton}
-                    color={themeColors.text.muted}
-                    aria-label="Edit message"
-                    _hover={{
-                        ...actionButton._hover,
-                        color: colors.green.dark
-                    }}
-                >
-                    <LuPencilLine size={16}/>
                 </IconButton>
             </HStack>
         </Flex>

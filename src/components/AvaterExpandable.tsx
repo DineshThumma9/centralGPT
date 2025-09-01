@@ -1,30 +1,33 @@
 import {Avatar, Button, HStack, IconButton, MenuPositioner, Portal, Separator, Text, VStack} from "@chakra-ui/react";
-import {BiCog, BiLogOut, BiUser} from "react-icons/bi";
+import {BiLogOut, BiUser} from "react-icons/bi";
 import {MenuContent, MenuItem, MenuRoot, MenuTrigger} from "./ui/menu.tsx";
 import {useAuth} from "../hooks/useAuth.ts";
 import {useNavigate} from "react-router-dom";
 import useInitStore from "../store/initStore.ts";
-import {GithubIcon} from "lucide-react";
+import {GitBranch} from "lucide-react";
 import {ColorModeToggle} from "./ColorModeToggle";
 import {useState} from "react";
 import GitDialog from "./GitDialog.tsx";
-import { useColorMode } from "../contexts/ColorModeContext";
-
 
 const AvaterExpandable = () => {
-    const { colors } = useColorMode();
 
     const avatarButton = {
-        bg: colors.background.card,
+        bg: "bg.panel",
         borderRadius: "50%",
-        border: `1px solid ${colors.border.default}`,
-        boxShadow: `0 4px 15px ${colors.background.body}`,
+        border: "1px solid",
+        borderColor: "border.subtle",
+        boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
         backdropFilter: "blur(10px)",
         transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         _hover: {
-            bg: colors.background.hover,
-            transform: "translateY(-1px)",
-            boxShadow: `0 8px 25px ${colors.border.hover}`
+            bg: "bg.subtle",
+            transform: "translateY(-2px)",
+            boxShadow: "0 8px 25px rgba(0, 0, 0, 0.15)",
+            borderColor: { base: "brand.700", _dark: "brand.600" }
+        },
+        _active: {
+            transform: "translateY(0px)",
+            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)"
         },
         p: 0,
         minW: "auto",
@@ -33,44 +36,59 @@ const AvaterExpandable = () => {
     };
 
     const menuContent = {
-        bg: colors.background.card,
-        borderColor: colors.border.default,
-        shadow: `0 10px 40px ${colors.background.body}`,
+        bg: "bg.panel",
+        borderColor: "border.subtle",
+        shadow: "0 10px 40px rgba(0, 0, 0, 0.1)",
         borderRadius: "12px",
-        border: `1px solid ${colors.border.default}`,
+        border: "1px solid",
         backdropFilter: "blur(20px)",
         minW: "200px"
     };
 
     const menuItem = {
-        color: colors.text.primary,
+        color: "fg.default",
         borderRadius: "8px",
-        mx: 1,
+        mx: 2,
         my: 1,
+        px: 3,
+        py: 2,
+        minH: "40px",
+        transition: "all 0.2s ease",
         _hover: {
-            bg: colors.background.hover,
-            color: colors.text.primary
+            bg: { base: "gray.50", _dark: "gray.800" },
+            color: { base: "brand.700", _dark: "brand.300" },
+            transform: "translateX(2px)"
         }
     };
 
     const logoutMenuItem = {
         ...menuItem,
+        transition: "all 0.2s ease",
         _hover: {
-            bg: colors.text.danger,
-            color: colors.text.primary
+            bg: { base: "red.500", _dark: "red.600" },
+            color: "white",
+            transform: "translateX(2px)"
         }
     };
 
     const separator = {
-        borderColor: colors.border.default,
+        borderColor: "border.subtle",
         my: 1
     };
 
     const iconButton = {
         size: "sm" as const,
         variant: "ghost" as const,
-        color: colors.text.secondary,
-        minW: "auto"
+        color: { base: "brand.700", _dark: "brand.600" },
+        minW: "auto",
+        mr: 3,
+        bg: "transparent",
+        transition: "all 0.2s ease",
+        _hover: {
+            bg: "transparent",
+            color: { base: "brand.800", _dark: "brand.500" },
+            transform: "scale(1.05)"
+        }
     };
 
     const {logout} = useAuth();
@@ -93,23 +111,29 @@ const AvaterExpandable = () => {
 
     return (
 
-        <HStack>
+        <HStack pr={2}>
             <IconButton
-                aria-label="Git Creditionals"
+                aria-label="Git Credentials"
                 onClick={() => setDialog(true)}
                 size="md"
                 variant="ghost"
-                color={colors.text.secondary}
+                bg="transparent"
+                color={{ base: "brand.700", _dark: "brand.600" }}
+                transition="all 0.2s ease"
                 _hover={{
-                    bg: colors.background.hover,
-                    color: colors.text.primary
+                    bg: { base: "brand.50", _dark: "brand.950" },
+                    color: { base: "brand.800", _dark: "brand.500" },
+                    transform: "scale(1.05)"
                 }}
-
+                _active={{
+                    bg: { base: "brand.100", _dark: "brand.900" },
+                    transform: "scale(0.95)"
+                }}
             >
-                <GithubIcon size={16}/>
+                <GitBranch size={16}/>
             </IconButton>
 
-            <ColorModeToggle />
+            <ColorModeToggle/>
 
             <VStack gap={0}>
 
@@ -120,15 +144,18 @@ const AvaterExpandable = () => {
 
                         <Button {...avatarButton}>
                             <Avatar.Root
-                                bg={colors.background.accent}
-                                color={colors.text.primary}>
+                                bg={{ base: "brand.600", _dark: "brand.700" }}
+                                color="white"
+                                borderRadius="50%"
+                                size="sm"
+                            >
                                 <Avatar.Fallback
                                     name={username || "user"}
-
+                                    fontWeight="600"
+                                    fontSize="sm"
                                 />
                                 <Avatar.Image/>
                             </Avatar.Root>
-
                         </Button>
                     </MenuTrigger>
 
@@ -139,7 +166,7 @@ const AvaterExpandable = () => {
                                     <IconButton {...iconButton}>
                                         <BiUser/>
                                     </IconButton>
-                                    <Text fontSize="sm" fontWeight="medium">
+                                    <Text fontSize="sm" fontWeight="medium" flex="1">
                                         {username || "User"}
                                     </Text>
                                 </MenuItem>
@@ -147,28 +174,26 @@ const AvaterExpandable = () => {
                                 <Separator {...separator} />
 
                                 <MenuItem value="email" {...menuItem}>
-                                    <Text fontSize="xs" color={colors.text.secondary} pl={6}>
+                                    <Text fontSize="xs" color={{ base: "gray.600", _dark: "gray.400" }} pl={10} flex="1">
                                         {email || "No email"}
                                     </Text>
                                 </MenuItem>
 
                                 <Separator {...separator} />
 
-                                <MenuItem value="customize" {...menuItem}>
-                                    <IconButton {...iconButton}>
-                                        <BiCog/>
-                                    </IconButton>
-                                    <Text fontSize="sm">Customize</Text>
-                                </MenuItem>
 
                                 <MenuItem value="logout" {...logoutMenuItem} onClick={handleLogout}>
                                     <IconButton
                                         {...iconButton}
-                                        color={colors.text.danger}
+                                        color={{ base: "red.600", _dark: "red.400" }}
+                                        _hover={{
+                                            color: "white",
+                                            transform: "scale(1.05)"
+                                        }}
                                     >
                                         <BiLogOut/>
                                     </IconButton>
-                                    <Text fontSize="sm">Logout</Text>
+                                    <Text fontSize="sm" flex="1">Logout</Text>
                                 </MenuItem>
                             </MenuContent>
                         </MenuPositioner>

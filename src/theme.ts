@@ -1,48 +1,38 @@
-import {createSystem, defaultConfig, defineConfig} from "@chakra-ui/react";
-import {badgeRecipe} from "./theme/BadgeTheme.ts";
-import {menuSlots} from "./theme/menuhelper.ts";
-import {dialogcust} from "./theme/dialogcust.ts";
-import {messageRecipes} from "./theme/file.ts";
-import {editableRecipes} from "./theme/editableRecipes.ts";
-import {codeBlockRecipes} from "./theme/codeBlockRecipes.ts";
-import {colors, spacing, borderRadius, typography, commonStyles} from "./theme/styleDefinitions.ts";
-import {componentRecipes} from "./theme/componentRecipes.ts";
-// 1. Design Tokens
-
+import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
+import { badgeRecipe } from "./theme/BadgeTheme";
+import { menuSlots } from "./theme/menuhelper";
+import { dialogcust } from "./theme/dialogcust";
+import { messageRecipes } from "./theme/file";
+import { editableRecipes } from "./theme/editableRecipes";
+import { codeBlockRecipes } from "./theme/codeBlockRecipes";
+import { componentRecipes } from "./theme/componentRecipes";
 
 const tokens = {
   colors: {
-    black: { value: '#000000' },
-    white: { value: '#FFFFFF' },
-    gray: {
-      500: { value: 'rgba(255, 255, 255, 0.72)' },
-    },
     brand: {
-      primary: { value: 'green.200' },
-    },
-    whiteAlpha: {
-      200: { value: 'rgba(255, 255, 255, 0.08)' },
-    },
-    // Add centralized color tokens
-    green: {
-      50: { value: colors.green[50] },
-      100: { value: colors.green[100] },
-      200: { value: colors.green[200] },
-      300: { value: colors.green[300] },
-      400: { value: colors.green[400] },
-      500: { value: colors.green[500] },
-      solid: { value: colors.green.solid },
-      light: { value: colors.green.light },
-      dark: { value: colors.green.dark },
+      50: { value: "rgba(34, 197, 94, 0.05)" },
+      100: { value: "rgba(34, 197, 94, 0.1)" },
+      200: { value: "rgba(34, 197, 94, 0.2)" },
+      300: { value: "rgba(34, 197, 94, 0.3)" },
+      400: { value: "rgba(34, 197, 94, 0.4)" },
+      500: { value: "rgba(34, 197, 94, 0.5)" },
+      600: { value: "#22c55e" },
+      700: { value: "#16a34a" },
+      800: { value: "#15803d" },
+      900: { value: "#166534" },
+      950: { value: "#14532d" },
     },
     emerald: {
-      50: { value: colors.emerald[50] },
-      100: { value: colors.emerald[100] },
-      200: { value: colors.emerald[200] },
-      300: { value: colors.emerald[300] },
-      400: { value: colors.emerald[400] },
-      500: { value: colors.emerald[500] },
-      solid: { value: colors.emerald.solid },
+      50: { value: "rgba(16, 185, 129, 0.05)" },
+      100: { value: "rgba(16, 185, 129, 0.1)" },
+      200: { value: "rgba(16, 185, 129, 0.2)" },
+      300: { value: "rgba(16, 185, 129, 0.3)" },
+      400: { value: "rgba(16, 185, 129, 0.4)" },
+      500: { value: "#10b981" },
+      600: { value: "#059669" },
+      700: { value: "#047857" },
+      800: { value: "#065f46" },
+      900: { value: "#064e3b" },
     },
   },
   fonts: {
@@ -50,160 +40,268 @@ const tokens = {
     body: { value: "'Jaldi', sans-serif" },
   },
   fontSizes: {
-    xs: { value: typography.fontSize.xs },
-    sm: { value: typography.fontSize.sm },
-    md: { value: typography.fontSize.md },
-    lg: { value: typography.fontSize.lg },
-    xl: { value: typography.fontSize.xl },
-    "2xl": { value: typography.fontSize["2xl"] },
-    "3xl": { value: typography.fontSize["3xl"] },
+    xs: { value: "12px" },
+    sm: { value: "14px" },
+    md: { value: "16px" },
+    lg: { value: "18px" },
+    xl: { value: "20px" },
+    "2xl": { value: "24px" },
+    "3xl": { value: "30px" },
+    "4xl": { value: "36px" },
+    "5xl": { value: "48px" },
+    "6xl": { value: "60px" },
   },
   fontWeights: {
-    normal: { value: typography.fontWeight.normal },
-    medium: { value: typography.fontWeight.medium },
-    semibold: { value: typography.fontWeight.semibold },
-    bold: { value: typography.fontWeight.bold },
+    normal: { value: "400" },
+    medium: { value: "500" },
+    semibold: { value: "600" },
+    bold: { value: "700" },
   },
   lineHeights: {
-    tight: { value: typography.lineHeight.tight },
-    normal: { value: typography.lineHeight.normal },
-    relaxed: { value: typography.lineHeight.relaxed },
-    loose: { value: typography.lineHeight.loose },
+    tight: { value: "1.25" },
+    normal: { value: "1.5" },
+    relaxed: { value: "1.6" },
+    loose: { value: "1.7" },
   },
   spacing: {
-    xs: { value: spacing.xs },
-    sm: { value: spacing.sm },
-    md: { value: spacing.md },
-    lg: { value: spacing.lg },
-    xl: { value: spacing.xl },
-    xxl: { value: spacing.xxl },
+    px: { value: "1px" },
+    0.5: { value: "2px" },
+    1: { value: "4px" },
+    1.5: { value: "6px" },
+    2: { value: "8px" },
+    2.5: { value: "10px" },
+    3: { value: "12px" },
+    3.5: { value: "14px" },
+    4: { value: "16px" },
+    5: { value: "20px" },
+    6: { value: "24px" },
+    7: { value: "28px" },
+    8: { value: "32px" },
+    9: { value: "36px" },
+    10: { value: "40px" },
+    12: { value: "48px" },
+    14: { value: "56px" },
+    16: { value: "64px" },
+    20: { value: "80px" },
+    24: { value: "96px" },
+    28: { value: "112px" },
+    32: { value: "128px" },
+    36: { value: "144px" },
+    40: { value: "160px" },
+    44: { value: "176px" },
+    48: { value: "192px" },
+    52: { value: "208px" },
+    56: { value: "224px" },
+    60: { value: "240px" },
+    64: { value: "256px" },
+    72: { value: "288px" },
+    80: { value: "320px" },
+    96: { value: "384px" },
+    // Also add the simplified spacing tokens from ref_theme
+    xs: { value: "4px" },
+    sm: { value: "8px" },
+    md: { value: "16px" },
+    lg: { value: "24px" },
+    xl: { value: "32px" },
+    xxl: { value: "48px" },
   },
   radii: {
-    sm: { value: borderRadius.sm },
-    md: { value: borderRadius.md },
-    lg: { value: borderRadius.lg },
-    xl: { value: borderRadius.xl },
-    xxl: { value: borderRadius.xxl },
-    full: { value: borderRadius.full },
+    none: { value: "0" },
+    sm: { value: "4px" },
+    base: { value: "4px" },
+    md: { value: "8px" },
+    lg: { value: "12px" },
+    xl: { value: "16px" },
+    "2xl": { value: "16px" },
+    "3xl": { value: "24px" },
+    xxl: { value: "22px" },
+    full: { value: "9999px" },
   },
 };
 
-// 2. Semantic Tokens with color mode support
 const semanticTokens = {
   colors: {
-    "app.bg": {
+    "brand.solid": {
       value: {
-        _light: colors.light.background.body,
-        _dark: colors.dark.background.body,
+        base: "brand.700",
+        _dark: "brand.600"
       }
     },
-    "app.text": {
+    "brand.subtle": {
       value: {
-        _light: colors.light.text.primary,
-        _dark: colors.dark.text.primary,
+        base: "brand.100",
+        _dark: "brand.900"
       }
     },
-    "app.text.secondary": {
+    "brand.emphasized": {
       value: {
-        _light: colors.light.text.secondary,
-        _dark: colors.dark.text.secondary,
+        base: "brand.800",
+        _dark: "brand.500"
       }
     },
-    "app.text.muted": {
+    "bg.canvas": {
       value: {
-        _light: colors.light.text.muted,
-        _dark: colors.dark.text.muted,
+        base: "#f5f5f5",
+        _dark: "#121212"
       }
     },
-    "app.bg.card": {
+    "bg.surface": {
       value: {
-        _light: colors.light.background.card,
-        _dark: colors.dark.background.card,
+        base: "white", 
+        _dark: "#1a1a1a"
       }
     },
-    "app.bg.hover": {
+    "bg.panel": {
       value: {
-        _light: colors.light.background.hover,
-        _dark: colors.dark.background.hover,
+        base: "white",
+        _dark: "#1e1e1e"
       }
     },
-  },
+    "bg.subtle": {
+      value: {
+        base: "gray.50",
+        _dark: "gray.800"
+      }
+    },
+    "bg.muted": {
+      value: {
+        base: "gray.100",
+        _dark: "gray.700"
+      }
+    },
+    "bg.emphasized": {
+      value: {
+        base: "gray.100",
+        _dark: "gray.600"
+      }
+    },
+    "fg.default": {
+      value: {
+        base: "#1a1a1a",
+        _dark: "#ffffff"
+      }
+    },
+    "fg": {
+      value: {
+        base: "#1a1a1a",
+        _dark: "#ffffff"
+      }
+    },
+    "fg.muted": {
+      value: {
+        base: "gray.600",
+        _dark: "gray.300"
+      }
+    },
+    "fg.subtle": {
+      value: {
+        base: "gray.500",
+        _dark: "gray.400"
+      }
+    },
+    "fg.inverted": {
+      value: {
+        base: "#ffffff",
+        _dark: "#000000"
+      }
+    },
+    "border.default": {
+      value: {
+        base: "gray.200",
+        _dark: "gray.600"
+      }
+    },
+    "border": {
+      value: {
+        base: "gray.300",
+        _dark: "gray.500"
+      }
+    },
+    "border.subtle": {
+      value: {
+        base: "gray.200",
+        _dark: "gray.700"
+      }
+    },
+    "border.emphasized": {
+      value: {
+        base: "gray.300",
+        _dark: "gray.500"
+      }
+    },
+    "border.accent": {
+      value: {
+        base: "brand.600",
+        _dark: "brand.500"
+      }
+    },
+    "colorPalette.solid": {
+      value: {
+        base: "brand.700",
+        _dark: "brand.600"
+      }
+    },
+    "colorPalette.contrast": {
+      value: {
+        base: "black",
+        _dark: "white"
+      }
+    },
+    "brand.hover": {
+      value: {
+        base: "rgba(34, 197, 94, 0.1)",
+        _dark: "rgba(34, 197, 94, 0.2)"
+      }
+    },
+    "brand.active": {
+      value: {
+        base: "rgba(34, 197, 94, 0.15)",
+        _dark: "rgba(34, 197, 94, 0.25)"
+      }
+    },
+  }
 };
-
-// 3. Global Styles (includes font smoothing + base font logic)
-const globalCss = {
-    body: {
-        bg: "app.bg",
-        color: "app.text",
-        fontFamily: "fonts.body",
-        WebkitFontSmoothing: "antialiased",
-        MozOsxFontSmoothing: "grayscale",
-        margin: "0",
-    },
-    code: {
-        fontFamily: "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace",
-    },
-
-    // Centralized scrollbar styles
-    "::webkit-scrollbars": {
-        width: "6px",
-        height: "6px",
-    },
-    '::-webkit-scrollbar-thumb': {
-        backgroundColor: colors.green[300],
-        borderRadius: borderRadius.sm,
-    },
-    '::-webkit-scrollbar-track': {
-        backgroundColor: 'transparent',
-    },
-    '*': {
-        scrollbarColor: `${colors.green[300]} transparent`,
-        scrollbarWidth: 'thin',
-    },
-
-    // Global utility classes
-    ".gradient-bg": commonStyles.gradientBackground,
-    ".glass-card": commonStyles.glassCard,
-    ".custom-scrollbar": commonStyles.customScrollbar,
-    ".fade-in": commonStyles.fadeIn,
-    ".slide-in": commonStyles.slideIn,
-    ".flex-center": commonStyles.flexCenter,
-    ".flex-between": commonStyles.flexBetween,
-    
-    // Typography classes
-    ".text-heading": {
-        ...commonStyles.heading,
-        fontFamily: "fonts.heading",
-        fontSize: typography.fontSize.lg,
-        lineHeight: typography.lineHeight.tight,
-    },
-    ".text-body": {
-        ...commonStyles.bodyText,
-        fontFamily: "fonts.body",
-        fontSize: typography.fontSize.md,
-        lineHeight: typography.lineHeight.normal,
-    },
-    ".text-muted": commonStyles.mutedText,
-    
-    // Button classes
-    ".btn-primary": commonStyles.primaryButton,
-    ".btn-ghost": commonStyles.ghostButton,
-    
-    // Input classes
-    ".input-base": commonStyles.input,
-};
-
-
-
-
 
 const config = defineConfig({
+  strictTokens: true,
+  cssVarsPrefix: "ck",
+  globalCss: {
+    "*": {
+      transition: "background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease",
+    },
+    body: {
+      bg: "bg.canvas",
+      color: "fg.default",
+      fontFamily: "fonts.body",
+      lineHeight: "normal",
+    },
+    code: {
+      fontFamily: "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace",
+    },
+    // Custom scrollbar
+    "::-webkit-scrollbar": {
+      width: "6px",
+      height: "6px",
+    },
+    "::-webkit-scrollbar-thumb": {
+      backgroundColor: "brand.600",
+      borderRadius: "sm",
+    },
+    "::-webkit-scrollbar-track": {
+      backgroundColor: "transparent",
+    },
+    "*::placeholder": {
+      color: "fg.muted",
+    },
+  },
+  
   theme: {
     tokens,
     semanticTokens,
     recipes: {
       badge: badgeRecipe,
-      // Add centralized component recipes
+      codeBlock: codeBlockRecipes,
+      editable: editableRecipes,
       ...componentRecipes,
     },
     slotRecipes: {
@@ -213,9 +311,6 @@ const config = defineConfig({
       codeBlock: codeBlockRecipes,
       editable: editableRecipes,
     },
-  },
-  globalCss: {
-    ...globalCss,
   },
 });
 

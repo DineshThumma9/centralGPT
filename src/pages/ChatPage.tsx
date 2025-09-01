@@ -1,19 +1,17 @@
-import {Grid, GridItem, Box, Toaster} from "@chakra-ui/react";
+import {Grid, GridItem, Box} from "@chakra-ui/react";
 import Sidebar from "../components/SideBar";
 import ChatArea from "../components/ChatArea";
 import { useState } from "react";
-import { useColorMode } from "../contexts/ColorModeContext";
-
 const ChatPage = () => {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const { colors } = useColorMode();
-
     return (
         <Box
             h="100vh"
             w="100vw"
-            bg={colors.background.body}
+            bg="bg.canvas"
             overflow="hidden"
+            p={0}
+            m={0}
             position="relative"
         >
             <Grid
@@ -21,15 +19,15 @@ const ChatPage = () => {
                 templateColumns={isSidebarCollapsed ? "60px 1fr" : "280px 1fr"}
                 h="100vh"
                 w="100vw"
-                bg={colors.background.body}
+                bg="bg.canvas"
                 transition="all 0.3s ease-in-out"
                 overflow="hidden"
+                gap={0}
             >
                 {/* Sidebar */}
                 <GridItem
                     area="aside"
                     overflow="hidden"
-                    zIndex={10}
                 >
                     <Sidebar onCollapse={setIsSidebarCollapsed} />
                 </GridItem>
@@ -38,7 +36,6 @@ const ChatPage = () => {
                 <GridItem
                     area="main"
                     overflow="hidden"
-                    bg={colors.background.body}
                     position="relative"
                 >
                     <ChatArea />

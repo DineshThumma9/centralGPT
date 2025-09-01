@@ -242,6 +242,86 @@ export const textRecipe = defineRecipe({
   },
 });
 
+// User Request Message Recipe
+export const userRequestRecipe = defineRecipe({
+  className: "user-request",
+  base: {
+    bg: "fg.default",
+    color: "bg.canvas",
+    px: "4",
+    py: "1",
+    borderRadius: "xl",
+    fontSize: "md",
+    lineHeight: "1.6",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    boxShadow: "sm",
+    border: "2px solid",
+    borderColor: "border.default",
+  },
+  variants: {
+    size: {
+      sm: { px: "3", py: "1", fontSize: "sm" },
+      md: { px: "4", py: "1", fontSize: "md" },
+      lg: { px: "5", py: "2", fontSize: "lg" },
+    },
+  },
+  defaultVariants: {
+    size: "md",
+  },
+});
+
+// API Key Dialog Recipe
+export const apiKeyDialogRecipe = defineRecipe({
+  className: "api-key-dialog",
+  base: {
+    bg: "bg.surface",
+    border: "1px solid",
+    borderColor: "border.default",
+    borderRadius: "lg",
+    p: "4",
+  },
+  variants: {
+    variant: {
+      default: {},
+      highlighted: {
+        borderColor: "border.accent",
+        boxShadow: "0 0 0 1px token(colors.border.accent)",
+      },
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
+
+// Menu Helper Recipe
+export const menuHelperRecipe = defineRecipe({
+  className: "menu-helper",
+  base: {
+    bg: "bg.surface",
+    borderColor: "border.default",
+    color: "fg.default",
+    _hover: {
+      bg: "bg.subtle",
+      borderColor: "border.subtle",
+    },
+  },
+  variants: {
+    variant: {
+      default: {},
+      active: {
+        bg: "bg.emphasized",
+        color: "fg.default",
+      },
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
+
 export const componentRecipes = {
   chatMessage: chatMessageRecipe,
   button: buttonRecipe,
@@ -252,4 +332,7 @@ export const componentRecipes = {
   fileItem: fileItemRecipe,
   modal: modalRecipe,
   text: textRecipe,
+  userRequest: userRequestRecipe,
+  apiKeyDialog: apiKeyDialogRecipe,
+  menuHelper: menuHelperRecipe,
 };

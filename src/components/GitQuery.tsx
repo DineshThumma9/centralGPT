@@ -1,5 +1,5 @@
 // GitQuery.tsx
-import { Field, HStack, Input, InputGroup, VStack } from "@chakra-ui/react";
+import {Field, HStack, Input, InputGroup, VStack} from "@chakra-ui/react";
 import SelectOptions from "./Select.tsx";
 
 const inputStyles = {
@@ -8,7 +8,7 @@ const inputStyles = {
     borderColor: "rgba(139, 92, 246, 0.3)",
     bg: "rgba(139, 92, 246, 0.05)",
     color: "white",
-    _placeholder: { color: "rgba(255, 255, 255, 0.6)" },
+    _placeholder: {color: "rgba(255, 255, 255, 0.6)"},
     _hover: {
         borderColor: "rgba(139, 92, 246, 0.5)",
         bg: "rgba(139, 92, 246, 0.1)"
@@ -41,11 +41,11 @@ interface Props {
 }
 
 const GitQuery = ({
-    owner, repo, branch, commit,
-    dirInput, fileExtInput, dirOption, fileExtOption,
-    setOwner, setRepo, setBranch, setCommit,
-    setDirInput, setFileExtInput, setDirOption, setFileExtOption
-}: Props) => {
+                      owner, repo, branch, commit,
+                      dirInput, fileExtInput, dirOption, fileExtOption,
+                      setOwner, setRepo, setBranch, setCommit,
+                      setDirInput, setFileExtInput, setDirOption, setFileExtOption
+                  }: Props) => {
 
     return (
         <VStack gap={6} align="stretch">
@@ -132,7 +132,7 @@ const GitQuery = ({
                             {...inputStyles}
                         />
                     </Field.Root>
-                    <SelectOptions value={dirOption} setValue={setDirOption} />
+                    <SelectOptions value={dirOption} setValue={setDirOption}/>
                 </HStack>
 
                 <HStack gap={4} align="flex-end">
@@ -147,7 +147,7 @@ const GitQuery = ({
                             {...inputStyles}
                         />
                     </Field.Root>
-                    <SelectOptions value={fileExtOption} setValue={setFileExtOption} />
+                    <SelectOptions value={fileExtOption} setValue={setFileExtOption}/>
                 </HStack>
             </VStack>
         </VStack>

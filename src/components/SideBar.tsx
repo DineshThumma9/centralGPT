@@ -6,17 +6,12 @@ import SideBarNav from "./SideBarNav";
 import SessionComponent from "./SessionComponent";
 import useSessions from "../hooks/useSessions.ts";
 import sessionStore from "../store/sessionStore";
-import type {Session} from "../entities/Session";
-import { useColorMode } from "../contexts/ColorModeContext";
-
 interface SidebarProps {
     onCollapse?: (collapsed: boolean) => void;
 }
 
 export default function Sidebar({onCollapse}: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
-    const { colors } = useColorMode();
-
     // ✅ Directly use Zustand selectors
     const sessions = sessionStore((s) => s.sessions);
     const currentSession = sessionStore((s) => s.current_session);
@@ -26,48 +21,64 @@ export default function Sidebar({onCollapse}: SidebarProps) {
 
     const boxStyles = {
         transition: "all 0.3s ease-in-out",
-        bg: colors.background.card,
-        color: colors.text.primary,
+        bg: "bg.surface",
+        color: "fg.default",
         h: "100vh",
         p: 3,
         overflow: "hidden",
-        borderRight: `1px solid ${colors.border.default}`,
+        borderRight: "1px solid",
+        borderRightColor: "border.default",
         position: "relative" as const,
-        boxShadow: `2px 0 8px ${colors.shadow.sm}`,
+        boxShadow: "sm",
     };
 
     const collapsibleButtonStyles = {
-        bg: colors.text.primary,
-        color: colors.background.primary,
+        bg: { base: "white", _dark: "gray.800" },
+        color: { base: "brand.700", _dark: "brand.600" },
         border: "2px solid",
-        borderColor: colors.border.default,
+        borderColor: { base: "brand.200", _dark: "brand.700" },
         _hover: {
-            bg: colors.text.secondary,
+            bg: { base: "brand.50", _dark: "brand.950" },
+            color: { base: "brand.800", _dark: "brand.500" },
             transform: "scale(1.05)",
-            borderColor: colors.border.hover,
+            borderColor: { base: "brand.300", _dark: "brand.600" },
         },
         _active: {
             transform: "scale(0.95)",
+            bg: { base: "brand.100", _dark: "brand.900" },
         },
         transition: "all 0.2s",
         size: "sm" as const,
         mb: 4,
-        borderRadius: "full"
+        borderRadius: "full",
+        boxShadow: "sm"
     };
 
     const stackStyles = {
-        gap: 3,
+        gap: 0,
         align: "stretch" as const,
         overflowY: "auto" as const,
         flex: "1",
-        pr: 2,
+        pr: 1,
+        css: {
+            "&::-webkit-scrollbar": {
+                width: "4px",
+            },
+            "&::-webkit-scrollbar-track": {
+                background: "transparent",
+            },
+            "&::-webkit-scrollbar-thumb": {
+                background: "token(colors.border.default)",
+                borderRadius: "2px",
+            },
+        },
     };
 
     const sessionStackStyles = {
-        borderRadius: "lg",
-        padding: "2px",
+        borderRadius: "12px",
+        padding: "0px",
         margin: "0",
-        transition: "all 0.2s ease-in-out"
+        transition: "all 0.2s ease",
     };
 
     const handleToggle = () => {
@@ -79,8 +90,6 @@ export default function Sidebar({onCollapse}: SidebarProps) {
     useEffect(() => {
         getSessions(); // ✅ Only run once on mount
     }, []);
-
-
 
 
     const handleSessionSelect = async (sessionId: string) => {
@@ -107,14 +116,12 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                 <Stack
                     key={sessionId}
                     {...sessionStackStyles}
-                    bg={isActive ? colors.background.active : "transparent"}
-                    border={isActive ? "1px solid" : "1px solid transparent"}
-                    borderColor={isActive ? colors.border.focus : "transparent"}
-                    borderRadius="22px"
+                    bg={isActive ? "bg.emphasized" : "transparent"}
+                    borderRadius="12px"
                 >
                     <SessionComponent
-                        bg={isActive ? colors.background.hover : colors.background.card}
-                        color={colors.text.primary}
+                        bg={isActive ? "bg.subtle" : "bg.surface"}
+                        color="fg.default"
                         title={session.title || "New Chat"}
                         sessionId={sessionId}
                         onSelect={() => handleSessionSelect(sessionId)}
@@ -147,7 +154,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
                         <VStack {...stackStyles}>
                             {isLoading && sessions.length === 0 && (
                                 <Box p={4}>
-                                    <Text fontSize="sm" color={colors.text.muted} textAlign="center">
+                                    <Text fontSize="sm" color="fg.muted" textAlign="center">
                                         Loading sessions...
                                     </Text>
                                 </Box>
@@ -155,7 +162,8 @@ export default function Sidebar({onCollapse}: SidebarProps) {
 
                             {!isLoading && sessions.length === 0 && (
                                 <Box p={4}>
-                                    <Text fontSize="sm" color={colors.text.secondary} textAlign="center" lineHeight="1.6">
+                                    <Text fontSize="sm" color="fg.subtle" textAlign="center"
+                                          lineHeight="1.6">
                                         No chat sessions yet.
                                         <br/>
                                         Create your first chat!

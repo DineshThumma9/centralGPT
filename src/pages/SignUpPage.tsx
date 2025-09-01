@@ -11,7 +11,6 @@ import CrediantialCard from "../components/CrediantialCard.tsx";
 import useValidationStore from "../store/validationStore.ts";
 import useInitStore from "../store/initStore.ts";
 import { ColorModeToggle } from '../components/ColorModeToggle.tsx';
-import { useColorMode } from '../contexts/ColorModeContext';
 
 const signUp = z.object({
     username: z.string().min(1, "Username is required"),
@@ -27,7 +26,6 @@ const SignUpPage = () => {
     const { clearAllFields } = useValidationStore();
     const [isLoading, setIsLoading] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
-    const { colorMode } = useColorMode();
 
     const username = useFieldForm("username")
     const password = useFieldForm("password")
@@ -113,34 +111,18 @@ const SignUpPage = () => {
             minH="100vh"
             minW="100vw"
             position="relative"
-            bg={colorMode === 'light' ? "white" : "#000000"}
+            bg="bg.canvas"
         >
-            {/* Teal Glow Background - Light Theme Only */}
-            {colorMode === 'light' && (
-                <Box
-                    position="absolute"
-                    inset={0}
-                    zIndex={0}
-                    style={{
-                        backgroundImage: `
-                            radial-gradient(125% 125% at 50% 90%, #ffffff 40%, #14b8a6 100%)
-                        `,
-                        backgroundSize: "100% 100%",
-                    }}
-                />
-            )}
-            
-            {/* Emerald Void Background - Dark Theme Only */}
-            {colorMode === 'dark' && (
-                <Box
-                    position="absolute"
-                    inset={0}
-                    zIndex={0}
-                    style={{
-                        background: "radial-gradient(125% 125% at 50% 10%, #000000 40%, #072607 100%)",
-                    }}
-                />
-            )}
+            {/* Background gradients for both light and dark modes */}
+            <Box
+                position="absolute"
+                inset={0}
+                zIndex={0}
+                bg={{
+                    base: "radial-gradient(125% 125% at 50% 90%, token(colors.gray.50) 40%, token(colors.brand.600) 100%)",
+                    _dark: "radial-gradient(125% 125% at 50% 10%, token(colors.gray.900) 40%, token(colors.brand.950) 100%)"
+                }}
+            />
             
             <Flex
                 minH="100vh"
@@ -164,8 +146,8 @@ const SignUpPage = () => {
             <Fade in={!fadeOut} unmountOnExit transition={{exit: {duration: 0.3}}}>
                 <CrediantialCard
                     heading={"Sign Up"}
-                    login_register={"register"}
-                    message={"Already Have an Account? Login in Here"}
+                    login_register={"Register"}
+                    message={"Already Have an Account? Log In Here"}
                     isLoading={isLoading}
                     onSubmit={onSubmit}
                     altlink={"/login"}

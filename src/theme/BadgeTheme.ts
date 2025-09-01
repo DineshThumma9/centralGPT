@@ -1,25 +1,55 @@
-import {defineRecipe} from "@chakra-ui/react";
-
-
-
+import { defineRecipe } from "@chakra-ui/react";
 
 export const badgeRecipe = defineRecipe({
+  className: "badge",
   base: {
-    bg: "linear-gradient(135deg, #16a34a, #15803d)", // Better contrast gradient
-    color: "white",
-    textTransform: "capitalize",
-    px: 3,
-    py: 1,
-    borderRadius: "full",
-    fontSize: "xs",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "md",
     fontWeight: "semibold",
-    boxShadow: "0 2px 8px rgba(22, 163, 74, 0.3)", // Updated shadow color
-    border: "1px solid",
-    borderColor: "green.400",
-    _hover: {
-      transform: "scale(1.05)",
-      boxShadow: "0 4px 12px rgba(22, 163, 74, 0.4)" // Updated hover shadow
+    fontSize: "xs",
+    textTransform: "uppercase",
+    letterSpacing: "wide",
+    transition: "all 0.2s",
+  },
+  variants: {
+    variant: {
+      solid: {
+        bg: "colorPalette.solid",
+        color: "colorPalette.contrast",
+      },
+      subtle: {
+        bg: "colorPalette.subtle",
+        color: "colorPalette.fg",
+      },
+      outline: {
+        borderWidth: "1px",
+        borderColor: "colorPalette.solid",
+        color: "colorPalette.solid",
+      },
     },
-    transition: "all 0.2s ease"
-  }
+    size: {
+      sm: {
+        px: "2",
+        py: "1",
+        fontSize: "xs",
+      },
+      md: {
+        px: "3",
+        py: "1.5",
+        fontSize: "xs",
+      },
+      lg: {
+        px: "4",
+        py: "2",
+        fontSize: "sm",
+      },
+    },
+  },
+  defaultVariants: {
+    variant: "solid",
+    size: "md",
+    colorPalette: "brand",
+  },
 });

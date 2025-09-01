@@ -1,20 +1,9 @@
-import {
-    Box,
-    createToaster,
-    Editable,
-    Flex,
-    IconButton,
-    MenuPositioner,
-    Portal,
-    Text,
-    useSlotRecipe,
-} from "@chakra-ui/react";
+import {Box, createToaster, Editable, Flex, IconButton, MenuPositioner, Portal, Text,} from "@chakra-ui/react";
 import {Edit, MoreVertical, Share, Trash} from "lucide-react";
 import {MenuContent, MenuItem, MenuRoot, MenuTrigger,} from "./ui/menu.tsx";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
 import DeleteAlert from "./DeleteAlert.tsx";
-import {useColorMode} from "../contexts/ColorModeContext.tsx";
 
 const toaster = createToaster({placement: "top"});
 
@@ -32,9 +21,6 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
     const [isUpdatingTitle, setIsUpdatingTitle] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [dialog, setIsDialog] = useState(false);
-    const recipe = useSlotRecipe({key: "menuHelper"})
-    const styles = recipe({visual: "session"})
-    const { colors } = useColorMode();
 
     const handleChangeTitleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -87,28 +73,30 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
         <>
             <Box
                 w="100%"
-                px={4}
-                py={3}
-                height="50px"
-                color={colors.text.primary}
-                overflow="hidden"
-                transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-                borderRadius="16px"
-                boxShadow={`0 4px 15px ${colors.shadow.md}`}
+                px={3}
+                py={2}
+                height="40px"
+                color="fg"
+                borderRadius="12px"
+                transition="all 0.2s ease"
                 cursor="pointer"
-                border={`1px solid ${colors.border.secondary}`}
-                backdropFilter="blur(10px)"
+                bg="transparent"
+                border="1px solid transparent"
                 onClick={onSelect}
                 opacity={isDeleting ? 0.5 : 1}
                 _hover={{
-                    bg: colors.background.hover,
-                    transform: "translateY(-1px)",
-                    boxShadow: `0 8px 25px ${colors.shadow.lg}`
+                    bg: { base: "gray.50", _dark: "gray.800" },
+                    borderColor: { base: "brand.200", _dark: "brand.700" },
+                    transform: "translateX(4px)",
+                    boxShadow: "sm"
+                }}
+                _active={{
+                    transform: "translateX(2px)"
                 }}
             >
-                <Flex justify="space-between" align="center" w="100%" h="100%" borderRadius={"inherit"}>
+                <Flex justify="space-between" align="center" w="100%" h="100%">
                     {/* Title section - takes available space */}
-                    <Box flex="1" minW={0} mr={2}>
+                    <Box flex="1" minW={0} mr={2} overflow="hidden">
                         <Editable.Root
                             value={title}
                             edit={isEditing}
@@ -130,37 +118,44 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                                 <Text
                                     fontSize="sm"
                                     fontWeight="medium"
-                                    color={colors.text.primary}
+                                    color="fg"
                                     overflow="hidden"
                                     whiteSpace="nowrap"
                                     textOverflow="ellipsis"
                                     opacity={isUpdatingTitle ? 0.7 : 1}
                                     cursor={isUpdatingTitle ? "default" : "text"}
+                                    maxW="100%"
+                                    display="block"
                                     _hover={{
-                                        opacity: isUpdatingTitle ? 0.7 : 0.8,
-                                        color: colors.text.accent
+                                        opacity: isUpdatingTitle ? 0.7 : 0.9,
+                                        color: { base: "brand.700", _dark: "brand.400" }
                                     }}
-                                    transition="all 0.2s"
+                                    transition="all 0.2s ease"
                                 >
-                                    {title.slice(0, 30) + "..."}
+                                    {title}
                                 </Text>
                             </Editable.Preview>
                             <Editable.Input
                                 fontSize="sm"
                                 fontWeight="medium"
-                                px={3}
-                                py={2}
-                                borderRadius="10px"
-                                color={colors.text.primary}
-                                bg={colors.background.card}
+                                px={2}
+                                py={1}
+                                borderRadius="6px"
+                                color={"fg"}
+                                bg={"bg.panel"}
                                 border="1px solid"
-                                borderColor={colors.border.default}
+                                borderColor={"border.subtle"}
+                                w="100%"
                                 _focus={{
-                                    borderColor: colors.border.focus,
-                                    boxShadow: `0 0 0 2px ${colors.border.focus}`,
+                                    borderColor: "border.emphasized",
+                                    boxShadow: `0 0 0 1px ${"border.emphasized"}`,
                                     outline: "none",
-                                    bg: colors.background.hover
+                                    bg: "bg.subtle"
                                 }}
+                                _hover={{
+                                    borderColor: "border"
+                                }}
+                                transition="all 0.2s ease"
                                 onClick={(e) => e.stopPropagation()}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Escape') {
@@ -176,54 +171,109 @@ const SessionComponent = ({title, sessionId, onSelect}: Props) => {
                         </Editable.Root>
                     </Box>
 
-                    {/* Menu button - fixed width, always visible */}
+                    {/* Menu button - compact and subtle */}
                     <Box flexShrink={0}>
                         <MenuRoot>
                             <MenuTrigger asChild>
                                 <IconButton
                                     onClick={(e) => e.stopPropagation()}
                                     disabled={isDeleting || isUpdatingTitle}
-                                    size="sm"
+                                    size="xs"
                                     variant="ghost"
-                                    color={colors.text.secondary}
+                                    bg="transparent"
+                                    color={{ base: "brand.700", _dark: "brand.600" }}
+                                    w="24px"
+                                    h="24px"
+                                    minW="24px"
+                                    borderRadius="6px"
+                                    transition="all 0.2s ease"
                                     _hover={{
-                                        bg: colors.background.hover,
-                                        color: colors.text.primary
+                                        bg: { base: "brand.50", _dark: "brand.950" },
+                                        color: { base: "brand.800", _dark: "brand.500" },
+                                        transform: "scale(1.1)"
                                     }}
+                                    _active={{
+                                        bg: { base: "brand.100", _dark: "brand.900" },
+                                        transform: "scale(0.95)"
+                                    }}
+                                    _disabled={{
+                                        opacity: 0.5,
+                                        cursor: "not-allowed"
+                                    }}
+                                    aria-label="Session options"
                                 >
-                                    <MoreVertical size={16}/>
+                                    <MoreVertical size={14}/>
                                 </IconButton>
                             </MenuTrigger>
                             <Portal>
                                 <MenuPositioner>
                                     <MenuContent
-                                        css={styles.content}
+                                        bg={"bg.panel"}
+                                        border={`1px solid ${"border.subtle"}`}
+                                        borderRadius="8px"
+                                        boxShadow={`0 4px 12px ${"md"}`}
+                                        py={1}
+                                        minW="150px"
                                     >
                                         <MenuItem
                                             value="title"
                                             onClick={handleChangeTitleClick}
                                             disabled={isUpdatingTitle}
-                                            css={styles.item}
+                                            color={"fg"}
+                                            fontSize="sm"
+                                            px={3}
+                                            py={2}
+                                            gap={2}
+                                            transition="all 0.2s ease"
+                                            _hover={{
+                                                bg: { base: "brand.50", _dark: "brand.950" },
+                                                color: { base: "brand.700", _dark: "brand.300" }
+                                            }}
+                                            _disabled={{
+                                                opacity: 0.5,
+                                                cursor: "not-allowed"
+                                            }}
                                         >
-                                            <Edit size={16}/>
+                                            <Edit size={14}/>
                                             {isUpdatingTitle ? "Updating..." : "Rename"}
                                         </MenuItem>
                                         <MenuItem
                                             value="share"
                                             onClick={handleShare}
-                                            css={styles.item}
+                                            color={"fg"}
+                                            fontSize="sm"
+                                            px={3}
+                                            py={2}
+                                            gap={2}
+                                            transition="all 0.2s ease"
+                                            _hover={{
+                                                bg: { base: "brand.50", _dark: "brand.950" },
+                                                color: { base: "brand.700", _dark: "brand.300" }
+                                            }}
                                         >
-                                            <Share size={16}/>
+                                            <Share size={14}/>
                                             Share
                                         </MenuItem>
                                         <MenuItem
                                             value="delete"
                                             onClick={() => setIsDialog(true)}
-                                            _hover={{bg: colors.background.hover, color: colors.text.danger}}
                                             disabled={isDeleting}
-                                            css={styles.item}
+                                            color={"fg"}
+                                            fontSize="sm"
+                                            px={3}
+                                            py={2}
+                                            gap={2}
+                                            transition="all 0.2s ease"
+                                            _hover={{
+                                                bg: { base: "red.50", _dark: "red.950" },
+                                                color: { base: "red.700", _dark: "red.300" }
+                                            }}
+                                            _disabled={{
+                                                opacity: 0.5,
+                                                cursor: "not-allowed"
+                                            }}
                                         >
-                                            <Trash size={16}/>
+                                            <Trash size={14}/>
                                             Delete
                                         </MenuItem>
                                     </MenuContent>

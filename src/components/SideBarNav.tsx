@@ -2,51 +2,9 @@ import {HStack, IconButton} from "@chakra-ui/react";
 import {Plus} from "lucide-react";
 import useSessions from "../hooks/useSessions.ts";
 import {useState} from "react";
-import {iconButton} from "../theme/iconButton.ts";
-import { useColorMode } from "../contexts/ColorModeContext.tsx";
-
-
-// const hstackplus = {
-//     "arialabel": "Create new chat",
-//     variant: "ghost",
-//     size: "sm",
-//     borderRadius: "full",
-//     bg: "linear-gradient(135deg, #8b45c5 0%, #6b46c1 100%)",
-//     color: "white",
-//     _hover: {
-//         bg: "linear-gradient(135deg, #9f4fd9 0%, #7c3aed 100%)",
-//         transform: "scale(1.05)",
-//         boxShadow: "0 6px 20px rgba(139, 69, 197, 0.3)"
-//     },
-//     _active: {
-//         transform: "scale(0.95)"
-//     },
-//     transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-// }
-//
-// const hstackseach = {
-//     "aria-label": "Search chats",
-//     variant: "ghost",
-//     size: "sm",
-//     borderRadius: "full",
-//     color: "rgba(139, 69, 197, 0.8)",
-//     bg: "rgba(139, 69, 197, 0.1)",
-//     _hover: {
-//         bg: "rgba(139, 69, 197, 0.2)",
-//         color: "#8b45c5",
-//         transform: "scale(1.05)",
-//         boxShadow: "0 4px 15px rgba(139, 69, 197, 0.2)"
-//     },
-//     _active: {
-//         transform: "scale(0.95)"
-//     },
-//     transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-//     p: 2,
-// }
 
 
 const SideBarNav = () => {
-    const { colors } = useColorMode();
     const {createNewSession} = useSessions();
     const [isCreating, setIsCreating] = useState(false);
 
@@ -57,8 +15,9 @@ const SideBarNav = () => {
         justifyContent: "space-between",
         height: "50px",
         px: 3,
-        border: `1px solid ${colors.border.secondary}`,
-        boxShadow: `0 4px 20px ${colors.shadow.md}`,
+        border: "1px solid",
+        borderColor: "border.muted",
+        boxShadow: "md",
     };
 
 
@@ -82,11 +41,28 @@ const SideBarNav = () => {
             {...hstackStyles}
         >
             <IconButton
-                recipe={iconButton}
                 onClick={handleCreateNewSession}
                 loading={isCreating}
                 disabled={isCreating}
                 p={2}
+                variant="ghost"
+                size="sm"
+                bg="transparent"
+                color={{ base: "brand.700", _dark: "brand.600" }}
+                transition="all 0.2s ease"
+                _hover={{
+                    bg: { base: "brand.50", _dark: "brand.950" },
+                    color: { base: "brand.800", _dark: "brand.500" },
+                    transform: "scale(1.05)"
+                }}
+                _active={{
+                    bg: { base: "brand.100", _dark: "brand.900" },
+                    transform: "scale(0.95)"
+                }}
+                _disabled={{
+                    opacity: 0.5,
+                    cursor: "not-allowed"
+                }}
             >
                 <Plus size={18}/>
             </IconButton>

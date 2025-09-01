@@ -6,45 +6,30 @@ import type {Message} from "../entities/Message.ts";
 import EmptyState from "./EmptyState.tsx";
 import UserRequest from "./UserRequest.tsx";
 import AIResponse from "./AIResponse.tsx";
-import { useColorMode } from "../contexts/ColorModeContext";
-
 const Response = () => {
     const [messages, setMessages] = useState<Message[]>([]);
+    const [prevMessageCount, setPrevMessageCount] = useState(0);
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const { colors } = useColorMode();
-
-    // Optimized styles for better space utilization
+    const shouldAutoScroll = useRef(true);
     const box = {
         h: "100%",
         w: "full",
         overflowY: "auto" as const,
         overflowX: "hidden" as const,
-        bg: colors.background.body, // Use theme background
+        bg: "bg.canvas",
         position: "relative" as const,
-        // Custom scrollbar styling
-        "&::-webkit-scrollbar": {
-            width: "6px",
-        },
-        "&::-webkit-scrollbar-track": {
-            bg: "transparent",
-        },
-        "&::-webkit-scrollbar-thumb": {
-            bg: colors.border.default,
-            borderRadius: "3px",
-        },
-        "&::-webkit-scrollbar-thumb:hover": {
-            bg: colors.border.hover,
-        },
+        scrollBehavior: "smooth" as const,
     };
 
     const vstack = {
-        gap: 3, // Even more reduced gap for compact layout
+        gap: 3,
         align: "stretch" as const,
         w: "full",
         maxW: "4xl",
+        bg: "bg.canvas",
         mx: "auto",
-        px: 1, // Minimal horizontal padding for maximum reading width
-        py: 1, // Minimal vertical padding
+        px: 1,
+        py: 1,
     };
 
     useEffect(() => {
@@ -56,14 +41,48 @@ const Response = () => {
         return unsubscribe;
     }, []);
 
-    useEffect(() => {
+    // Handle scroll detection
+    const handleScroll = () => {
         if (containerRef.current) {
-            containerRef.current.scrollTo({
-                top: containerRef.current.scrollHeight,
-                behavior: "smooth",
+            const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+            const threshold = 100; // pixels from bottom
+            const atBottom = scrollTop + clientHeight >= scrollHeight - threshold;
+            shouldAutoScroll.current = atBottom;
+        }
+    };
+
+    // Smart scrolling logic
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        // Only scroll if:
+        // 1. New message was added (not just content update)
+        // 2. User is at the bottom or it's the first message
+        const newMessageAdded = messages.length > prevMessageCount;
+        const shouldScroll = newMessageAdded && (shouldAutoScroll.current || messages.length === 1);
+
+        if (shouldScroll) {
+            // Use requestAnimationFrame for smoother scrolling
+            requestAnimationFrame(() => {
+                container.scrollTo({
+                    top: container.scrollHeight,
+                    behavior: messages.length === 1 ? "auto" : "smooth",
+                });
             });
         }
-    }, [messages]);
+
+        setPrevMessageCount(messages.length);
+    }, [messages, prevMessageCount]);
+
+    // Add scroll listener
+    useEffect(() => {
+        const container = containerRef.current;
+        if (container) {
+            container.addEventListener('scroll', handleScroll, { passive: true });
+            return () => container.removeEventListener('scroll', handleScroll);
+        }
+    }, []);
 
     return (
         <Box

@@ -1,12 +1,9 @@
 import {v4, v4 as uuidv4} from 'uuid';
 import useAuthStore from "../store/authStore.ts";
 import useSessionStore from "../store/sessionStore.ts";
-import sessionStore from "../store/sessionStore.ts";
 import {z} from "zod/v4";
 import {useEffect, useRef} from "react";
 import useSessions from "./useSessions.ts";
-
-
 
 const docSchema = z.object({
     doc_id: z.string().uuid(),
@@ -26,19 +23,14 @@ const docSchema = z.object({
     text: z.string()
 });
 
-
 type Doc = z.infer<typeof docSchema>;
 
-
 const API_BASE_URL = import.meta.env.VITE_API_URI;
-
 
 const useMessage = () => {
 
     const eventSourceRef = useRef<EventSource | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
-
-
 
  const abortStream = () => {
     if (abortControllerRef.current) {
@@ -55,33 +47,27 @@ const useMessage = () => {
     useSessionStore.getState().setSending(false)
 };
 
-
     useEffect(() => {
         return () => {
             if (eventSourceRef.current) {
-                eventSourceRef.current.close();
-                console.log("EventSource closed on unmount.");
-            }
+                eventSourceRef.current.close();}
 
             if(abortControllerRef.current){
                 abortControllerRef.current.abort();
                 abortControllerRef.current = null;
 
-
             }
         };
     }, []);
 
-
     const {changeTitle} = useSessions()
 
-    const store = sessionStore.getState();
+    const store = useSessionStore.getState();
     const {
         addMessage,
         current_session, setTitle, messages, setStreaming, updateMessage,
         context,files
     } = store;
-
 
     async function streamMessage(userMsg: string): Promise<void> {
 
@@ -90,8 +76,6 @@ const useMessage = () => {
         }
         abortControllerRef.current = new AbortController(); // new controller for this stream
 
-
-
         const token = useAuthStore.getState().accessToken;
         const assistantMsgId = uuidv4();
         const session_id = useSessionStore.getState().current_session;
@@ -99,11 +83,7 @@ const useMessage = () => {
         const isFirst = messages.length == 0
         if (!session_id) {
             throw new Error('No session ID provided');
-        }
-
-        console.log('Using session_id:', session_id);
-
-        // Add empty assistant message to start streaming
+        }// Add empty assistant message to start streaming
         addMessage({
             message_id: assistantMsgId,
             session_id: session_id,
@@ -119,11 +99,10 @@ const useMessage = () => {
         let sources: Doc[] = [];
         let isStreamComplete = false;
 
-        // BEFORE streamin
+        // BEFORE streaming
         const context_id = useSessionStore.getState().context_id
 
-// Log them
-        console.log("Starting stream with:", session_id, context_id)
+        // Log them
         const displayCurrentFiles = []
         for(const file of files){
             displayCurrentFiles.push(file.name)
@@ -133,12 +112,7 @@ const useMessage = () => {
             if (eventSourceRef.current) {
                 eventSourceRef.current.close();
             }
-
-            console.log('Starting stream with sessionId:', session_id, 'message:', userMsg);
-
-
-
-
+            
             const response = await fetch(`${API_BASE_URL}/messages/simple-stream`, {
                 method: 'POST',
                 headers: {
@@ -151,20 +125,11 @@ const useMessage = () => {
                     isFirst: isFirst,
                     context_type: context,
                     context_id: context_id,
-                    files:displayCurrentFiles
+                    files: displayCurrentFiles
                 }),
-                signal:abortControllerRef.current.signal
+                signal: abortControllerRef.current.signal
             });
-
-            console.log(`key Sending : ${session_id}_${context_id}_${context}`)
-            console.log(JSON.stringify({
-                session_id: session_id,
-                msg: userMsg,
-                isFirst: isFirst
-            }))
-
-            console.log('Response status:', response.status);
-
+            
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('Error response:', errorText);
@@ -198,9 +163,7 @@ const useMessage = () => {
                                 const data = JSON.parse(line.slice(6));
 
                                 switch (data.type) {
-                                    case 'start':
-                                        console.log('Stream started');
-                                        break;
+                                    case 'start':break;
 
                                     case 'token':
                                         if (data.content && !isStreamComplete) {
@@ -213,7 +176,6 @@ const useMessage = () => {
                                         }
                                         break;
 
-
                                     case 'sources': {
                                         const sourcesData = data.content;
                                         const parsed = sourcesData
@@ -223,10 +185,7 @@ const useMessage = () => {
 
                                         if (parsed.length > 0) {
                                             // Sort by score (highest first)
-                                            sources = parsed.sort((a: { score: number; }, b: { score: number; }) => b.score - a.score);
-                                            console.log('Sources received:', sources);
-
-                                            // Don't update the message content here, just store sources
+                                            sources = parsed.sort((a: { score: number; }, b: { score: number; }) => b.score - a.score);// Don't update the message content here, just store sources
                                             // The sources will be displayed separately in the UI
                                         } else {
                                             console.warn("No valid source documents found in 'sources' payload.");
@@ -235,10 +194,7 @@ const useMessage = () => {
                                         break;
                                     }
 
-
-                                    case 'done':
-                                        console.log('Stream completed');
-                                        isStreamComplete = true;
+                                    case 'done':isStreamComplete = true;
 
                                         // Final update with complete content and sources
                                         updateMessage(assistantMsgId, {
@@ -248,26 +204,17 @@ const useMessage = () => {
                                         });
                                         break;
 
-
-                                    case 'title': {
-
-                                        console.log(`Session Title has been generated ${data.content}`);
-                                        setTitle(data.content);
+                                    case 'title': {setTitle(data.content);
                                         await changeTitle(current_session || v4(), data.content)
                                         break;
                                     }
-
 
                                     case 'abort' : {
                                         isStreamComplete=true;
                                         break;
                                     }
 
-
-
-
                                     case 'error':
-
 
                                         console.error('Stream error:', data.content);
                                         updateMessage(assistantMsgId, {

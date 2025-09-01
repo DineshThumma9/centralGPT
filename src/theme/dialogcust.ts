@@ -5,38 +5,34 @@ export const dialogcust = defineSlotRecipe(({
     slots: ["content", "title", "backdrop", "cancel", "confirm","input"],
     base: {
         content: {
-            bg: "linear-gradient(135deg, #1a0a2e 0%, #2d1b3d 100%)",
-            borderRadius: "20px",
-            border: "1px solid rgba(139, 69, 197, 0.2)",
-            boxShadow: "0 20px 60px rgba(139, 69, 197, 0.3)",
-            backdropFilter: "blur(20px)",
+            bg: { base: "white", _dark: "gray.800" },
+            borderRadius: "12px",
+            border: "1px solid",
+            borderColor: { base: "gray.200", _dark: "gray.700" },
+            boxShadow: "lg",
             maxW: "md",
             mx: 4
         },
         title: {
             fontSize: "xl",
             fontWeight: "bold",
-            color: "white",
-            textAlign: "center",
-            bg: "linear-gradient(135deg, #8b45c5 0%, #06b6d4 100%)",
-            bgClip: "text",
-
+            color: { base: "gray.800", _dark: "white" },
+            textAlign: "center"
         },
         backdrop: {
-            bg: "rgba(10, 10, 15, 0.8)",
-            backdropFilter: "blur(20px)"
+            bg: "rgba(0, 0, 0, 0.5)"
         },
         cancel: {
-            borderRadius: "12px",
-            border: "1px solid rgba(139, 69, 197, 0.3)",
-            color: "rgba(255, 255, 255, 0.8)",
+            borderRadius: "8px",
+            border: "1px solid",
+            borderColor: { base: "gray.300", _dark: "gray.600" },
+            color: { base: "gray.700", _dark: "gray.300" },
             bg: "transparent",
             px: 6,
             py: 2,
             _hover: {
-                bg: "rgba(139, 69, 197, 0.1)",
-                borderColor: "rgba(139, 69, 197, 0.5)",
-                color: "white"
+                bg: { base: "gray.50", _dark: "gray.700" },
+                borderColor: { base: "gray.400", _dark: "gray.500" }
             },
             _active: {
                 transform: "translateY(1px)"
@@ -44,25 +40,24 @@ export const dialogcust = defineSlotRecipe(({
             transition: "all 0.2s"
         },
         input: {
-            bg: "rgba(26, 10, 46, 0.6)",
-            border: "1px solid rgba(139, 69, 197, 0.3)",
-            borderRadius: "12px",
-            color: "white",
+            bg: { base: "white", _dark: "gray.700" },
+            border: "1px solid",
+            borderColor: { base: "gray.300", _dark: "gray.600" },
+            borderRadius: "8px",
+            color: { base: "gray.800", _dark: "white" },
             px: 4,
             py: 3,
             fontSize: "sm",
-            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            transition: "all 0.2s ease",
             _placeholder: {
-                color: "rgba(255, 255, 255, 0.5)"
+                color: { base: "gray.500", _dark: "gray.400" }
             },
             _focus: {
-                borderColor: "#8b45c5",
-                boxShadow: "0 0 0 3px rgba(139, 69, 197, 0.2)",
-                bg: "rgba(26, 10, 46, 0.8)"
+                borderColor: { base: "brand.500", _dark: "brand.400" },
+                boxShadow: "0 0 0 3px rgba(34, 197, 94, 0.1)"
             },
             _hover: {
-                borderColor: "rgba(139, 69, 197, 0.5)",
-                bg: "rgba(26, 10, 46, 0.7)"
+                borderColor: { base: "gray.400", _dark: "gray.500" }
             }
         }
     }

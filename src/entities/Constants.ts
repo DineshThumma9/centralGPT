@@ -101,16 +101,16 @@ const mistralModels: string[] = [
     "nousresearch/deephermes-3-llama-3-8b-preview",
   ];
   const modelsProviders: string[] = [
-    "openai",
-    "claude",
-    "gemini",
-    "vertex",
-    "azure",
-    "GROQ",
-    "openrouter",
-      "mistral",
-      "deepinfra",
-      "together"
+    "Openai",
+    "Claude",
+    "Gemini",
+   
+ 
+    "Groq",
+    "Openrouter",
+      "Mistral",
+    
+      "Together"
   ];
 
   const ollamaModels: string[] = [
@@ -126,22 +126,20 @@ const mistralModels: string[] = [
 
 const providers_api_link = new Map<string, string>([
   ["groq", "https://console.groq.com/keys"],
-  ["ollama", ""],
   ["together", "https://api.together.xyz/settings/api-keys"],
   ["mistral", "https://console.mistral.ai/api-keys"],
   ["openai", "https://platform.openai.com/api-keys"],
-  ["deepseek", "https://platform.deepseek.com/api_keys"],
   ["gemini", "https://aistudio.google.com/app/apikey"],
   ["openrouter", "https://openrouter.ai/settings/keys"],
 ]);
 
 const api_providers_models = new Map<string, string >([
   ["groq", "https://console.groq.com/docs/models"],
-  ["ollama", "https://ollama.com/library?sort=newest"],
+  // ["ollama", "https://ollama.com/library?sort=newest"],
   ["together", "https://api.together.xyz/models"],
   ["mistral", "https://docs.mistral.ai/getting-started/models/models_overview/"],
   ["openai", "https://platform.openai.com/docs/models"],
-  ["deepseek", "https://api-docs.deepseek.com/quick_start/pricing"],
+  // ["deepseek", "https://api-docs.deepseek.com/quick_start/pricing"],
   ["gemini", "https://ai.google.dev/gemini-api/docs/models"],
   ["openrouter", "https://openrouter.ai/models"],
 ]);
@@ -159,21 +157,21 @@ const providers_dic = new Map<string, ProviderInfo>([
     api_link: providers_api_link.get("groq")!,
     model_link: api_providers_models.get("groq")!
   }],
-  ["ollama", {
-    models: ollamaModels,
-    api_link: providers_api_link.get("ollama")!,
-    model_link: api_providers_models.get("ollama")!
-  }],
+  // ["ollama", {
+  //   models: ollamaModels,
+  //   api_link: providers_api_link.get("ollama")!,
+  //   model_link: api_providers_models.get("ollama")!
+  // }],
   ["together", {
     models: togetherModels,
     api_link: providers_api_link.get("together")!,
     model_link: api_providers_models.get("together")!
   }],
-  ["deepInfra", {
-    models: deepInfraModels,
-    api_link: "",
-    model_link: ""
-  }],
+  // ["deepInfra", {
+  //   models: deepInfraModels,
+  //   api_link: "",
+  //   model_link: ""
+  // }],
   ["mistral", {
     models: mistralModels,
     api_link: providers_api_link.get("mistral")!,
@@ -189,11 +187,11 @@ const providers_dic = new Map<string, ProviderInfo>([
     api_link: providers_api_link.get("qwen")!,
     model_link: api_providers_models.get("qwen")!
   }],
-  ["deepseek", {
-    models: deepseekModels,
-    api_link: providers_api_link.get("deepseek")!,
-    model_link: api_providers_models.get("deepseek")!
-  }],
+  // ["deepseek", {
+  //   models: deepseekModels,
+  //   api_link: providers_api_link.get("deepseek")!,
+  //   model_link: api_providers_models.get("deepseek")!
+  // }],
   ["gemini", {
     models: geminiModels,
     api_link: providers_api_link.get("gemini")!,
@@ -209,13 +207,14 @@ const providers_dic = new Map<string, ProviderInfo>([
 
  const  providers_models = new Map<string, string[]>([
   ["groq", groqModels],
-  ["ollama", ollamaModels],
+  
   ["together", togetherModels],
-  ["deepInfra", deepInfraModels],
+  // ["deepInfra", deepInfraModels],
   ["mistral", mistralModels],
   ["openai", openaiModels],
-  ["qwen", qwenModels],
-  ["deepseek", deepseekModels],
+  // ["qwen", qwenModels],
+  ["claudie",[]],
+  // ["deepseek", deepseekModels],
   ["gemini", geminiModels],
   ["openrouter", openrouterModels],
 ]);
