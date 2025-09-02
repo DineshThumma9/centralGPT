@@ -91,9 +91,13 @@ const VisibilityTrigger = React.forwardRef<HTMLButtonElement, ButtonProps>(
         variant="ghost"
         height="calc(100% - {spacing.2})"
         aria-label="Toggle password visibility"
-        color={{ base: "brand.700", _dark: "brand.600" }}
+        color={{ base: "#374151", _dark: "#d1d5db" }}
         _hover={{
-          color: { base: "black", _dark: "gray.400" }
+          color: { base: "#111827", _dark: "#f9fafb" },
+          bg: { base: "#f3f4f6", _dark: "#374151" }
+        }}
+        _active={{
+          bg: { base: "#e5e7eb", _dark: "#4b5563" }
         }}
         {...props}
       />
