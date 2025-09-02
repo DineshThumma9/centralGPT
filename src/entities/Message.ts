@@ -34,4 +34,3 @@ const Message = z.object({
 
 export type Message = z.infer<typeof Message>;
 export type SourceDocument = z.infer<typeof SourceDocument>;
-export default Message;

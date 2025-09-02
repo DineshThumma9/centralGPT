@@ -109,6 +109,7 @@ const LLMModelChooser = () => {
                 selected={currentModel}
                 onSelect={handleModelSelection}
                 disabled={!currentLLMProvider || modelMap.length === 0}
+                allowManualInput={true}
             />
 
 

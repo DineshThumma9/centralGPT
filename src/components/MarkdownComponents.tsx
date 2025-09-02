@@ -129,14 +129,14 @@ const CodeComponent = ({
                     <CodeBlock.Title>{language}</CodeBlock.Title>
                     <CodeBlock.CopyTrigger asChild>
                         <IconButton 
-                            variant="ghost" 
+                            variant="solid"
                             size="2xs"
-                            color={{ base: "brand.700", _dark: "brand.600" }}
+                            color={{ base:  "white", _dark: "brand.600" }}
                             transition="all 0.2s ease"
                             _hover={{
-                                bg: { base: "brand.50", _dark: "brand.950" },
+                                bg: { base: "whitesmoke", _dark: "brand.950" },
                                 color: { base: "brand.800", _dark: "brand.500" },
-                                transform: "scale(1.05)"
+
                             }}
                             _active={{
                                 bg: { base: "brand.100", _dark: "brand.900" },

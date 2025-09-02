@@ -6,6 +6,7 @@ import {v4} from "uuid";
 import useSessionStore from "../store/sessionStore.ts";
 import {z} from "zod";
 import {gitFilesUpload} from "../api/rag-api.ts";
+
 import SelectOptions from "./Select.tsx";
 import {toaster} from "./ui/toaster.tsx"
 import {RiArrowRightLine} from "react-icons/ri";

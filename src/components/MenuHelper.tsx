@@ -1,8 +1,8 @@
 // src/components/MenuHelper.tsx
-import {Button, Menu, MenuPositioner, Portal} from "@chakra-ui/react";
+import {Button, Menu, MenuPositioner, Portal, Input, VStack, Text, Separator} from "@chakra-ui/react";
 import {MenuTrigger} from "./ui/menu.tsx";
 import {ChevronDownIcon} from "lucide-react";
-import {useRef, useEffect} from "react";
+import {useRef, useEffect, useState} from "react";
 
 interface Props {
     title: string
@@ -11,11 +11,13 @@ interface Props {
     onDoubleClick?: (selected: string) => void
     selected?: string
     disabled?: boolean
+    allowManualInput?: boolean // New prop to enable manual input
 }
 
 
-const MenuHelper = ({title, options, onSelect, onDoubleClick, selected, disabled}: Props) => {
+const MenuHelper = ({title, options, onSelect, onDoubleClick, selected, disabled, allowManualInput}: Props) => {
     const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [manualInput, setManualInput] = useState("");
 
     useEffect(() => {
         return () => {
@@ -46,6 +48,13 @@ const MenuHelper = ({title, options, onSelect, onDoubleClick, selected, disabled
         }
     };
 
+    const handleManualInputSubmit = () => {
+        if (manualInput.trim()) {
+            onSelect(manualInput.trim());
+            setManualInput("");
+        }
+    };
+
     return (
         <Menu.Root>
             <MenuTrigger asChild>
@@ -62,6 +71,43 @@ const MenuHelper = ({title, options, onSelect, onDoubleClick, selected, disabled
                         borderColor="border.default"
                         boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)"
                     >
+                        {allowManualInput && (
+                            <>
+                                <VStack p={3} gap={2}>
+                                    <Text fontSize="sm" color="fg.muted">
+                                        Enter custom model name:
+                                    </Text>
+                                    <Input
+                                        placeholder="e.g., gpt-4-custom"
+                                        value={manualInput}
+                                        onChange={(e) => setManualInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handleManualInputSubmit();
+                                            }
+                                        }}
+                                        size="sm"
+                                        bg="bg.canvas"
+                                        borderColor="border.default"
+                                        _focus={{
+                                            borderColor: "border.accent",
+                                            boxShadow: `0 0 0 1px token(colors.border.accent)`
+                                        }}
+                                    />
+                                    <Button 
+                                        size="xs" 
+                                        variant="solid"
+                                        colorPalette="brand"
+                                        onClick={handleManualInputSubmit}
+                                        disabled={!manualInput.trim()}
+                                        w="full"
+                                    >
+                                        Use Custom Model
+                                    </Button>
+                                </VStack>
+                                <Separator />
+                            </>
+                        )}
                         {options.map((option) => (
                             <Menu.Item
                                 value={option}

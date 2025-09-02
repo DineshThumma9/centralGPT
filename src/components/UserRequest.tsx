@@ -1,17 +1,14 @@
-import {Box, Editable, Flex, HStack, IconButton, VStack} from "@chakra-ui/react";
+import {Box, Editable, Flex, HStack, IconButton, VStack, Clipboard} from "@chakra-ui/react";
 import {type Message} from "../entities/Message.ts";
-import {Check, Copy} from "lucide-react";
-import {LuCheck, LuX} from "react-icons/lu";
-import {toaster} from "./ui/toaster.tsx";
-import {useState} from "react";
+import {LuCheck, LuX, LuCopy} from "react-icons/lu";
 import FileDisplayForUserMessage from "./FileDisplayForUserMessage.tsx";
+
 
 interface Props {
     msg: Message;
 }
 
 const UserRequest = ({msg}: Props) => {
-    const [copied, setCopied] = useState(false);
 
     const editableInput = {
         wordBreak: "break-word" as const,
@@ -42,40 +39,6 @@ const UserRequest = ({msg}: Props) => {
             transform: "scale(1.05)"
         }
     }
-
-    const actionButton = {
-        size: "sm" as const,
-        variant: "ghost" as const,
-        borderRadius: "8px",
-        transition: "all 0.2s ease",
-        color: { base: "brand.700", _dark: "brand.600" },
-        _hover: {
-            bg: { base: "brand.50", _dark: "brand.950" },
-            color: { base: "brand.800", _dark: "brand.500" },
-            transform: "scale(1.05)",
-        },
-        _active: {
-            bg: { base: "brand.100", _dark: "brand.900" },
-            color: { base: "brand.800", _dark: "brand.500" },
-            transform: "scale(0.95)",
-        }
-    }
-
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(msg.content.trimEnd());
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            toaster.create({
-                title: "Failed to copy",
-                type: "error",
-                description: String(err),
-                duration: 2000,
-            });
-        }
-    };
 
     return (
         <Flex
@@ -138,15 +101,30 @@ const UserRequest = ({msg}: Props) => {
 
             {/* Action buttons */}
             <HStack gap={2}>
-                <IconButton
-                    {...actionButton}
-                    onClick={handleCopy}
-                    aria-label="Copy message"
-                    bg={copied ? { base: "brand.100", _dark: "brand.900" } : "transparent"}
-                    color={copied ? { base: "brand.800", _dark: "brand.400" } : { base: "brand.700", _dark: "brand.600" }}
-                >
-                    {copied ? <Check size={16}/> : <Copy size={16}/>}
-                </IconButton>
+                <Clipboard.Root value={msg.content.trimEnd()}>
+                    <Clipboard.Trigger asChild>
+                        <IconButton
+                            size="xs"
+                            variant="outline"
+                            color={{ base: "#374151", _dark: "#d1d5db" }}
+                            borderColor={{ base: "#d1d5db", _dark: "#6b7280" }}
+                            bg={{ base: "white", _dark: "#1f2937" }}
+                            _hover={{ 
+                                bg: { base: "#f3f4f6", _dark: "#374151" },
+                                borderColor: { base: "#9ca3af", _dark: "#9ca3af" },
+                                color: { base: "#111827", _dark: "#f9fafb" }
+                            }}
+                            _active={{
+                                bg: { base: "#e5e7eb", _dark: "#4b5563" },
+                            }}
+                            aria-label="Copy message"
+                        >
+                            <Clipboard.Indicator copied={<LuCheck color="#22c55e" />}>
+                                <LuCopy />
+                            </Clipboard.Indicator>
+                        </IconButton>
+                    </Clipboard.Trigger>
+                </Clipboard.Root>
             </HStack>
         </Flex>
     );

@@ -60,18 +60,7 @@ export default function Sidebar({onCollapse}: SidebarProps) {
         overflowY: "auto" as const,
         flex: "1",
         pr: 1,
-        css: {
-            "&::-webkit-scrollbar": {
-                width: "4px",
-            },
-            "&::-webkit-scrollbar-track": {
-                background: "transparent",
-            },
-            "&::-webkit-scrollbar-thumb": {
-                background: "token(colors.border.default)",
-                borderRadius: "2px",
-            },
-        },
+
     };
 
     const sessionStackStyles = {

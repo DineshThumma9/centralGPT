@@ -2,7 +2,8 @@ import type {SourceDocument} from "../entities/Message.ts";
 
 import {useState} from "react";
 import {Badge, Box, Collapsible, Flex, HStack, IconButton, Text, VStack} from "@chakra-ui/react";
-import {Check, ChevronDown, ChevronUp, Copy} from "lucide-react";
+import {ChevronDown, ChevronUp} from "lucide-react";
+import { ClipboardIconButton } from "./ui/clipboard.tsx";
 
 
 const getSourcesContainer = () => ({
@@ -32,20 +33,9 @@ const getSourceItem = () => ({
 const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
     
     const [isExpanded, setIsExpanded] = useState(false);
-    const [copiedSource, setCopiedSource] = useState<string | null>(null);
 
     const sourcesContainer = getSourcesContainer();
     const sourceItem = getSourceItem();
-
-    const handleCopySource = async (text: string, docId: string) => {
-        try {
-            await navigator.clipboard.writeText(text);
-            setCopiedSource(docId);
-            setTimeout(() => setCopiedSource(null), 2000);
-        } catch (err) {
-            console.error('Copy failed:', err);
-        }
-    };
 
     if (!sources || sources.length === 0) return null;
 
@@ -105,12 +95,10 @@ const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
                                         <Text>Relevance: {(source.score * 100).toFixed(1)}%</Text>
                                     </HStack>
                                 </VStack>
-                                <IconButton
+                                <ClipboardIconButton
+                                    value={source.text}
                                     size="xs"
                                     variant="ghost"
-                                    bg={copiedSource === source.doc_id ? { base: "brand.100", _dark: "brand.900" } : "transparent"}
-                                    color={copiedSource === source.doc_id ? { base: "brand.800", _dark: "brand.400" } : { base: "brand.700", _dark: "brand.600" }}
-                                    onClick={() => handleCopySource(source.text, source.doc_id)}
                                     aria-label="Copy source text"
                                     transition="all 0.2s ease"
                                     _hover={{
@@ -122,9 +110,7 @@ const SourcesDisplay = ({sources}: { sources: SourceDocument[] }) => {
                                         bg: { base: "brand.100", _dark: "brand.900" },
                                         transform: "scale(0.95)"
                                     }}
-                                >
-                                    {copiedSource === source.doc_id ? <Check size={12}/> : <Copy size={12}/>}
-                                </IconButton>
+                                />
                             </Flex>
                             <Text fontSize="xs" color={{ base: "gray.700", _dark: "gray.300" }} lineHeight="1.4">
                                 {source.text.substring(0, 200)}

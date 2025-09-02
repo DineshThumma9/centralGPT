@@ -74,7 +74,7 @@ const InputField = ({
                 {label}
             </FieldLabel>
             <Box w="full">
-                {isPassword ? <PasswordInput  {...commonProps} /> : <Input {...commonProps} />}
+                {isPassword ? <PasswordInput  css={{bg: "transparent"}} {...commonProps} /> : <Input {...commonProps} />}
             </Box>
             {shouldShake && (
                 <FieldErrorText

@@ -36,8 +36,11 @@ const APIKey = ({provider, title, link}: Props) => {
         if (currentAPIProvider != null && apiKey != null) {
             setDialogOpen(false);
             await apiKeySelection(currentAPIProvider, apiKey);
-            setCurrentAPIKey(apiKey);
+            setCurrentAPIKey("");
+            setAPIKey(""); // Clear the local state as well
         }
+
+        
 
 
     };

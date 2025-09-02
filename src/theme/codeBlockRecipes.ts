@@ -44,9 +44,7 @@ export const codeBlockRecipes = defineSlotRecipe({
 
       opacity: 0,
       transition: "opacity 0.2s",
-
-
-      color: "white",
+      color: "yellow",
     },
     inline: {
       background: "rgba(34, 197, 94, 0.2)",

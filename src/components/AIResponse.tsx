@@ -1,6 +1,7 @@
 // src/components/AIResponse.tsx
-import {Box, Flex, HStack, IconButton, Skeleton, SkeletonText, Spinner, VStack} from "@chakra-ui/react";
-import {Check, Copy, RepeatIcon} from "lucide-react";
+import {Box, Clipboard, Flex, HStack, IconButton, Skeleton, SkeletonText, Spinner, VStack} from "@chakra-ui/react";
+import {RepeatIcon} from "lucide-react";
+import {LuCheck, LuCopy} from "react-icons/lu";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
@@ -63,11 +64,9 @@ const AIResponse = ({msg, idx}: Props) => {
     const {messages, isStreaming} = useSessionStore();
     
     const [displayed, setDisplayed] = useState(msg.content || "");
-    const [copied, setCopied] = useState(false);
     const [retry, setRetry] = useState(false);
-    const [copiedCodeBlocks, setCopiedCodeBlocks] = useState<Record<string, boolean>>({});
 
-    // Get dynamic style objects
+    
     const messageBox = getMessageBox();
 
     const actionButton = getActionButton();
@@ -86,32 +85,6 @@ const AIResponse = ({msg, idx}: Props) => {
         const sourcesRegex = /\n\n📚 \*\*Sources:\*\*\n[\s\S]*$/;
         return displayed.replace(sourcesRegex, "");
     }, [displayed]);
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(cleanContent.trimEnd());
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
-            console.error("Error has occurred", err);
-        }
-    };
-
-    const handleCodeBlockCopy = async (code: string, blockId: string) => {
-        try {
-            await navigator.clipboard.writeText(code);
-            setCopiedCodeBlocks(prev => ({...prev, [blockId]: true}));
-            setTimeout(() => {
-                setCopiedCodeBlocks(prev => {
-                    const newState = {...prev};
-                    delete newState[blockId];
-                    return newState;
-                });
-            }, 2000);
-        } catch (err) {
-            console.error('Copy failed:', err);
-        }
-    };
 
     const handleRetry = () => {
         setRetry(true);
@@ -133,11 +106,7 @@ const AIResponse = ({msg, idx}: Props) => {
         }
     }, [msg.content, displayed]);
 
-    const markdownComponents = createMarkdownComponents(
-        idx,
-        copiedCodeBlocks,
-        handleCodeBlockCopy
-    );
+    const markdownComponents = createMarkdownComponents(idx, {}, () => {});
 
     return (
         <Flex
@@ -225,17 +194,30 @@ const AIResponse = ({msg, idx}: Props) => {
 
                             {!isCurrentlyStreaming && (
                                 <HStack mt={3} gap={2}>
-                                    <IconButton
-                                        {...actionButton}
-                                        size="sm"
-                                        variant="ghost"
-                                        bg={copied ? { base: "brand.100", _dark: "brand.900" } : "transparent"}
-                                        onClick={handleCopy}
-                                        color={copied ? { base: "brand.800", _dark: "brand.400" } : { base: "brand.700", _dark: "brand.600" }}
-                                        aria-label="Copy message"
-                                    >
-                                        {copied ? <Check size={16}/> : <Copy size={16}/>}
-                                    </IconButton>
+                                    <Clipboard.Root value={cleanContent.trimEnd()}>
+                                        <Clipboard.Trigger asChild>
+                                            <IconButton
+                                                size="xs"
+                                                variant="outline"
+                                                color={{ base: "#374151", _dark: "#d1d5db" }}
+                                                borderColor={{ base: "#d1d5db", _dark: "#6b7280" }}
+                                                bg={{ base: "white", _dark: "#1f2937" }}
+                                                _hover={{ 
+                                                    bg: { base: "#f3f4f6", _dark: "#374151" },
+                                                    borderColor: { base: "#9ca3af", _dark: "#9ca3af" },
+                                                    color: { base: "#111827", _dark: "#f9fafb" }
+                                                }}
+                                                _active={{
+                                                    bg: { base: "#e5e7eb", _dark: "#4b5563" },
+                                                }}
+                                                aria-label="Copy message"
+                                            >
+                                                <Clipboard.Indicator copied={<LuCheck color="#22c55e" />}>
+                                                    <LuCopy />
+                                                </Clipboard.Indicator>
+                                            </IconButton>
+                                        </Clipboard.Trigger>
+                                    </Clipboard.Root>
 
                                     <IconButton
                                         {...actionButton}

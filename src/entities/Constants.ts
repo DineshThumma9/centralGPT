@@ -12,13 +12,6 @@ export const Constants = () => {
       "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
   ];
 
-  const deepInfraModels: string[] = [
-    "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8",
-    "meta-llama/Llama-4-Scout-17B-16E-Instruct",
-    "deepseek-ai/DeepSeek-V3",
-    "cognitivecomputations/Dolphin-2.6-Mixtral-8x7B",
-    "black-forest-labs/FLUX-pro",
-  ];
 
 const mistralModels: string[] = [
   "magistral-medium",
@@ -59,14 +52,11 @@ const mistralModels: string[] = [
     "QwQ-32B",
   ];
 
-  const deepseekModels: string[] = [
-    "deepseek-r1",
-    "deepseek-v3",
-    "deepseek-v3-0324",
-  ];
+
 
   const geminiModels: string[] = [
     "gemini-2.5-pro",
+    "models/gemini-2.5-flash-lite",
     "gemini-2.0-flash",
     "gemini-1.5-flash",
     "gemini-2.5-flash",
@@ -102,7 +92,7 @@ const mistralModels: string[] = [
   ];
   const modelsProviders: string[] = [
     "Openai",
-    "Claude",
+
     "Gemini",
    
  
@@ -212,8 +202,7 @@ const providers_dic = new Map<string, ProviderInfo>([
   // ["deepInfra", deepInfraModels],
   ["mistral", mistralModels],
   ["openai", openaiModels],
-  // ["qwen", qwenModels],
-  ["claudie",[]],
+
   // ["deepseek", deepseekModels],
   ["gemini", geminiModels],
   ["openrouter", openrouterModels],

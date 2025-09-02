@@ -80,10 +80,4 @@ export const getButtonVariant = (variant: string) => ({
   borderRadius: borderRadius.md,
 });
 
-export const getHoverStyle = () => ({
-  opacity: 0.8,
-});
 
-export const getFocusStyle = () => ({
-  outline: `2px solid ${colors.green.solid}`,
-});
