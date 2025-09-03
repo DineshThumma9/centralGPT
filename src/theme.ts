@@ -4,6 +4,7 @@ import { dialogcust } from "./theme/dialogcust";
 import { messageRecipes } from "./theme/file";
 import { editableRecipes } from "./theme/editableRecipes";
 import { codeBlockRecipes } from "./theme/codeBlockRecipes";
+import { componentRecipes } from "./theme/componentRecipes";
 
 const tokens = {
   colors: {
@@ -300,6 +301,7 @@ const config = defineConfig({
       
       codeBlock: codeBlockRecipes,
       editable: editableRecipes,
+      ...componentRecipes,
     },
     slotRecipes: {
       menuHelper: menuSlots,
