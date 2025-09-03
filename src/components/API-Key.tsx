@@ -1,6 +1,6 @@
 "use client";
-import {Button, Dialog, Field, Input, Portal, Stack, Text, Link, HStack} from "@chakra-ui/react";
-import {useRef, useState} from "react";
+import {Button, Dialog, Input, Portal, Stack, Text, Link, HStack, Field} from "@chakra-ui/react";
+import {useRef, useState, useEffect} from "react";
 import {apiKeySelection} from "../api/session-api.ts";
 import useInitStore from "../store/initStore.ts";
 import {Constants} from "../entities/Constants.ts";
@@ -17,7 +17,7 @@ const APIKey = ({provider, title, link}: Props) => {
         dialogOpen,
         setDialogOpen,
         currentAPIProvider,
-        setCurrentAPIKey,
+        currentAPIKey,
     } = useInitStore();
 
     // Get the constants to access API links
@@ -27,21 +27,41 @@ const APIKey = ({provider, title, link}: Props) => {
     const ref = useRef<HTMLInputElement>(null);
     const [apiKey, setAPIKey] = useState("");
 
+    // Sync local state with global state when dialog opens
+    useEffect(() => {
+        if (dialogOpen && currentAPIKey) {
+            setAPIKey(currentAPIKey);
+        }
+    }, [dialogOpen, currentAPIKey]);
 
-    const handleDialogChange = ({open}: { open: boolean }) =>
+
+    const handleDialogChange = ({open}: { open: boolean }) => {
         setDialogOpen(open);
+        
+        // Clear local state when dialog closes
+        if (!open) {
+            setAPIKey("");
+        }
+    };
 
     const handleApiKeySelect = async () => {
-
-        if (currentAPIProvider != null && apiKey != null) {
-            setDialogOpen(false);
-            await apiKeySelection(currentAPIProvider, apiKey);
-
+        // Validation
+        if (!currentAPIProvider) {
+            return;
         }
 
-        
+        if (!apiKey || apiKey.trim() === "") {
+            return;
+        }
 
-
+        try {
+            await apiKeySelection(currentAPIProvider, apiKey);
+            setDialogOpen(false);
+            setAPIKey(""); // Clear local state
+            
+        } catch (error) {
+            console.error("Error in handleApiKeySelect:", error);
+        }
     };
 
     return (

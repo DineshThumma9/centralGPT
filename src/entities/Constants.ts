@@ -64,31 +64,26 @@ const mistralModels: string[] = [
   ];
 
   const groqModels: string[] = [
-    "qwen-qwq-32b",
-    "compound-beta",
-    "gemma2-9b-it",
-    "compound-beta-mini",
-      "openai/gpt-oss-20b",
-      "openai/gpt-oss-120b",
-    "llama3-70b-8192",
-    "llama-3.1-8b-instant",
-    "meta-llama/Llama-Guard-4-12",
-  ];
+  "llama-3.1-8b-instant",
+  "llama-3.3-70b-versatile",
+  "meta-llama/llama-guard-4-12b",
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-20b"
+];
+
 
   const openrouterModels: string[] = [
-    "meta-llama/llama-4-maverick",
-    "meta-llama/llama-4-scout",
-    "moonshotai/kimi-vl-a3b-thinking",
-    "nvidia/llama-3.1-nemotron-nano-8b-v1",
-    "google/gemini-2.5-pro-exp-03-25",
-    "mistralai/mistral-small-3.1-24b-instruct",
-    "openrouter/optimus-alpha",
-    "openrouter/quasar-alpha",
-    "deepseek/deepseek-v3-base",
-    "qwen/qwen2.5-vl-3b-instruct",
-    "deepseek/deepseek-chat-v3-0324",
-    "deepseek/deepseek-r1-zero",
-    "nousresearch/deephermes-3-llama-3-8b-preview",
+     "deepseek/deepseek-chat-v3.1:free",
+     "openai/gpt-oss-20b:free",
+     "openai/gpt-oss-120b:free",
+     "z-ai/glm-4.5-air:free",
+     "qwen/qwen3-coder:free",
+     "google/gemma-3n-e2b-it:free",
+     "mistralai/mistral-small-3.2-24b-instruct:free",
+     "deepseek/deepseek-r1-0528:free",
+"moonshotai/kimi-k2:free"
+
+
   ];
   const modelsProviders: string[] = [
     "Openai",

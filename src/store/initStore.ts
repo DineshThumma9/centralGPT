@@ -45,8 +45,12 @@ export const useInitStore = create<InitState>()(
             setDialogOpen: (open) => set({dialogOpen: open}),
             setEmail: (email: string) => set({email}),
             setUsername: (username: string) => set({username}),
-            setCurrentAPIProvider: (provider) => set({currentAPIProvider: provider}),
-            setCurrentAPIKey: (key) => set({currentAPIKey: key}),
+            setCurrentAPIProvider: (provider) => {
+                set({currentAPIProvider: provider});
+            },
+            setCurrentAPIKey: (key) => {
+                set({currentAPIKey: key});
+            },
             clearInit:()=>set({
                 currentAPIKey:'',
                 currentModel:'',

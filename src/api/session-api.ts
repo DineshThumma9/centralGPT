@@ -11,13 +11,20 @@ export const apiKeySelection = async (api_prov: string, api_key: string) => {
         "api_key": api_key
     };
 
-
-    const res = await setupAPI.post("/init/", data, {
-        headers: {"Content-Type": "application/json"}
-    });
-
-    console.log(res.data);
-    useInitStore.getState().setCurrentAPIProvider(api_prov);
+    try {
+        const res = await setupAPI.post("/init/", data, {
+            headers: {"Content-Type": "application/json"}
+        });
+        
+        // Update the store with both API provider and API key
+        useInitStore.getState().setCurrentAPIProvider(api_prov);
+        useInitStore.getState().setCurrentAPIKey(api_key);
+        
+        return res.data;
+    } catch (error) {
+        console.error("API error in apiKeySelection:", error);
+        throw error;
+    }
 };
 
 export const llmSelection = async (llm_class: string) => {
