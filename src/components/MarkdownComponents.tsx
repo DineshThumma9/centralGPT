@@ -19,7 +19,6 @@ import {
 import React from "react";
 import type {Components} from "react-markdown";
 import type {HighlighterGeneric} from "shiki";
-import {borderRadius, colors, spacing, typography} from "../theme/styleDefinitions";
 
 interface CodeComponentProps {
     node?: unknown;
@@ -49,14 +48,14 @@ const shikiAdapter = createShikiAdapter<HighlighterGeneric<any, any>>({
                 "typescript",
                 "c",
                 "c++",
+                "yml",
+                "yaml",
+                "shellscript",
+                "shell",
+                "jsx",
+                "json",
                 "dotenv",
                 "docker",
-                "yaml",
-                "angular-ts",
-                "jsx",
-                 "md",
-                "shellscript",
-                'cmake',
                 "powershell"
             ],
             themes: ["github-dark", "github-light"]
@@ -106,7 +105,7 @@ const CodeComponent = ({
                 color={"fg"}
                 px={2}
                 py={1}
-                borderRadius={borderRadius.sm}
+                borderRadius="sm"
                 fontFamily="ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace"
                 fontSize="14px"
                 whiteSpace="normal"
@@ -134,7 +133,7 @@ const CodeComponent = ({
                 <CodeBlock.Header>
                     <CodeBlock.Title>{language}</CodeBlock.Title>
                     <CodeBlock.CopyTrigger asChild>
-                        <IconButton 
+                        <IconButton
                             variant="solid"
                             size="2xs"
                             color={{ base:  "white", _dark: "brand.600" }}
@@ -263,7 +262,7 @@ export const createMarkdownComponents = (
     blockquote: ({children}) => (
         <Blockquote.Root
             bg={"bg.muted"}
-            borderRadius={borderRadius.md}
+            borderRadius="md"
             color={"fg.subtle"}
             my={4}
             pl={4}
@@ -332,9 +331,9 @@ export const createMarkdownComponents = (
     table: ({children}) => (
         <Table.Root
             size="sm"
-            my={spacing.lg}
+            my="lg"
             css={{
-                borderRadius: borderRadius.md,
+                borderRadius: "md",
                 overflow: "hidden",
                 border: "1px solid",
                 borderColor: "border.subtle",
@@ -349,9 +348,9 @@ export const createMarkdownComponents = (
     caption: ({children}) => (
         <Table.Caption
             color={"fg.subtle"}
-            fontSize={typography.fontSize.sm}
+            fontSize="sm"
             textAlign="left"
-            p={spacing.sm}
+            p="sm"
             bg={"bg.muted"}
         >
             {children}
@@ -368,17 +367,17 @@ export const createMarkdownComponents = (
 //   </Mark>
 // ),
     dl: ({children}) => (
-        <DataList.Root my={spacing.md}>
+        <DataList.Root my="md">
             {children}
         </DataList.Root>
     ),
     dt: ({children}) => (
-        <DataList.ItemLabel color={"fg.subtle"} fontWeight={typography.fontWeight.bold}>
+        <DataList.ItemLabel color={"fg.subtle"} fontWeight="bold">
             {children}
         </DataList.ItemLabel>
     ),
     dd: ({children}) => (
-        <DataList.ItemValue color={"colorPalette.500"} mb={spacing.sm}>
+        <DataList.ItemValue color={"colorPalette.500"} mb="sm">
             {children}
         </DataList.ItemValue>
     ),
@@ -387,7 +386,7 @@ export const createMarkdownComponents = (
         <Table.Header
             bg={"bg.muted"}
             color={"fg.subtle"}
-            fontWeight={typography.fontWeight.bold}
+            fontWeight="bold"
         >
             {children}
         </Table.Header>
@@ -425,10 +424,10 @@ export const createMarkdownComponents = (
     th: ({children}) => (
         <Table.ColumnHeader
             color={"fg.subtle"}
-            fontWeight={typography.fontWeight.bold}
+            fontWeight="bold"
             borderBottom="2px solid"
             borderColor={"colorPalette.500"}
-            p={spacing.md}
+            p="md"
             textAlign="left"
         >
             {children}
@@ -440,7 +439,7 @@ export const createMarkdownComponents = (
             color={"fg"}
             borderBottom="1px solid"
             borderColor={"border.subtle"}
-            p={spacing.md}
+            p="md"
         >
             {children}
         </Table.Cell>
