@@ -15,7 +15,7 @@ export const apiKeySelection = async (api_prov: string, api_key: string) => {
         const res = await setupAPI.post("/init/", data, {
             headers: {"Content-Type": "application/json"}
         });
-        
+
         // Update the store with both API provider and API key
         useInitStore.getState().setCurrentAPIProvider(api_prov);
         useInitStore.getState().setCurrentAPIKey(api_key);

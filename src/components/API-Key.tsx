@@ -1,5 +1,5 @@
 "use client";
-import {Button, Dialog, Input, Portal, Stack, Text, Link, HStack, Field} from "@chakra-ui/react";
+import {Button, Dialog, Field, Input, Portal, Stack, Text, Link, HStack} from "@chakra-ui/react";
 import {useRef, useState, useEffect} from "react";
 import {apiKeySelection} from "../api/session-api.ts";
 import useInitStore from "../store/initStore.ts";
@@ -56,6 +56,7 @@ const APIKey = ({provider, title, link}: Props) => {
 
         try {
             await apiKeySelection(currentAPIProvider, apiKey);
+            
             setDialogOpen(false);
             setAPIKey(""); // Clear local state
             
