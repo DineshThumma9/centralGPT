@@ -12,7 +12,7 @@ export const apiKeySelection = async (api_prov: string, api_key: string) => {
     };
 
     try {
-        const res = await setupAPI.post("/init/", data, {
+        const res = await setupAPI.post("/init", data, {
             headers: {"Content-Type": "application/json"}
         });
 
